@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Planner Pro</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <a href="#">Travel Planner Pro ✈️</a>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="#">หน้าแรก</a></li>
+                    <li><a href="#">แผนการเดินทางของฉัน</a></li>
+                    <li><a href="#" class="btn-create">สร้างแผนใหม่</a></li>
+                    <li><a href="#" class="btn-login">เข้าสู่ระบบ</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <h1>วางแผนทริปในฝันร่วมกับเพื่อน ๆ ของคุณ</h1>
+                <p>สร้างแผนการเดินทางที่สมบูรณ์แบบและจัดการทุกอย่างได้ในที่เดียว</p>
+                <a href="#" class="btn btn-primary">เริ่มสร้างแผน</a>
+            </div>
+        </section>
+
+        <section class="features">
+            <div class="container">
+                <div class="feature-item">
+                    <div class="icon">💻</div>
+                    <h3>วางแผนร่วมกันแบบเรียลไทม์</h3>
+                    <p>ทุกคนในกลุ่มสามารถแก้ไขและดูการเปลี่ยนแปลงได้พร้อมกัน</p>
+                </div>
+                <div class="feature-item">
+                    <div class="icon">🗳️</div>
+                    <h3>โหวตสถานที่</h3>
+                    <p>ให้ทุกคนมีส่วนร่วมในการตัดสินใจเลือกสถานที่ที่อยากไป</p>
+                </div>
+                <div class="feature-item">
+                    <div class="icon">💰</div>
+                    <h3>จัดการงบประมาณ</h3>
+                    <p>ติดตามค่าใช้จ่ายและแบ่งปันกันอย่างโปร่งใส</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Travel Planner Pro. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+</body>
+<style>
+/* Basic Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Prompt', sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f4f7f6;
+}
+
+.container {
+    margin: 0 auto;
+    padding: 0 20px; /* เพิ่ม padding ให้ดูโปร่งขึ้น */
+}
+
+/* Header */
+.header {
+    background: #fff;
+    padding: 1rem 0;
+    border-bottom: 1px solid #eee;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    top: 0;
+    z-index: 1000;
+}
+
+.header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 60px;
+}
+
+/* Logo */
+.logo a {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #007bff;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.logo a:hover {
+    color: #0056b3;
+}
+
+/* Navigation */
+.main-nav ul {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+    align-items: center;
+}
+
+.main-nav a {
+    text-decoration: none;
+    color: #444;
+    font-weight: 500;
+    position: relative;
+    padding: 6px 0;
+    transition: color 0.3s ease;
+}
+
+/* Hover effect เส้นใต้ */
+.main-nav a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    width: 0%;
+    height: 2px;
+    background: #007bff;
+    transition: width 0.3s ease;
+}
+
+.main-nav a:hover {
+    color: #007bff;
+}
+
+.main-nav a:hover::after {
+    width: 100%;
+}
+
+/* ปุ่ม */
+.btn-create, .btn-login {
+    display: inline-block;
+    padding: 6px 18px !important;   /* เพิ่มความสูง/กว้าง */
+    border-radius: 8px;   /* มุมโค้งมนขึ้น */
+    font-size: 1rem;      /* ตัวอักษรใหญ่ขึ้นนิด */
+    font-weight: 600;     /* ทำให้ตัวหนาชัดเจน */
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;      /* เพิ่ม cursor แบบปุ่ม */
+}
+
+/* ปุ่มสร้างแผนใหม่ */
+.btn-create {
+    background-color: #f1f3f5;
+    color: #333;
+}
+
+.btn-create:hover {
+    background-color: #e2e6ea;
+}
+
+/* ปุ่มเข้าสู่ระบบ */
+.btn-login {
+    background-color: #007bff;
+    color: #fff !important;
+    box-shadow: 0 3px 6px rgba(0, 123, 255, 0.25); /* เพิ่มเงาเบาๆ */
+}
+
+.btn-login:hover {
+    background-color: #0056b3;
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.35);
+}
+
+/* Hero Section */
+.hero {
+    background: url('https://images.unsplash.com/photo-1473186578172-c141e6798cf4?q=80&w=1073&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') no-repeat center center/cover;
+    height: 75vh; /* ลดลงเล็กน้อยให้พอดีกับ desktop */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: #fff;
+    position: relative;
+    box-shadow: 0 8px 15px 9px rgba(74, 74, 74, 0.25); /* เพิ่มเงาเบาๆ */
+    z-index: 1;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: -1;
+}
+
+.hero-content h1 {
+    font-size: 3.2rem;
+    margin-bottom: 1rem;
+}
+
+.hero-content p {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+.btn {
+    padding: 12px 28px;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 700;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+/* Features Section */
+.features {
+    padding: 60px 0;
+    text-align: center;
+}
+
+.features .container {
+    max-width: 1200px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+.feature-item {
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+}
+
+.feature-item .icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+}
+
+/* Footer */
+.footer {
+    background: #333;
+    color: #fff;
+    text-align: center;
+    padding: 20px 0;
+}
+
+</style>
+</html>

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เข้าสู่ระบบ - Travel Planner Pro</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <main class="login-page">
+        <div class="login-card">
+            <div class="logo">
+                <h1>Travel Planner Pro ✈️</h1>
+            </div>
+            <h2>เข้าสู่ระบบ</h2>
+
+            <form class="login-form">
+                <div class="form-group">
+                    <label for="email">อีเมล</label>
+                    <input type="email" id="email" name="email" placeholder="ชื่ออีเมลของคุณ" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">รหัสผ่าน</label>
+                    <input type="password" id="password" name="password" placeholder="รหัสผ่าน" required>
+                </div>
+                <div class="forgot-password">
+                    <a href="#">ลืมรหัสผ่าน?</a>
+                </div>
+                <button type="submit" class="btn btn-primary">เข้าสู่ระบบ</button>
+            </form>
+
+            <div class="divider">หรือเข้าสู่ระบบด้วย</div>
+
+            <div class="social-login">
+                <button class="btn btn-social btn-google">
+                    <img src="https://img.icons8.com/color/16/000000/google-logo.png" alt="Google icon">
+                    Google
+                </button>
+                <button class="btn btn-social btn-facebook">
+                    <img src="https://img.icons8.com/color/16/000000/facebook-new.png" alt="Facebook icon">
+                    Facebook
+                </button>
+            </div>
+
+            <div class="signup-link">
+                ยังไม่มีบัญชีใช่ไหม? <a href="#">สมัครสมาชิก</a>
+            </div>
+        </div>
+    </main>
+
+</body>
+<style>
+    /* เพิ่มส่วนของ Login Page ต่อจากโค้ดเดิม */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Prompt', sans-serif;
+}
+
+.login-page {
+    display: flex;
+    min-height: 100vh;
+    background: url('https://images.unsplash.com/photo-1473186578172-c141e6798cf4?q=80&w=1073&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') no-repeat center center/cover;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-card {
+    background: #fff;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 450px;
+    margin-left: 60%;
+    text-align: center;
+}
+
+.login-card .logo {
+    margin-bottom: 20px;
+}
+
+.login-card .logo h1 {
+    font-size: 1.8rem;
+    color: #007bff;
+}
+
+.login-card h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 25px;
+    color: #333;
+}
+
+.login-form .form-group {
+    text-align: left;
+    margin-bottom: 15px;
+}
+
+.login-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 100;
+}
+
+.login-form input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.login-form input:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+.forgot-password {
+    text-align: right;
+    margin-bottom: 20px;
+}
+
+.forgot-password a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.divider {
+    margin: 25px 0;
+    font-size: 0.9rem;
+    color: #888;
+    position: relative;
+}
+
+.divider::before, .divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 40%;
+    height: 1px;
+    background-color: #ddd;
+}
+
+.divider::before {
+    left: 0;
+}
+
+.divider::after {
+    right: 0;
+}
+
+.social-login {
+    display: flex;
+    gap: 15px;
+}
+
+.btn-social {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 1rem;
+}
+
+.btn-google {
+    border-color: #db4437;
+    color: #db4437;
+}
+
+.btn-facebook {
+    border-color: #4267b2;
+    color: #4267b2;
+}
+
+.signup-link {
+    margin-top: 25px;
+}
+
+.signup-link a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 700;
+}
+</style>
+</html>

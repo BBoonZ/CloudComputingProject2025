@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>สมัครสมาชิก - Travel Planner Pro</title>
-    <link rel="stylesheet" href="style.css">
+    <title>เข้าสู่ระบบ - Travel Planner Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -12,15 +11,11 @@
     <main class="login-page">
         <div class="login-card">
             <div class="logo">
-                <h1>Travel Planner Pro ✈️</h1>
+                <a href="homepage.html"><h1>Travel Planner Pro ✈️</h1></a>
             </div>
-            <h2>สมัครสมาชิก</h2>
+            <h2>เข้าสู่ระบบ</h2>
 
             <form class="login-form">
-                <div class="form-group">
-                    <label for="username">ชื่อผู้ใช้งาน</label>
-                    <input type="text" id="username" name="username" placeholder="ชื่อผู้ใช้งาน" required>
-                </div>
                 <div class="form-group">
                     <label for="email">อีเมล</label>
                     <input type="email" id="email" name="email" placeholder="ชื่ออีเมลของคุณ" required>
@@ -30,19 +25,32 @@
                     <input type="password" id="password" name="password" placeholder="รหัสผ่าน" required>
                 </div>
                 <div class="forgot-password">
+                    <a href="#">ลืมรหัสผ่าน?</a>
                 </div>
-                <button type="submit" class="btn btn-primary">สร้างบัญชี</button>
+                <button type="submit" class="btn btn-primary">เข้าสู่ระบบ</button>
             </form>
 
+            <div class="divider">หรือเข้าสู่ระบบด้วย</div>
+
+            <div class="social-login">
+                <button class="btn btn-social btn-google">
+                    <img src="https://img.icons8.com/color/16/000000/google-logo.png" alt="Google icon">
+                    Google
+                </button>
+                <button class="btn btn-social btn-facebook">
+                    <img src="https://img.icons8.com/color/16/000000/facebook-new.png" alt="Facebook icon">
+                    Facebook
+                </button>
+            </div>
+
             <div class="signup-link">
-                มีบัญชีอยู่แล้วใช่ไหม? <a href="#">เข้าสู่ระบบ</a>
+                ยังไม่มีบัญชีใช่ไหม? <a href="signin.html">สมัครสมาชิก</a>
             </div>
         </div>
     </main>
 
 </body>
 <style>
-    /* เพิ่มส่วนของ Login Page ต่อจากโค้ดเดิม */
 * {
     margin: 0;
     padding: 0;
@@ -51,6 +59,9 @@
 
 body {
     font-family: 'Prompt', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 .login-page {
@@ -74,6 +85,10 @@ body {
 
 .login-card .logo {
     margin-bottom: 20px;
+}
+
+.login-card .logo a{
+    text-decoration: none;
 }
 
 .login-card .logo h1 {

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>จัดการแผนการท่องเที่ยวของฉัน - Travel Planner Pro</title>
+    <link rel="stylesheet" href="static/css/main-nav.css">
+    <link rel="stylesheet" href="static/css/tripManage.css">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body>
+    <header class="header dashboard-header">
+        <div class="container">
+            <div class="logo">
+                <a href="tripMain.html">Travel Planner Pro ✈️</a>
+            </div>
+            <button class="btn-back" onclick="history.back()">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+        </div>
+    </header>
+
+    <main class="trip-main">
+        <h1 class="page-title">ทริปการท่องเที่ยวของฉัน</h1>
+
+        <!-- สรุปข้อมูล -->
+        <div class="trip-summary">
+            <div class="summary-card">
+                <h3>🌍 สถานที่ที่ไปแล้ว</h3>
+                <p>20 แห่ง</p>
+            </div>
+            <div class="summary-card">
+                <h3>💸 งบที่ใช้ไป</h3>
+                <p>45,000 บาท</p>
+            </div>
+            <div class="summary-card">
+                <h3>🧳 จำนวนทริป</h3>
+                <p>5 ทริป</p>
+            </div>
+            <div class="summary-card">
+                <h3>⏳ รวมระยะเวลา</h3>
+                <p>18 วัน</p>
+            </div>
+        </div>
+
+        <!-- รายการทริป -->
+        <div class="trip-list">
+            <div class="trip-card">
+                <div class="trip-image" style="background-image: url('https://picsum.photos/id/1015/400/300');"></div>
+                <div class="trip-content">
+                    <div class="trip-title">ทริปตะลุยเชียงใหม่</div>
+                    <div class="trip-date">1 - 4 ธันวาคม 2567</div>
+                    <div class="trip-meta">ไปมาแล้ว 12 แห่ง · ใช้ไป 15,000 บาท</div>
+                    <div class="trip-actions">
+                        <button class="btn btn-edit" onclick="window.location.href='tripPlan.html'"><i class="fas fa-edit"></i> จัดการ</button>
+                        <button class="btn btn-delete"><i class="fas fa-trash"></i> ลบ</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="trip-card">
+                <div class="trip-image" style="background-image: url('https://picsum.photos/id/1025/400/300');"></div>
+                <div class="trip-content">
+                    <div class="trip-title">เที่ยวทะเลภูเก็ต</div>
+                    <div class="trip-date">15 - 18 มกราคม 2568</div>
+                    <div class="trip-meta">ไปมาแล้ว 8 แห่ง · ใช้ไป 12,000 บาท</div>
+                    <div class="trip-actions">
+                        <button class="btn btn-edit" onclick="window.location.href='tripPlan.html'"><i class="fas fa-edit"></i> จัดการ</button>
+                        <button class="btn btn-delete"><i class="fas fa-trash"></i> ลบ</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="trip-card">
+                <div class="trip-image" style="background-image: url('https://picsum.photos/id/1015/400/300');"></div>
+                <div class="trip-content">
+                    <div class="trip-title">ทริปตะลุยเชียงใหม่</div>
+                    <div class="trip-date">1 - 4 ธันวาคม 2567</div>
+                    <div class="trip-meta">ไปมาแล้ว 12 แห่ง · ใช้ไป 15,000 บาท</div>
+                    <div class="trip-actions">
+                        <button class="btn btn-edit" onclick="window.location.href='tripPlan.html'"><i class="fas fa-edit"></i> จัดการ</button>
+                        <button class="btn btn-delete"><i class="fas fa-trash"></i> ลบ</button>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </main>
+
+
+</body>
+
+</html>

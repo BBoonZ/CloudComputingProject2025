@@ -397,6 +397,7 @@
 
 .modal-content input,
 .modal-content textarea,
+.modal-content select,
 .modal-content input[type="date"] {
     width: 100%;
     padding: 10px;
@@ -643,6 +644,7 @@
     gap: 10px;
     margin-top: 5px;
 }
+
 
 /* Animation */
 @keyframes fadeIn {

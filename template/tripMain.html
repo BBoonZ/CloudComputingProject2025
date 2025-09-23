@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="static/css/tripMain.css">
     <link rel="stylesheet" href="static/css/popup.css">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
@@ -92,7 +93,7 @@
         <div class="modal-content">
             <div class="modal-main">
                 <h2>สร้างแผนการเดินทาง</h2>
-                <span class="close" id="closeModal" onclick="document.getElementById('createPlan').style.display='none';">&times;</span>
+                <span class="close" id="closeModal" onclick="document.getElementById('createPlan').style.display='none'; document.getElementById('preview').style.display='none';">&times;</span>
             </div>
             <form>
                 <label for="tripText">ชื่อทริป *</label>
@@ -103,7 +104,14 @@
 
                 <label for="tripDate">เลือกวันทริป *</label>
                 <input id="tripRange" placeholder="เลือกวันที่เริ่มต้น - สิ้นสุด" required>
-                
+
+                <label for="tripBudget">งบประมาณ</label>
+                <input id="tripBudget" placeholder="งบประมาณ...">
+
+                <label for="tripPic">รูปปกทริป</label>
+                <input type="file" id="tripPic" accept="image/*" onchange="previewImage(event)">
+                <img id="preview" style="max-width: 150px; display:none; padding: 10px;">
+
                 <div style="display: flex;">
                     <button type="submit" class="btn-save-edit">ยืนยัน</button>
                 </div>
@@ -111,5 +119,7 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="static/javascript/tripMain.js"></script>
 </body>
 </html>

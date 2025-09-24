@@ -21,9 +21,9 @@
             </div>
             <nav class="main-nav">
                 <ul>
-                    <li><a href="#">แผนการเดินทางของฉัน</a></li>
-                    <li><a href="#">การตั้งค่า</a></li>
-                    <img src="https://img.poki-cdn.com/cdn-cgi/image/q=78,scq=50,width=1200,height=1200,fit=cover,f=png/5f8d164d8269cffacc89422054b94c70/roblox.png" alt="User Profile" class="profile-pic">
+                    <li><a href="tripMain.html">หน้าหลัก</a></li>
+                    <li><a href="tripManage.html">แผนการเดินทางของฉัน</a></li>
+                    <img src="https://img.poki-cdn.com/cdn-cgi/image/q=78,scq=50,width=1200,height=1200,fit=cover,f=png/5f8d164d8269cffacc89422054b94c70/roblox.png" alt="User Profile" class="profile-pic" onclick="window.location.href='user.html'">
                 </ul>
             </nav>
         </div>
@@ -35,8 +35,8 @@
                 <h1>ทริปตะลุยเชียงใหม่ 4 วัน 3 คืน</h1>
                 <div class="plan-meta">
                     <span class="plan-dates">1 - 4 ธันวาคม 2567</span>
-                    <button class="btn btn-save" id="openEdit"><i class="fas fa-edit"></i> แก้ไข</button>
-                    <button class="btn btn-share" id="openShare"><i class="fas fa-share-alt"></i> แชร์</button>
+                    <button class="btn btn-save" id="openEdit" onclick="document.getElementById('iframeEditModal').style.display='flex'"><i class="fas fa-edit"></i> แก้ไข</button>
+                    <button class="btn btn-share" id="openShare" onclick="document.getElementById('iframeShareModal').style.display='flex'"><i class="fas fa-share-alt"></i> แชร์</button>
                 </div>
             </div>
             <div class="info">
@@ -320,6 +320,14 @@
                 </div>
             </form>
         </div>
+    </div>
+
+    <div class="iframe-wrapper" id="iframeEditModal" style="display:none;">
+        <iframe id="editFrame" class="iframe-edit" src="popup-editTripPlan.html"></iframe>
+    </div>
+
+    <div class="iframe-wrapper" id="iframeShareModal" style="display:none;">
+        <iframe id="iframe-share" class="iframe-share" src="popup-shareTrip.html"></iframe>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>

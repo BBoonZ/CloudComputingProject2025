@@ -84,6 +84,7 @@
     min-width: 32px;
     border-radius: 50%;
     overflow: hidden;
+    cursor: pointer;
 }
 
 .btn-back {

@@ -158,8 +158,8 @@
                 <input type="text" id="memberName" name="memberName" placeholder="ชื่อสมาชิก" required>
 
                 <label for="memberPic">รูปสมาชิก</label>
-                <input type="file" id="memberPic" accept="image/*" onchange="previewImage(event)">
-                <img id="preview" style="max-width: 150px; display:none; padding: 10px;">
+                <input type="file" id="memberPic" accept="image/*" onchange="previewImage2(event)">
+                <img id="preview2" style="max-width: 150px; display:none; padding: 10px;">
 
                 <div style="display: flex; margin-top: 10px;">
                     <div style="margin-left: auto;">
@@ -191,7 +191,17 @@
               preview.src = URL.createObjectURL(file);
               preview.style.display = "block";
             }
-          }
+        }
+
+        function previewImage2(event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById('preview2');
+            
+            if (file) {
+              preview.src = URL.createObjectURL(file);
+              preview.style.display = "block";
+            }
+        }
     </script>
 </body>
 </html>

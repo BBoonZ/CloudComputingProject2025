@@ -4,7 +4,7 @@ frontend:
     build:
       commands: []
   artifacts:
-    baseDirectory: /template
+    baseDirectory: template
     files:
       - '**/*'
   cache:

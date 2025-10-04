@@ -82,6 +82,43 @@
 
                     <div class="budget-details">
                         <div class="details-header">
+                            <h2>จำนวนเงินที่จ่ายไปทั้งหมด</h2>
+                        </div>
+
+                        <table class="expense-table">
+                            <thead>
+                                <tr>
+                                    <th>รายชื่อ</th>
+                                    <th>จำนวนเงินที่จ่ายไปทั้งหมด</th>
+                                    <th>จำนวนเงินที่ควรจ่าย</th>
+                                    <th>ควรได้รับคืน / ยังต้องจ่ายเพิ่ม (เลือกมาอย่างเดียวนะ)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expense-body">
+                                <tr>
+                                    <td>Jane Doe</td>
+                                    <td>5,000 B</td>
+                                    <td>1,200 B</td>
+                                    <td class="td1">3,200 B</td>
+                                </tr>
+                                <tr>
+                                    <td>John Smith</td>
+                                    <td>3,000 B</td>
+                                    <td>1,200 B</td>
+                                    <td class="td1">1,800 B</td>
+                                </tr>
+                                <tr>
+                                    <td>สมใจ</td>
+                                    <td>500 B</td>
+                                    <td>1,200 B</td>
+                                    <td class="td2">700 B</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="budget-details">
+                        <div class="details-header">
                             <h2>รายการค่าใช้จ่าย</h2>
                             <button class="btn btn-add-expense" onclick="document.getElementById('addBudgetModal').style.display='flex'">
                                 <i class="fas fa-plus" ></i> เพิ่มค่าใช้จ่าย

@@ -45,6 +45,7 @@
     padding: 30px;
     border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    margin-bottom: 30px;
 }
 
 .details-header {
@@ -133,6 +134,15 @@
     border: none;
     border-radius: 10px;
     animation: fadeIn 0.3s ease;
+}
+
+.td1 {
+    color: #28a745;
+}
+
+.td2 {
+    color: #dc3545;
+ 
 }
 
 /* Responsive design */

@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>แผนการเดินทาง - Travel Planner Pro</title>
     <link rel="stylesheet" href="static/css/tripPlan.css">
+    <link rel="stylesheet" href="static/css/tripBudget.css">
     <link rel="stylesheet" href="static/css/main-nav.css">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -18,7 +19,7 @@
             <div class="logo">
                 <a href="tripMain.html">Travel Planner Pro ✈️</a>
             </div>
-            <button class="btn-back" onclick="history.back()">
+            <button class="btn-back" onclick="window.location.href='tripMain.html'">
                 <i class="fas fa-arrow-left"></i>
             </button>
         </div>
@@ -45,14 +46,8 @@
                     <div class="sidebar-item active">
                         <i class="fas fa-calendar-alt"></i> กำหนดการเดินทาง
                     </div>
-                    <div class="sidebar-item">
+                    <div class="sidebar-item" onclick="window.location.href='tripBudgetInfo.html'">
                         <i class="fas fa-wallet"></i> งบประมาณ
-                    </div>
-                    <div class="sidebar-item">
-                        <i class="fas fa-users"></i> สมาชิก & แชท
-                    </div>
-                    <div class="sidebar-item">
-                        <i class="fas fa-file-alt"></i> เอกสาร
                     </div>
                 </aside>
 
@@ -125,7 +120,7 @@
             </div>
         </div>
     </main>
-    <style>
+    <!-- <style>
         .btn-back {
             background: white;
             color: #007bff;
@@ -141,7 +136,7 @@
         .btn-back:hover {
             background: #e6f0ff;
         }
-    </style>
+    </style> -->
 </body>
 
 </html>

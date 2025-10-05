@@ -1,0 +1,10 @@
+aws_access_key = ""
+aws_secret_key = ""
+aws_session_token = ""
+
+github_token = ""
+
+key_name = ""
+
+!  จะใช้สร้างไฟล์ใหม่แล้วลบ .example ออกด้วยนะจัฟ !
+

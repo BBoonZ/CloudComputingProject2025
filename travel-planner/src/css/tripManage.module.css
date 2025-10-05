@@ -1,5 +1,5 @@
 /* สรุปข้อมูล */
-.trip-summary {
+.tripSummary {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 20px;
@@ -7,7 +7,7 @@
     margin: 0 auto 40px auto;
   }
   
-  .summary-card {
+  .summaryCard {
     background: #fff;
     border-radius: 16px;
     padding: 20px;
@@ -16,38 +16,38 @@
     transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
   
-  .summary-card:hover {
+  .summaryCard:hover {
     transform: translateY(-5px);
     box-shadow: 0 12px 25px rgba(0,0,0,0.12);
   }
   
-  .summary-card h3 {
+  .summaryCard h3 {
     font-size: 1rem;
     color: #6b7280;
     margin-bottom: 8px;
   }
   
-  .summary-card p {
+  .summaryCard p {
     font-size: 1.5rem;
     font-weight: 700;
     color: #111827;
   }
   
-  /* trip-meta (แสดงใน card ย่อย) */
-  .trip-meta {
+  /* tripMeta (แสดงใน card ย่อย) */
+  .tripMeta {
     font-size: 0.9rem;
     color: #4b5563;
     margin-bottom: 10px;
   }
   
 /* พื้นหลังหลัก */
-.trip-main {
+.tripMain {
     padding: 50px 20px;
     font-family: 'Prompt', sans-serif;
 }
 
 /* Title */
-.page-title {
+.pageTitle {
     font-size: 2rem;
     font-weight: 700;
     text-align: center;
@@ -59,7 +59,7 @@
 }
 
 /* List */
-.trip-list {
+.tripList {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     gap: 25px;
@@ -68,7 +68,7 @@
 }
 
 /* Card */
-.trip-card {
+.tripCard {
     background: #fff;
     border-radius: 20px;
     overflow: hidden;
@@ -78,13 +78,13 @@
     flex-direction: column;
 }
 
-.trip-card:hover {
+.tripCard:hover {
     transform: translateY(-10px);
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
 }
 
 /* Image */
-.trip-image {
+.tripImage {
     width: 100%;
     height: 200px;
     background-size: cover;
@@ -92,26 +92,26 @@
 }
 
 /* Content */
-.trip-content {
+.tripContent {
     padding: 20px;
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
 
-.trip-title {
+.tripTitle {
     font-size: 1.3rem;
     font-weight: 600;
     color: #111827;
 }
 
-.trip-date {
+.tripDate {
     font-size: 0.95rem;
     color: #6b7280;
 }
 
 /* Actions */
-.trip-actions {
+.tripActions {
     margin-top: auto;
     display: flex;
     gap: 10px;
@@ -132,27 +132,27 @@
     gap: 6px;
 }
 
-.btn-edit {
+.btnEdit {
     background: #4f46e5;
     color: #fff;
 }
 
-.btn-edit:hover {
+.btnEdit:hover {
     background: #4338ca;
     transform: translateY(-2px);
 }
 
-.btn-delete {
+.btnDelete {
     background: #fee2e2;
     color: #b91c1c;
 }
 
-.btn-delete:hover {
+.btnDelete:hover {
     background: #fca5a5;
     transform: translateY(-2px);
 }
 
-.btn-back {
+.btnBack {
     background: white;
     color: #007bff;
     padding: 8px 15px;
@@ -164,6 +164,6 @@
     gap: 8px;
     transition: background 0.3s;
 }
-.btn-back:hover {
+.btnBack:hover {
     background: #e6f0ff;
 }

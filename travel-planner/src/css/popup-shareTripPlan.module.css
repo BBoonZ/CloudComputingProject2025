@@ -1,0 +1,328 @@
+* {
+  font-family: 'Prompt', sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.overlayBlur {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(3px); /* ทำเบลอ */
+  background-color: rgba(0, 0, 0, 0.6); /* สีทึบเล็กน้อย */
+  z-index: 999;
+}
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modalMain {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.modalContent {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  width: 470px;
+  max-width: 100%;
+  animation: fadeIn 0.3s ease;
+}
+
+.modalMain h2 {
+  margin: 0;
+}
+
+.modalContent label {
+  display: block;
+  margin: 10px 0 5px;
+}
+
+.modalContent input,
+.modalContent textarea,
+.modalContent input[type="date"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  resize: none;
+  margin: 0;
+}
+
+.btnSaveEdit {
+  background: #007bff;
+  color: white;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-top: 10px;
+  margin-left: auto;
+}
+
+.btnSaveEdit:hover {
+  background: #0056b3;
+}
+
+/* ปุ่มปิด (X) */
+.modalMain .close {
+  float: right;
+  font-size: 2rem;
+  cursor: pointer;
+  color: #555;
+  line-height: 1;
+}
+
+.modalMain .close:hover {
+  color: red;
+}
+
+/* invite button */
+.modalInvite {
+  display: flex;
+}
+
+.modalInvite .btnCancel {
+  background: none;
+  color: #007bff;
+  padding: 8px 15px;
+  border-radius: 25px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.modalInvite .btnCancel:hover {
+  background: #e6f0ff;
+}
+
+.inputInvite select {
+  padding: 10px 5px 10px 0px;
+  border: none;
+  outline: none;
+  color: rgb(95, 99, 104);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.inputInvite select option {
+  padding: 8px 12px;
+  outline: none;
+  background-color: #ffffff;
+  color: rgb(95, 99, 104);
+  font-weight: 600;
+}
+
+/* popup share & profile */
+.modalMain .preProfile {
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  /* ถ้ามีหลาย profile จะเรียงแนวตั้ง */
+  gap: 8px;
+  /* เว้นระหว่าง profile */
+  margin-left: 0;
+  padding: 8px 24px 8px 16px;
+}
+
+/* profile card */
+.preProfile .profile,
+.share {
+  display: flex;
+  flex-direction: row;
+  /* avatar + user + privilege เรียงแนวนอน */
+  align-items: center;
+  /* กึ่งกลางแนวตั้ง */
+  gap: 20px;
+  /* spacing ระหว่างลูก */
+  padding: 4px 0;
+  width: 100%;
+}
+
+/* avatar */
+.profile .pic,
+.share .sharePic {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  border-radius: 50%;
+  /* ทำให้เป็นวงกลม */
+  overflow: hidden;
+}
+
+.profile .pic img,
+.share .sharePic img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* user info */
+.profile .user .share .shareDetail {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  /* ขยายเต็มพื้นที่ที่เหลือ */
+  word-break: break-word;
+  /* ข้อความยาวตัดบรรทัด */
+}
+
+/* username */
+.user .username,
+.share .shareOption {
+  letter-spacing: .0178571429em;
+  color: rgb(60, 64, 67);
+  font-weight: 600;
+}
+
+/* email */
+.user .email,
+.share .shareText {
+  letter-spacing: .025em;
+  color: rgb(95, 99, 104);
+  font-size: 0.8em;
+}
+
+/* privilege */
+.profile .privilege,
+.share .sharePrivilege {
+  font-weight: 600;
+  color: #007bff;
+  white-space: nowrap;
+  margin-left: auto;
+}
+
+/* shareOption */
+.shareOption {
+  position: relative;
+  display: inline-block;
+  width: 50%;
+}
+
+.shareOption select {
+  padding: 10px 5px 10px 0px;
+  border: none;
+  outline: none;
+  color: rgb(95, 99, 104);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.shareOption select option {
+  padding: 8px 12px;
+  outline: none;
+  background-color: #ffffff;
+  color: rgb(95, 99, 104);
+  font-weight: 600;
+}
+
+
+/* share Privilege*/
+.sharePrivilege select {
+  padding: 10px 5px 10px 0px;
+  border: none;
+  outline: none;
+  color: #007bff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sharePrivilege select option {
+  padding: 8px 12px;
+  outline: none;
+  background-color: #ffffff;
+  color: #007bff;
+  font-weight: 600;
+}
+
+/* share button*/
+.sharebutt {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  /* กึ่งกลางแนวตั้ง */
+  margin: 10px;
+  gap: 10px;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.sharebutt2butt {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  gap: 10px;
+}
+
+.btnShareOnline {
+  background: none;
+  color: #1d73d0;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btnShareOnline:hover {
+  background: #e6f0ff;
+}
+
+.btnShare {
+  padding: 8px 15px;
+  border-radius: 25px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.btnSave {
+  background-color: #17a2b8;
+  color: #fff;
+}
+
+.btnSave:hover {
+  background-color: #138496;
+}
+
+.btnShare {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.btnShare:hover {
+  background-color: #0056b3;
+}
+
+@keyframes fadeIn {
+  from {
+      opacity: 0;
+      transform: scale(0.9);
+  }
+
+  to {
+      opacity: 1;
+      transform: scale(1);
+  }
+}

@@ -11,7 +11,7 @@ function HomePage() {
           </div>
           <nav className="main-nav">
             <ul>
-              <li><Link to="#">หน้าแรก</Link></li>
+              <li><Link to="/tripmain">หน้าแรก</Link></li>
               <li><Link to="/tripManage">แผนการเดินทางของฉัน</Link></li>
               <li><Link to="#" className="btn-create">สร้างแผนการเดินทาง</Link></li>
               <li><Link to="/login" className="btn-login">เข้าสู่ระบบ</Link></li>

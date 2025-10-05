@@ -1,0 +1,141 @@
+/* พื้นหลังหลัก */
+.dashboard-main {
+    padding: 50px 20px;
+    font-family: 'Prompt', sans-serif;
+    /* ฟอนต์ไทยสวย ๆ */
+}
+
+/* Container */
+.dashboard-main .container {
+    max-width: 1200px;
+    margin: auto;
+}
+
+/* Section Title */
+.trips-section h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 30px;
+    background: linear-gradient(90deg, #4f46e5, #9333ea);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Search Bar */
+.search-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border-radius: 50px;
+    padding: 10px 20px;
+    margin-bottom: 40px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.search-bar i {
+    color: #6b7280;
+    margin-right: 10px;
+}
+
+.search-bar input {
+    border: none;
+    outline: none;
+    font-size: 1rem;
+    width: 100%;
+}
+
+/* Trips Grid */
+.trips-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 25px;
+}
+
+/* Trip Card */
+.trip-card {
+    background: #fff;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.trip-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+}
+
+.trip-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.trip-info {
+    padding: 20px;
+}
+
+.trip-info h3 {
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+    color: #111827;
+}
+
+.trip-meta {
+    font-size: 0.9rem;
+    color: #6b7280;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+/* Buttons */
+.trip-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 10px 15px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary {
+    background: #4f46e5;
+    color: #fff;
+    text-decoration: none;
+}
+
+.btn-secondary:hover {
+    background: #4338ca;
+}
+
+.btn-copy {
+    background: #f3f4f6;
+    border: 1px solid #d1d5db;
+    color: #111827;
+}
+
+.btn-copy:hover {
+    background: #e5e7eb;
+}
+
+.btn-create {
+    background-color: #e2e6ea;
+    display: inline-block;
+    padding: 6px 18px !important;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}

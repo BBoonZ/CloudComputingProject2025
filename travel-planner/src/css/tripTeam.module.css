@@ -1,16 +1,20 @@
+.planContent {
+    flex-grow: 1;
+}
+
 /* Members Tab */
-.member-header {
+.memberHeader {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
 }
 
-.member-header h2 {
+.memberHeader h2 {
     font-size: 1.5rem;
 }
 
-.btn-add-member {
+.btnAddMember {
     padding: 10px 20px;
     background-color: #007bff;
     color: #fff;
@@ -22,18 +26,18 @@
     transition: all 0.3s ease;
 }
 
-.btn-add-member:hover {
+.btnAddMember:hover {
     background-color: #0056b3;
 }
 
-.member-grid {
+.memberGrid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 20px;
     margin-top: 20px;
 }
 
-.member-card {
+.memberCard {
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -44,17 +48,17 @@
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.member-card:hover {
+.memberCard:hover {
     transform: translateY(-3px);
     box-shadow: 0 6px 16px rgba(0,0,0,0.12);
 }
 
-.member-avatar {
+.memberAvatar {
     display: flex;
     justify-content: center;
 }
 
-.member-avatar img{
+.memberAvatar img{
     width: 60px;
     height: 60px;
     border-radius: 50%;
@@ -67,20 +71,20 @@
     font-size: 1.5rem;
 }
 
-.member-name {
+.memberName {
     font-weight: 600;
     text-align: center;
     font-size: 1.4rem;
 }
 
-.member-actions {
+.memberActions {
     display: grid;
     grid-template-columns: repeat(3);
     gap: 10px;
     margin-top: 12px;
 }
 
-.member-actions button {
+.memberActions button {
     padding: 6px 14px;
     border-radius: 8px;
     border: none;
@@ -94,44 +98,62 @@
 }
 
 /* ปุ่มการเงิน */
-.btn-finance {
+.btnFinance {
     background: linear-gradient(135deg, #28a745, #20c997);
     color: #fff;
 }
-.btn-finance:hover {
+.btnFinance:hover {
     background: linear-gradient(135deg, #218838, #198754);
     transform: translateY(-2px);
 }
 
 /* ปุ่มแก้ไข */
-.btn-edit {
+.btnEdit {
     background: linear-gradient(135deg, #ffc107, #ffcd39);
     color: #333;
 }
-.btn-edit:hover {
+.btnEdit:hover {
     background: linear-gradient(135deg, #e0a800, #d39e00);
     color: #222;
     transform: translateY(-2px);
 }
 
 /* ปุ่มลบ */
-.btn-delete {
+.btnDelete {
     background: linear-gradient(135deg, #dc3545, #e55353);
     color: #fff;
 }
-.btn-delete:hover {
+.btnDelete:hover {
     background: linear-gradient(135deg, #b02a37, #c82333);
     transform: translateY(-2px);
 }
 
+.btnBack {
+    background: #f8f9fa; /* พื้นหลังปกติ เหมือนพื้นหลัง container */
+    color: #007bff;
+    padding: 8px 15px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.3s, color 0.3s;
+    border: none;
+}
+.btnBack:hover {
+    background: #e2e6ea; /* hover เป็นสีเข้มขึ้นเล็กน้อย */
+}
+
 /* ครอบ iframe ด้วย overlay */
-.iframe-wrapper {
+.iframeWrapper {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(3px);
+    background-color: rgba(0, 0, 0, 0.6);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -139,7 +161,7 @@
 }
 
 /* ตัว iframe */
-.iframe-showPersonalBudget {
+.iframeShowPersonalBudget {
     width: 90%;
     max-width: 100%;
     height: 100%;
@@ -148,7 +170,7 @@
     animation: fadeIn 0.3s ease;
 }
 
-.iframe-edit {
+.iframeEdit {
     width: 90%;
     max-width: 90%;
     height: 600px;
@@ -157,7 +179,7 @@
     animation: fadeIn 0.3s ease;
 }
 
-.iframe-share {
+.iframeShare {
     width: 90%;
     max-width: 90%;
     height: 600px;

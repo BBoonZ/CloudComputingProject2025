@@ -8,6 +8,7 @@ import "./css/home-nav.css";
 import "./css/LoginPage.css";
 import "./css/ForgotPage.css";
 import "./css/popup.css";
+import "./css/color.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

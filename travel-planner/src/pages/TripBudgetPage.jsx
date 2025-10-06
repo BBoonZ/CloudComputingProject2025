@@ -65,7 +65,7 @@ export default function TripBudget() {
     ];
 
         return (
-            <div className={tripTemplate.pageWrapper}>
+            <>
                 {/* Header */}
                 <header className={nav.header}>
                     <div className={nav.container}>
@@ -247,7 +247,7 @@ export default function TripBudget() {
                     isOpen={shareModalOpen}
                     onClose={() => setShareModalOpen(false)}
                 />
-            </div>
+            </>
         );
     }
 

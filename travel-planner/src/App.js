@@ -7,6 +7,8 @@ import TripMainPage from "./pages/TripMainPage";
 import TripManagePage from "./pages/TripManagePage";
 import TripPlanPage from "./pages/TripPlanPage";
 import TripBudgetPage from "./pages/TripBudgetPage";
+import TripTeamPage from "./pages/TripTeamPage";
+import TripFolderPage from "./pages/TripFolderPage";
 
 function App() {
   return (
@@ -20,6 +22,8 @@ function App() {
         <Route path="/tripmanage" element={<TripManagePage />} />
         <Route path="/tripplan" element={<TripPlanPage />} />
         <Route path="/tripbudget" element={<TripBudgetPage />} />
+        <Route path="/tripteam" element={<TripTeamPage />} />
+        <Route path="/tripfolder" element={<TripFolderPage />} />
 
       </Routes>
     </Router>

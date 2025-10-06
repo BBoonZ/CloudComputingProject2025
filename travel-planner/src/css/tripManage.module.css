@@ -152,18 +152,3 @@
     transform: translateY(-2px);
 }
 
-.btnBack {
-    background: white;
-    color: #007bff;
-    padding: 8px 15px;
-    border-radius: 20px;
-    text-decoration: none;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: background 0.3s;
-}
-.btnBack:hover {
-    background: #e6f0ff;
-}

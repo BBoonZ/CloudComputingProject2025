@@ -1,11 +1,79 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  CognitoIdentityProviderClient,
+  SignUpCommand,
+  ConfirmSignUpCommand,
+} from "@aws-sdk/client-cognito-identity-provider";
+
+const config = { region: process.env.REACT_APP_AWS_REGION  }
+
+const cognitoClient = new CognitoIdentityProviderClient(config);
+const clientId = process.env.REACT_APP_COGNITO_CLIENT_ID
 
 export default function SignupPage() {
-  const handleSubmit = (e) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [verificationCode, setVerificationCode] = useState("");
+  const [showVerification, setShowVerification] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSignUp = async (e) => {
     e.preventDefault();
-    console.log("สมัครสมาชิก...");
-    // TODO: ต่อ Cognito หรือ API signup ตรงนี้
+
+    if (password !== confirmPassword) {
+      alert("Passwords do not match!");
+      return;
+    }
+
+    try {
+      const input = {
+        ClientId: clientId,
+        Username: email,
+        Password: password,
+        UserAttributes: [
+          {
+            Name: "email",
+            Value: email,
+          },
+        ],
+      };
+
+      const command = new SignUpCommand(input);
+      const response = await cognitoClient.send(command);
+
+      if (response.$metadata.httpStatusCode === 200) {
+        alert("Verification code has been sent to your email");
+        setShowVerification(true);
+      }
+    } catch (error) {
+      alert("Error signing up: " + error.message);
+    }
+  };
+
+  const handleVerification = async (e) => {
+    e.preventDefault();
+
+    try {
+      const input = {
+        ClientId: clientId,
+        Username: email,
+        ConfirmationCode: verificationCode,
+      };
+
+      const command = new ConfirmSignUpCommand(input);
+      const response = await cognitoClient.send(command);
+
+      if (response.$metadata.httpStatusCode === 200) {
+        // ✅ เมื่อยืนยันสำเร็จให้ไปหน้า login ทันที
+        alert("ยืนยันอีเมลสำเร็จ! กรุณาเข้าสู่ระบบ");
+        navigate("/login");
+      }
+    } catch (error) {
+      alert("Error verifying code: " + error.message);
+    }
   };
 
   return (
@@ -13,50 +81,71 @@ export default function SignupPage() {
       <div className="login-card">
         <div className="logo">
           <Link to="/">
-            <h1>Travel Planner Pro ✈️</h1>
+            <h1>Travel Planner Pro ✈️</h1>{clientId}
           </Link>
         </div>
         <h2>สมัครสมาชิก</h2>
 
-        <form className="login-form" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="username">ชื่อผู้ใช้งาน</label>
-            <input
-              type="text"
-              id="username"
-              name="username"
-              placeholder="ชื่อผู้ใช้งาน"
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="email">อีเมล</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              placeholder="ชื่ออีเมลของคุณ"
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="password">รหัสผ่าน</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              placeholder="รหัสผ่าน"
-              required
-            />
-          </div>
+        {!showVerification ? (
+          <form className="login-form" onSubmit={handleSignUp}>
+            <div className="form-group">
+              <label htmlFor="email">อีเมล</label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="ชื่ออีเมลของคุณ"
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="password">รหัสผ่าน</label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="รหัสผ่าน"
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="confirmPassword">ยืนยันรหัสผ่าน</label>
+              <input
+                type="password"
+                id="confirmPassword"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="ยืนยันรหัสผ่าน"
+                required
+              />
+            </div>
+            <button type="submit" className="btn btn-primary">
+              สมัครสมาชิก
+            </button>
+          </form>
+        ) : (
+          <form className="login-form" onSubmit={handleVerification}>
+            <div className="form-group">
+              <label htmlFor="verificationCode">รหัสยืนยัน</label>
+              <input
+                type="text"
+                id="verificationCode"
+                value={verificationCode}
+                onChange={(e) => setVerificationCode(e.target.value)}
+                placeholder="กรอกรหัสยืนยันที่ส่งไปทางอีเมล"
+                required
+              />
+            </div>
+            <button type="submit" className="btn btn-primary">
+              ยืนยันอีเมล
+            </button>
+          </form>
+        )}
 
-          <button type="submit" className="btn btn-primary">
-            สร้างบัญชี
-          </button>
-        </form>
-
-        <div className="signup-link">
-          มีบัญชีอยู่แล้วใช่ไหม? <Link to="/login">เข้าสู่ระบบ</Link>
+        <div className="login-link">
+          มีบัญชีอยู่แล้ว? <Link to="/login">เข้าสู่ระบบ</Link>
         </div>
       </div>
     </main>

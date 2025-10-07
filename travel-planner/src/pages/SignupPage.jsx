@@ -5,6 +5,7 @@ import {
   SignUpCommand,
   ConfirmSignUpCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
+import { userService } from '../services/userService';
 
 const config = { region: process.env.REACT_APP_AWS_REGION  }
 
@@ -18,6 +19,8 @@ export default function SignupPage() {
   const [verificationCode, setVerificationCode] = useState("");
   const [showVerification, setShowVerification] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [showAlert, setShowAlert] = useState(false);
   const navigate = useNavigate();
 
   const handleSignUp = async (e) => {
@@ -43,9 +46,20 @@ export default function SignupPage() {
 
       const command = new SignUpCommand(input);
       const response = await cognitoClient.send(command);
-
+      
       if (response.$metadata.httpStatusCode === 200) {
-        alert("Verification code has been sent to your email");
+        // Create user through API
+        await userService.createUser({
+          email,
+          username: email.split('@')[0],
+          name: '',
+          surname: '',
+          phone_number: ''
+        });
+
+        // Show success message
+        setAlertMessage("ลงทะเบียนสำเร็จ กรุณายืนยันอีเมล");
+        setShowAlert(true);
         setShowVerification(true);
       }
     } catch (error) {
@@ -81,7 +95,7 @@ export default function SignupPage() {
       <div className="login-card">
         <div className="logo">
           <Link to="/">
-            <h1>Travel Planner Pro ✈️</h1>{clientId}
+            <h1>Travel Planner Pro ✈️</h1>
           </Link>
         </div>
         <h2>สมัครสมาชิก</h2>
@@ -144,6 +158,12 @@ export default function SignupPage() {
           </form>
         )}
 
+        {showAlert && (
+          <div className="alert-message">
+            {alertMessage}
+          </div>
+        )}
+
         <div className="login-link">
           มีบัญชีอยู่แล้ว? <Link to="/login">เข้าสู่ระบบ</Link>
         </div>
@@ -151,3 +171,8 @@ export default function SignupPage() {
     </main>
   );
 }
+
+// // Helper function to generate user ID
+// function generateUserId() {
+//   return Math.random().toString(36).substring(2, 12).toUpperCase();
+// }

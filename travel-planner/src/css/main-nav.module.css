@@ -9,6 +9,12 @@
     margin: 0 auto;
     padding: 0 20px;
     /* เพิ่ม padding ให้ดูโปร่งขึ้น */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 /* Header */
@@ -37,6 +43,13 @@
     transition: color 0.3s ease;
 }
 
+.logo a {
+  text-decoration: none;
+  color: #333;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
 .logo a:hover {
     color: #0056b3;
 }
@@ -47,6 +60,8 @@
     display: flex;
     gap: 30px;
     align-items: center;
+    margin: 0;
+    padding: 0;
 }
 
 .mainNav a {
@@ -56,6 +71,12 @@
     position: relative;
     padding: 6px 0;
     transition: color 0.3s ease;
+}
+
+.mainNav li a {
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
 }
 
 /* Hover effect เส้นใต้ */
@@ -112,6 +133,18 @@
   color: #666;
 }
 
+.profilePic {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  object-fit: cover;
+}
+
+.profilePic:hover {
+  opacity: 0.8;
+}
+
 .logoutBtn {
   padding: 0.5rem 1rem;
   background-color: #ff4444;
@@ -119,6 +152,14 @@
   border: none;
   border-radius: 4px;
   cursor: pointer;
+}
+
+.loginBtn {
+  padding: 0.5rem 1rem;
+  background-color: #007bff;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
 }
 
 .logoutBtn:hover {

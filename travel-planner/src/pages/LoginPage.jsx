@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { CognitoIdentityProviderClient, InitiateAuthCommand, RespondToAuthChallengeCommand } from "@aws-sdk/client-cognito-identity-provider";
+import { CognitoIdentityProviderClient, InitiateAuthCommand } from "@aws-sdk/client-cognito-identity-provider";
+import { useAuth } from '../context/AuthContext';
 import styles from '../css/LoginPage.module.css';
 const config = { region: process.env.REACT_APP_AWS_REGION  }
 
@@ -15,6 +16,7 @@ export default function LoginPage() {
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleError = (message) => {
     setAlertMessage(message);
@@ -41,8 +43,7 @@ export default function LoginPage() {
         setView('otp');
       }
       else if (response['$metadata']['httpStatusCode'] === 200) {
-        localStorage.setItem('userEmail', email);
-        // Redirect to home page
+        login(email, response.AuthenticationResult.AccessToken);
         navigate('/');
       }
     } catch (error) {

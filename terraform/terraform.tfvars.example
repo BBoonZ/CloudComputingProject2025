@@ -1,0 +1,6 @@
+db_username = ""
+db_password = ""
+environment = "dev"
+aws_access_key = ""
+aws_secret_key = ""
+aws_session_token = ""

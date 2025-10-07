@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { CognitoIdentityProviderClient, InitiateAuthCommand, RespondToAuthChallengeCommand } from "@aws-sdk/client-cognito-identity-provider";
 import styles from '../css/LoginPage.module.css';
 const config = { region: process.env.REACT_APP_AWS_REGION  }
@@ -14,6 +14,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
+  const navigate = useNavigate();
 
   const handleError = (message) => {
     setAlertMessage(message);
@@ -40,7 +41,9 @@ export default function LoginPage() {
         setView('otp');
       }
       else if (response['$metadata']['httpStatusCode'] === 200) {
-        alert("เข้าสู่ระบบสำเร็จ!");
+        localStorage.setItem('userEmail', email);
+        // Redirect to home page
+        navigate('/');
       }
     } catch (error) {
       // Handle specific Cognito errors
@@ -59,21 +62,6 @@ export default function LoginPage() {
       }
     }
   };
-
-  const handleChallenge = async () => {
-    const input = { // RespondToAuthChallengeRequest
-      ClientId: clientId, // required
-      ChallengeName: "NEW_PASSWORD_REQUIRED",
-      Session: session,
-      ChallengeResponses: {
-        "NEW_PASSWORD": password, "USERNAME": email
-      },
-    };
-    const command = new RespondToAuthChallengeCommand(input);
-    const response = await cognitoClient.send(command);
-    console.log(response)
-    if (response['$metadata']['httpStatusCode'] === 200) { alert("Password Changed Successfully!"); setView('login') }
-  }
 
   const handleSubmit = (e) => {
     e.preventDefault();

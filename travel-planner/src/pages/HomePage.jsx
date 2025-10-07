@@ -12,8 +12,8 @@ function HomePage() {
           <nav className="main-nav">
             <ul>
               <li><Link to="/tripmain">หน้าแรก</Link></li>
-              <li><Link to="/tripManage">แผนการเดินทางของฉัน</Link></li>
-              <li><Link to="#" className="btn-create">สร้างแผนการเดินทาง</Link></li>
+              <li><Link to="/tripmanage">แผนการเดินทางของฉัน</Link></li>
+              <li><Link to="/tripmain" className="btn-create">สร้างแผนการเดินทาง</Link></li>
               <li><Link to="/login" className="btn-login">เข้าสู่ระบบ</Link></li>
             </ul>
           </nav>
@@ -25,7 +25,7 @@ function HomePage() {
           <div className="hero-content">
             <h1>วางแผนทริปในฝันร่วมกับเพื่อน ๆ ของคุณ</h1>
             <p>สร้างแผนการเดินทางที่สมบูรณ์แบบและจัดการทุกอย่างได้ในที่เดียว</p>
-            <Link to="#" className="btn btn-primary">เริ่มสร้างแผน</Link>
+            <Link to="/tripmain" className="btn btn-primary">เริ่มสร้างแผน</Link>
           </div>
         </section>
 

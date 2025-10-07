@@ -9,6 +9,9 @@ import TripPlanPage from "./pages/TripPlanPage";
 import TripBudgetPage from "./pages/TripBudgetPage";
 import TripTeamPage from "./pages/TripTeamPage";
 import TripFolderPage from "./pages/TripFolderPage";
+import UserPage from "./pages/UserPage";
+import TripPlanInfoPage from "./pages/TripPlanInfoPage";
+import TripBudgetInfoPage from "./pages/TripBudgetInfoPage";
 
 function App() {
   return (
@@ -24,6 +27,9 @@ function App() {
         <Route path="/tripbudget" element={<TripBudgetPage />} />
         <Route path="/tripteam" element={<TripTeamPage />} />
         <Route path="/tripfolder" element={<TripFolderPage />} />
+        <Route path="/user" element={<UserPage />} />
+        <Route path="/tripplaninfo" element={<TripPlanInfoPage />} />
+        <Route path="/tripbudgetinfo" element={<TripBudgetInfoPage />} />
 
       </Routes>
     </Router>

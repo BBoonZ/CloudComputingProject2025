@@ -159,7 +159,7 @@ resource "aws_cognito_user_pool" "main" {
   }
 
   username_attributes = ["email"]
-  auto_verify_attributes = ["email"]
+  auto_verified_attributes = ["email"]
 
   account_recovery_setting {
     recovery_mechanism {
@@ -211,5 +211,55 @@ resource "aws_cognito_user_pool_client" "client" {
   token_validity_units {
     access_token  = "days"
     refresh_token = "days"
+  }
+}
+
+# S3 Bucket for profile uploads
+resource "aws_s3_bucket" "profile_uploads" {
+  bucket = "travel-planner-profile-uploads-${random_id.suffix.hex}"
+  force_destroy = true
+
+  tags = {
+    Name = "travel-planner-profile-uploads"
+  }
+}
+
+# S3 Bucket public access block (optional, allow public read for profile images)
+resource "aws_s3_bucket_public_access_block" "profile_uploads" {
+  bucket = aws_s3_bucket.profile_uploads.id
+
+  block_public_acls   = false
+  block_public_policy = false
+  ignore_public_acls  = false
+  restrict_public_buckets = false
+}
+
+# S3 Bucket policy to allow public read (for profile images)
+resource "aws_s3_bucket_policy" "profile_uploads_public_read" {
+  bucket = aws_s3_bucket.profile_uploads.id
+  policy = jsonencode({
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = "*"
+        Action = ["s3:GetObject"]
+        Resource = ["${aws_s3_bucket.profile_uploads.arn}/*"]
+      }
+    ]
+  })
+}
+
+# Random suffix for unique bucket name
+resource "random_id" "suffix" {
+  byte_length = 4
+}
+
+# S3 Bucket CORS configuration for profile uploads
+resource "aws_s3_bucket_cors_configuration" "profile_uploads_cors" {
+  bucket = aws_s3_bucket.profile_uploads.id
+
+  cors_rule {
+    allowed_methods = ["GET", "PUT", "POST", "HEAD"]
+    allowed_origins = ["http://localhost:3000"]
   }
 }

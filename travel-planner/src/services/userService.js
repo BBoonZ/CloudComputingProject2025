@@ -5,7 +5,7 @@ const API_URL = process.env.REACT_APP_API_URL;
 export const userService = {
   async createUser(userData) {
     try {
-      const response = await axios.post(`${API_URL}/api/users`, userData);
+      const response = await axios.post(`${API_URL}/api/users/`, userData);
       return response.data;
     } catch (error) {
       throw error;

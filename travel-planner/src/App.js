@@ -14,29 +14,32 @@ import TripPlanInfoPage from "./pages/TripPlanInfoPage";
 import TripBudgetInfoPage from "./pages/TripBudgetInfoPage";
 import Navbar from './component/Navbar';
 import { AuthProvider } from './context/AuthContext';
+import { UserProvider } from './context/UserContext';
 
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
-          <Route path="/forgot" element={<ForgotPage />} />
-          <Route path="/tripmain" element={<TripMainPage />} />
-          <Route path="/tripmanage" element={<TripManagePage />} />
-          <Route path="/tripplan" element={<TripPlanPage />} />
-          <Route path="/tripbudget" element={<TripBudgetPage />} />
-          <Route path="/tripteam" element={<TripTeamPage />} />
-          <Route path="/tripfolder" element={<TripFolderPage />} />
-          <Route path="/user" element={<UserPage />} />
-          <Route path="/tripplaninfo" element={<TripPlanInfoPage />} />
-          <Route path="/tripbudgetinfo" element={<TripBudgetInfoPage />} />
+      <UserProvider>
+        <Router>
+          <Navbar />
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />
+            <Route path="/forgot" element={<ForgotPage />} />
+            <Route path="/tripmain" element={<TripMainPage />} />
+            <Route path="/tripmanage" element={<TripManagePage />} />
+            <Route path="/tripplan" element={<TripPlanPage />} />
+            <Route path="/tripbudget" element={<TripBudgetPage />} />
+            <Route path="/tripteam" element={<TripTeamPage />} />
+            <Route path="/tripfolder" element={<TripFolderPage />} />
+            <Route path="/user" element={<UserPage />} />
+            <Route path="/tripplaninfo" element={<TripPlanInfoPage />} />
+            <Route path="/tripbudgetinfo" element={<TripBudgetInfoPage />} />
 
-        </Routes>
-      </Router>
+          </Routes>
+        </Router>
+      </UserProvider>
     </AuthProvider>
   );
 }

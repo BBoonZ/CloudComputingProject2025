@@ -7,7 +7,7 @@ import {
 } from "@aws-sdk/client-cognito-identity-provider";
 import { userService } from '../services/userService';
 
-const config = { region: process.env.REACT_APP_AWS_REGION  }
+const config = { region: process.env.REACT_APP_AWS_REGION }
 
 const cognitoClient = new CognitoIdentityProviderClient(config);
 const clientId = process.env.REACT_APP_COGNITO_CLIENT_ID
@@ -26,11 +26,6 @@ export default function SignupPage() {
   const handleSignUp = async (e) => {
     e.preventDefault();
 
-    if (password !== confirmPassword) {
-      alert("Passwords do not match!");
-      return;
-    }
-
     try {
       const input = {
         ClientId: clientId,
@@ -43,10 +38,15 @@ export default function SignupPage() {
           },
         ],
       };
+      if (password !== confirmPassword) {
+        alert("Passwords do not match!");
+        return;
+      }
+
 
       const command = new SignUpCommand(input);
       const response = await cognitoClient.send(command);
-      
+
       if (response.$metadata.httpStatusCode === 200) {
         // Create user through API
         await userService.createUser({

@@ -27,3 +27,14 @@ output "cognito_endpoint" {
   description = "The endpoint of the Cognito User Pool"
   value       = aws_cognito_user_pool.main.endpoint
 }
+
+# S3 Bucket outputs
+output "s3_profile_uploads_bucket" {
+  description = "The name of the S3 bucket for profile uploads"
+  value       = aws_s3_bucket.profile_uploads.bucket
+}
+
+output "s3_profile_uploads_arn" {
+  description = "The ARN of the S3 bucket for profile uploads"
+  value       = aws_s3_bucket.profile_uploads.arn
+}

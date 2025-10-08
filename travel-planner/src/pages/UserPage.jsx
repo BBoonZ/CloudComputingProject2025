@@ -6,10 +6,13 @@ import navStyles from "../css/main-nav.module.css";
 import { CognitoIdentityProviderClient, ChangePasswordCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { useAuth } from '../context/AuthContext';
+import { useUser } from '../context/UserContext';
+
 
 export default function SettingPage() {
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const { updateUserData } = useUser();
   const [userData, setUserData] = useState({
     username: "",
     name: "",
@@ -72,41 +75,58 @@ export default function SettingPage() {
       setUploadError("กรุณาเลือกไฟล์ภาพ");
       return;
     }
+
     setUploading(true);
     setUploadError("");
+
     try {
-      // S3 config (use env vars or config file for real app)
-      const REGION = process.env.REACT_APP_AWS_REGION;
-      const BUCKET = process.env.REACT_APP_S3_BUCKET;
-      const s3 = new S3Client({
-        region: REGION,
+      // Convert File to ArrayBuffer
+      const fileBuffer = await selectedFile.arrayBuffer();
+      console.log(process.env.REACT_APP_AWS_REGION)
+      const s3Client = new S3Client({
+        region: process.env.REACT_APP_AWS_REGION,
         credentials: {
           accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
-          secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY
+          secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
+          sessionToken: process.env.REACT_APP_AWS_SESSION_TOKEN
         }
       });
+
       const fileName = `profile_${userData.username}_${Date.now()}.${selectedFile.name.split('.').pop()}`;
-      const uploadParams = {
-        Bucket: BUCKET,
+
+      const command = new PutObjectCommand({
+        Bucket: process.env.REACT_APP_S3_BUCKET,
         Key: fileName,
-        Body: await selectedFile.arrayBuffer(),
+        Body: fileBuffer, // Use ArrayBuffer instead of File object
         ContentType: selectedFile.type,
         ACL: 'public-read'
-      };
-      await s3.send(new PutObjectCommand(uploadParams));
-      const s3Url = `https://${BUCKET}.s3.${REGION}.amazonaws.com/${fileName}`;
-      // Update user profile_uri
-      const updatedUser = { ...userData, profile_uri: s3Url };
-      await userService.updateUser(updatedUser);
-      setUserData(updatedUser);
+      });
+
+      await s3Client.send(command);
+
+      // Update profile URI using the public URL format
+      const profileUri = `https://${process.env.REACT_APP_S3_BUCKET}.s3.${process.env.REACT_APP_AWS_REGION}.amazonaws.com/${fileName}`;
+
+      // Update user profile with new image URL
+      const updatedUserData = { ...userData, profile_uri: profileUri };
+      await userService.updateUser(updatedUserData);
+      setUserData(updatedUserData);
+
       setShowUploadPopup(false);
       setSuccessMessage("อัพโหลดรูปโปรไฟล์สำเร็จ");
-      setTimeout(() => setSuccessMessage(""), 3000);
     } catch (err) {
-      setUploadError("อัพโหลดรูปไม่สำเร็จ");
       console.error('S3 upload error:', err);
+      if (err.name === 'AccessDenied') {
+        setUploadError("ไม่มีสิทธิ์ในการอัพโหลดไฟล์");
+      } else {
+        setUploadError("ไม่สามารถอัพโหลดไฟล์ได้");
+      }
     } finally {
       setUploading(false);
+      setSelectedFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
@@ -131,6 +151,7 @@ export default function SettingPage() {
     e.preventDefault();
     try {
       await userService.updateUser(userData);
+      updateUserData(userData); // <-- Update user data in context
       setSuccessMessage("อัพเดตข้อมูลสำเร็จ");
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch (err) {
@@ -181,6 +202,15 @@ export default function SettingPage() {
     navigate('/login');
   };
 
+  useEffect(() => {
+    return () => {
+      // Cleanup URL object when component unmounts or file changes
+      if (selectedFile) {
+        URL.revokeObjectURL(URL.createObjectURL(selectedFile));
+      }
+    };
+  }, [selectedFile]);
+
   if (loading) {
     return <div>กำลังโหลด...</div>;
   }
@@ -197,32 +227,74 @@ export default function SettingPage() {
           <img
             src={userData.profile_uri || "https://img.poki-cdn.com/cdn-cgi/image/q=78,scq=50,width=1200,height=1200,fit=cover,f=png/5f8d164d8269cffacc89422054b94c70/roblox.png"}
             alt="User Profile"
+            className={userStyles.profilePic}
             style={{ cursor: 'pointer' }}
             onClick={handleProfileImageClick}
             title="คลิกเพื่อเปลี่ยนรูปโปรไฟล์"
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = "https://img.poki-cdn.com/cdn-cgi/image/q=78,scq=50,width=1200,height=1200,fit=cover,f=png/5f8d164d8269cffacc89422054b94c70/roblox.png";
+            }}
           />
         </div>
 
         {/* Upload Profile Popup */}
         {showUploadPopup && (
-          <div className={userStyles.popupOverlay}>
-            <div className={userStyles.popupContent}>
-              <h3>อัพโหลดรูปโปรไฟล์ใหม่</h3>
+          <div className={userStyles.popupOverlay} onClick={() => !uploading && setShowUploadPopup(false)}>
+            <div className={userStyles.popupContent} onClick={e => e.stopPropagation()}>
+              <h2 style={{ marginTop: 0, color: '#333' }}>อัพโหลดรูปโปรไฟล์ใหม่</h2>
               <form onSubmit={handleUploadToS3}>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  ref={fileInputRef}
-                  disabled={uploading}
-                />
-                {uploadError && <div className={userStyles.error}>{uploadError}</div>}
-                <div style={{ marginTop: 10 }}>
-                  <button type="submit" className={userStyles.btnSave} disabled={uploading}>
-                    {uploading ? "กำลังอัพโหลด..." : "อัพโหลด"}
-                  </button>
-                  <button type="button" className={userStyles.btnLogout} style={{ marginLeft: 10 }} onClick={() => setShowUploadPopup(false)} disabled={uploading}>
+                <div className={userStyles.uploadArea}>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    ref={fileInputRef}
+                    className={userStyles.fileInput}
+                    id="fileInput"
+                    disabled={uploading}
+                  />
+                  <label htmlFor="fileInput" className={userStyles.uploadButton}>
+                    เลือกรูปภาพ
+                  </label>
+                  <p style={{ margin: '0.5rem 0', color: '#6c757d' }}>
+                    {selectedFile ? selectedFile.name : 'รองรับไฟล์ .jpg, .png, .gif'}
+                  </p>
+                  {selectedFile && (
+                    <img
+                      src={URL.createObjectURL(selectedFile)}
+                      alt="Preview"
+                      className={userStyles.imagePreview}
+                    />
+                  )}
+                </div>
+                {uploadError && (
+                  <div className={userStyles.error} style={{ marginBottom: '1rem' }}>
+                    {uploadError}
+                  </div>
+                )}
+                <div className={userStyles.buttonGroup}>
+                  <button
+                    type="button"
+                    className={userStyles.btnLogout}
+                    onClick={() => setShowUploadPopup(false)}
+                    disabled={uploading}
+                  >
                     ยกเลิก
+                  </button>
+                  <button
+                    type="submit"
+                    className={userStyles.btnSave}
+                    disabled={!selectedFile || uploading}
+                  >
+                    {uploading ? (
+                      <span>
+                        <i className="fas fa-spinner fa-spin" style={{ marginRight: '8px' }}></i>
+                        กำลังอัพโหลด...
+                      </span>
+                    ) : (
+                      'อัพโหลด'
+                    )}
                   </button>
                 </div>
               </form>

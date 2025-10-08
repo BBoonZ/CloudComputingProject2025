@@ -224,6 +224,23 @@ resource "aws_s3_bucket" "profile_uploads" {
   }
 }
 
+# Enable ACL Object Ownership
+resource "aws_s3_bucket_ownership_controls" "profile_uploads" {
+  bucket = aws_s3_bucket.profile_uploads.id
+  
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
+}
+
+# Enable ACLs for the bucket
+resource "aws_s3_bucket_acl" "profile_uploads" {
+  depends_on = [aws_s3_bucket_ownership_controls.profile_uploads]
+  
+  bucket = aws_s3_bucket.profile_uploads.id
+  acl    = "public-read"
+}
+
 # S3 Bucket public access block (optional, allow public read for profile images)
 resource "aws_s3_bucket_public_access_block" "profile_uploads" {
   bucket = aws_s3_bucket.profile_uploads.id
@@ -259,7 +276,17 @@ resource "aws_s3_bucket_cors_configuration" "profile_uploads_cors" {
   bucket = aws_s3_bucket.profile_uploads.id
 
   cors_rule {
-    allowed_methods = ["GET", "PUT", "POST", "HEAD"]
-    allowed_origins = ["http://localhost:3000"]
+    allowed_headers = ["*"]
+    allowed_methods = ["GET", "PUT", "POST", "DELETE", "HEAD"]
+    allowed_origins = [
+      "*"
+    ]
+    expose_headers = [
+      "ETag",
+      "x-amz-server-side-encryption",
+      "x-amz-request-id",
+      "x-amz-id-2"
+    ]
+    max_age_seconds = 3600
   }
 }

@@ -48,14 +48,6 @@ export default function SignupPage() {
       const response = await cognitoClient.send(command);
 
       if (response.$metadata.httpStatusCode === 200) {
-        // Create user through API
-        await userService.createUser({
-          email,
-          username: email.split('@')[0],
-          name: '',
-          surname: '',
-          phone_number: ''
-        });
 
         // Show success message
         setAlertMessage("ลงทะเบียนสำเร็จ กรุณายืนยันอีเมล");
@@ -83,6 +75,14 @@ export default function SignupPage() {
       if (response.$metadata.httpStatusCode === 200) {
         // ✅ เมื่อยืนยันสำเร็จให้ไปหน้า login ทันที
         alert("ยืนยันอีเมลสำเร็จ! กรุณาเข้าสู่ระบบ");
+        // Create user through API
+        await userService.createUser({
+          email,
+          username: email.split('@')[0],
+          name: '',
+          surname: '',
+          phone_number: ''
+        });
         navigate("/login");
       }
     } catch (error) {

@@ -4,15 +4,18 @@ import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
 import styles from "../css/tripMain.module.css";
 import nav from "../css/main-nav.module.css";
+import e from "cors";
 
 export default function TripMainPage() {
     const [showModal, setShowModal] = useState(false);
     const [preview, setPreview] = useState(null);
+    const [tripdata, setTripData] = useState(null)
 
-    const openModal = () => setShowModal(true);
+    const openModal = () => { setTripData({ name: "", detail: "", range: "", budget: "", image: null, }); setShowModal(true);};
     const closeModal = () => {
         setShowModal(false);
         setPreview(null);
+        setTripData(null);
     };
 
     const previewImage = (event) => {
@@ -21,8 +24,27 @@ export default function TripMainPage() {
             const reader = new FileReader();
             reader.onload = () => setPreview(reader.result);
             reader.readAsDataURL(file);
+            setTripData({ ...tripdata, image: reader.result });
         }
     };
+
+    const createTrip = async () => {
+  try {
+    const res = await fetch("http://localhost:5000/createplan", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(tripdata),
+    });
+    const data = await res.json();
+    console.log("Trip created:", data);
+    setShowModal(false);  // ปิด modal
+    setTripData({ name: "", detail: "", range: "", budget: "", image: null }); // รีเซ็ต state
+    setPreview(null);  // รีเซ็ต preview
+  } catch (err) {
+    console.error(err);
+  }
+};
+
 
     useEffect(() => {
         const monthsTH = [
@@ -151,23 +173,23 @@ export default function TripMainPage() {
 
                         <form>
                             <label>ชื่อทริป *</label>
-                            <input type="text" placeholder="ชื่อทริป..." required />
+                            <input type="text" placeholder="ชื่อทริป..." value={tripdata.name} onChange={(e) => setTripData({ ...tripdata, name: e.target.value })} required />
 
                             <label>รายละเอียด *</label>
-                            <textarea rows="3" placeholder="ใส่ข้อความ..." required />
+                            <textarea rows="3" placeholder="ใส่ข้อความ..." value={tripdata.detail} onChange={(e) => setTripData({...tripdata, detail: e.target.value})} required />
 
                             <label>เลือกวันทริป *</label>
-                            <input id="tripRange" placeholder="เลือกวันที่เริ่มต้น - สิ้นสุด" required />
+                            <input id="tripRange" placeholder="เลือกวันที่เริ่มต้น - สิ้นสุด" value={tripdata.range} onChange={(e) => setTripData({...tripdata, range: e.target.value})} required />
 
                             <label>งบประมาณ</label>
-                            <input placeholder="งบประมาณ..." />
+                            <input placeholder="งบประมาณ..." value={tripdata.budget} onChange={(e) => setTripData({...tripdata, budget: e.target.value})}/>
 
                             <label>รูปปกทริป</label>
-                            <input type="file" accept="image/*" onChange={previewImage} />
+                            <input type="file" accept="image/*"  onChange={previewImage} />
 
                             {preview && <img src={preview} alt="preview" className="preview-img" />}
 
-                            <button type="submit" className="btn-save-edit">ยืนยัน</button>
+                            <button type="submit" className="btn-save-edit" onClick={createTrip}>ยืนยัน</button>
                         </form>
                     </div>
                 </div>

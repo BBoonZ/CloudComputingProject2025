@@ -24,7 +24,7 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING(100)
   },
   profile_uri: {
-    type: DataTypes.TEXT()
+    type: DataTypes.TEXT
   }
 }, {
   tableName: 'user',

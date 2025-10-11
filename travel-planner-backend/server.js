@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const { initializeTables } = require('./config/initDb');
 const userRoutes = require('./routes/userRoutes');
-const { validateUser } = require('./middleware/validation');
+const tripRoutes = require('./routes/tripRoutes');
 
 const app = express();
 
@@ -24,6 +24,9 @@ app.use((err, req, res, next) => {
 // Routes with validation
 // app.use('/api/users', validateUser, userRoutes);
 app.use('/api/users', userRoutes);
+
+// Add routes
+app.use('/api/trips', tripRoutes);
 
 const PORT = process.env.PORT || 3001;
 

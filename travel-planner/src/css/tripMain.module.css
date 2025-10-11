@@ -7,7 +7,8 @@
   /* Container */
   .container {
     max-width: 1200px;
-    margin: auto;
+    margin: 0 auto;
+    padding: 2rem;
   }
   
   /* Section Title */
@@ -54,43 +55,84 @@
   
   /* Trip Card */
   .tripCard {
-    background: #fff;
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-  
-  .tripCard:hover {
-    transform: translateY(-10px) scale(1.02);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
-  }
-  
-  .tripImage {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-  }
-  
-  .tripInfo {
-    padding: 20px;
-  }
-  
-  .tripInfo h3 {
-    font-size: 1.3rem;
-    margin-bottom: 10px;
-    color: #111827;
-  }
-  
-  .tripMeta {
-    font-size: 0.9rem;
-    color: #6b7280;
+    position: relative;
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+    min-height: 400px;
     display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    margin-bottom: 15px;
+    flex-direction: column;
+    justify-content: flex-end;
+    overflow: hidden;
   }
   
+  .tripCard::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.8;
+    z-index: 1;
+    transition: transform 0.3s ease;
+  }
+  
+  .tripCard:hover::before {
+    transform: scale(1.05);
+  }
+  
+  .tripContent {
+    position: relative;
+    z-index: 2;
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.9) 0%,
+      rgba(0, 0, 0, 0.7) 50%,
+      rgba(0, 0, 0, 0) 100%
+    );
+    margin: -1.5rem;
+    padding: 1.5rem;
+    color: white;
+  }
+  
+  .tripHeader {
+    margin-bottom: 1rem;
+  }
+  
+  .tripHeader h2 {
+    margin: 0;
+    color: white;
+    font-size: 1.25rem;
+  }
+  
+  .dates {
+    display: block;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+  }
+  
+  .description {
+    color: rgba(255, 255, 255, 0.9);
+    margin: 1rem 0;
+    line-height: 1.5;
+  }
+  
+  .tripFooter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
   /* Buttons */
   .tripActions {
     display: flex;
@@ -138,4 +180,159 @@
     border: none;
     cursor: pointer;
   }
-  
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+
+  .createButton {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+  }
+
+  .tripGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+    padding: 1rem;
+  }
+
+  .tripCard {
+    position: relative;
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    overflow: hidden;
+
+
+    width: 100%;
+    height: 200px;
+    background-size: cover;
+    background-position: center;
+  }
+
+  .tripCard::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.8;
+    z-index: 1;
+    transition: transform 0.3s ease;
+  }
+
+  .tripCard:hover::before {
+    transform: scale(1.05);
+  }
+
+  .tripContent {
+    position: relative;
+    z-index: 2;
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.9) 0%,
+      rgba(0, 0, 0, 0.7) 50%,
+      rgba(0, 0, 0, 0) 100%
+    );
+    margin: -1.5rem;
+    padding: 1.5rem;
+    color: white;
+  }
+
+  .tripHeader {
+    margin-bottom: 1rem;
+  }
+
+  .tripHeader h2 {
+    margin: 0;
+    color: white;
+    font-size: 1.25rem;
+  }
+
+  .dates {
+    display: block;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+  }
+
+  .description {
+    color: rgba(255, 255, 255, 0.9);
+    margin: 1rem 0;
+    line-height: 1.5;
+  }
+
+  .tripFooter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .budget {
+    color: #2ecc71;
+    font-weight: 500;
+  }
+
+  .members {
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .viewButton {
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 0.75rem;
+    border-radius: 4px;
+    margin-top: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  .viewButton:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .loading {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+  }
+
+  .error {
+    text-align: center;
+    padding: 2rem;
+    color: #dc3545;
+  }
+
+  @media (max-width: 768px) {
+    .container {
+      padding: 1rem;
+    }
+    
+    .tripGrid {
+      grid-template-columns: 1fr;
+    }
+  }

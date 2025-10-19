@@ -327,6 +327,28 @@
     color: #dc3545;
   }
 
+  .ownerInfo {
+    display: flex;
+    align-items: center;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .ownerAvatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+    border: 2px solid white;
+  }
+
+  .ownerName {
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
   @media (max-width: 768px) {
     .container {
       padding: 1rem;

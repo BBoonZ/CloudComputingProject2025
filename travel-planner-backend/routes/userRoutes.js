@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { User } = require('../models/user');
+// Import User model from models/index.js instead
+const { User } = require('../models');
 
 // Get user by email
 router.get('/:email', async (req, res) => {
@@ -37,7 +38,7 @@ router.get('/:email', async (req, res) => {
   }
 });
 
-// Create new user
+// Create new user 
 router.post('/', async (req, res) => {
   try {
     const { email, username, name, surname, phone_number } = req.body;

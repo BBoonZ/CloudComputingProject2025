@@ -11,7 +11,7 @@ import { useUser } from '../context/UserContext';
 
 export default function SettingPage() {
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout, user, refreshUserData, updateUserDataImmediately } = useAuth();
   const { updateUserData } = useUser();
   const [userData, setUserData] = useState({
     username: "",
@@ -109,11 +109,16 @@ export default function SettingPage() {
 
       // Update user profile with new image URL
       const updatedUserData = { ...userData, profile_uri: profileUri };
-      await userService.updateUser(updatedUserData);
-      setUserData(updatedUserData);
-
-      setShowUploadPopup(false);
-      setSuccessMessage("อัพโหลดรูปโปรไฟล์สำเร็จ");
+      const response = await userService.updateUser(updatedUserData);
+      
+      if (response.status === 'success') {
+        setUserData(updatedUserData);
+        // Update both contexts
+        updateUserData(updatedUserData);
+        await refreshUserData(); // This will update the AuthContext and navbar
+        setShowUploadPopup(false);
+        setSuccessMessage("อัพโหลดรูปโปรไฟล์สำเร็จ");
+      }
     } catch (err) {
       console.error('S3 upload error:', err);
       if (err.name === 'AccessDenied') {
@@ -150,10 +155,14 @@ export default function SettingPage() {
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
     try {
-      await userService.updateUser(userData);
-      updateUserData(userData); // <-- Update user data in context
-      setSuccessMessage("อัพเดตข้อมูลสำเร็จ");
-      setTimeout(() => setSuccessMessage(""), 3000);
+      const response = await userService.updateUser(userData);
+      if (response.status === 'success') {
+        // Update both contexts
+        updateUserData(userData);
+        await refreshUserData(); // This will update the AuthContext and navbar
+        setSuccessMessage("อัพเดตข้อมูลสำเร็จ");
+        setTimeout(() => setSuccessMessage(""), 3000);
+      }
     } catch (err) {
       setError("ไม่สามารถอัพเดตข้อมูลได้");
     }
@@ -210,6 +219,16 @@ export default function SettingPage() {
       }
     };
   }, [selectedFile]);
+
+  // Add useEffect to sync with AuthContext user data
+  useEffect(() => {
+    if (user) {
+      setUserData(prevData => ({
+        ...prevData,
+        ...user
+      }));
+    }
+  }, [user]);
 
   if (loading) {
     return <div>กำลังโหลด...</div>;

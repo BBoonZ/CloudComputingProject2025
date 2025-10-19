@@ -8,10 +8,11 @@ import { useAuth } from "../context/AuthContext";
 import axios from "axios";
 import { tripService } from '../services/tripService';
 import SearchBar from '../components/SearchBar';
+import SortBar from '../components/SortBar';
 
 export default function TripMainPage() {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth(); // Add user from auth context
   const [trips, setTrips] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -20,6 +21,10 @@ export default function TripMainPage() {
   const [tripdata, setTripData] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredTrips, setFilteredTrips] = useState([]);
+  const [sortBy, setSortBy] = useState('');
+  const [sortOrder, setSortOrder] = useState('DESC');
+  const [filters, setFilters] = useState({});
+  const [isFilterVisible, setIsFilterVisible] = useState(true);
 
   const openModal = () => {
     setTripData({
@@ -77,8 +82,7 @@ export default function TripMainPage() {
   useEffect(() => {
     const fetchTrips = async () => {
       try {
-        const email = localStorage.getItem('userEmail');
-        if (!email) {
+        if (!isAuthenticated) {
           navigate('/login');
           return;
         }
@@ -87,7 +91,6 @@ export default function TripMainPage() {
         if (response.status === 'success') {
           setTrips(response.data);
           setFilteredTrips(response.data);
-          console.log(response.data);
         }
         setLoading(false);
       } catch (error) {
@@ -98,7 +101,7 @@ export default function TripMainPage() {
     };
 
     fetchTrips();
-  }, [navigate]);
+  }, [navigate, isAuthenticated]); // Remove email check, use isAuthenticated
 
   const handleSearch = async (query) => {
     setSearchQuery(query);
@@ -114,6 +117,39 @@ export default function TripMainPage() {
       }
     } catch (error) {
       console.error('Error searching trips:', error);
+    }
+  };
+
+  const handleSort = async (value) => {
+    setSortBy(value);
+    await fetchTrips(value, sortOrder, filters);
+  };
+
+  const handleOrderChange = async (value) => {
+    setSortOrder(value);
+    await fetchTrips(sortBy, value, filters);
+  };
+
+  const handleFilter = (key, value) => {
+    const newFilters = { ...filters, [key]: value };
+    setFilters(newFilters);
+    fetchTrips(sortBy, sortOrder, newFilters);
+  };
+
+  const fetchTrips = async (sort = sortBy, order = sortOrder, currentFilters = filters) => {
+    try {
+      const response = await tripService.getPublicTrips({
+        sortBy: sort,
+        order,
+        ...currentFilters,
+        searchQuery
+      });
+      if (response.status === 'success') {
+        setFilteredTrips(response.data);
+      }
+    } catch (error) {
+      console.error('Error fetching trips:', error);
+      setError('ไม่สามารถโหลดข้อมูลทริปได้');
     }
   };
 
@@ -189,6 +225,13 @@ export default function TripMainPage() {
       </header>
 
       <SearchBar onSearch={handleSearch} />
+      <SortBar 
+        onSort={handleSort}
+        onOrderChange={handleOrderChange}
+        onFilter={handleFilter}
+        isVisible={isFilterVisible}
+        onToggleVisibility={() => setIsFilterVisible(!isFilterVisible)}
+      />
 
       <div className={styles.tripGrid}>
         {filteredTrips.map((trip) => (
@@ -196,7 +239,7 @@ export default function TripMainPage() {
             key={trip.room_id} 
             className={styles.tripCard}
             style={{
-              backgroundImage: `url(${trip.plan_url || 'https://travel-planner-profile-uploads.s3.amazonaws.com/default-trip.jpg'})`
+              backgroundImage: `url(${trip.image || 'https://travel-planner-profile-uploads.s3.amazonaws.com/default-trip.jpg'})`
             }}
           >
             <div className={styles.tripContent}>
@@ -207,6 +250,16 @@ export default function TripMainPage() {
                 </span>
               </div>
               <p className={styles.description}>{trip.description}</p>
+              <div className={styles.ownerInfo}>
+                <img 
+                  src={trip.User?.profile_uri || "https://via.placeholder.com/40"} 
+                  alt={trip.User?.name}
+                  className={styles.ownerAvatar}
+                />
+                <span className={styles.ownerName}>
+                  {trip.User?.name || trip.User?.username}
+                </span>
+              </div>
               <div className={styles.tripFooter}>
                 <div className={styles.budget}>
                   งบประมาณ: {trip.total_budget?.toLocaleString('th-TH')} บาท

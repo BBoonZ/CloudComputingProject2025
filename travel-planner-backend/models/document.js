@@ -19,6 +19,7 @@ const Document = sequelize.define('Document', {
   file: DataTypes.TEXT
 }, {
   tableName: 'document',
+  schema: 'aws',
   timestamps: false
 });
 

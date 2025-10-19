@@ -30,6 +30,7 @@ const Expend = sequelize.define('Expend', {
   type: DataTypes.STRING(50)
 }, {
   tableName: 'expend',
+  schema: 'aws',
   timestamps: false
 });
 

@@ -10,11 +10,11 @@ import "./css/ForgotPage.css";
 import "./css/popup.css";
 import "./css/color.css";
 
-ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+// ReactDOM.createRoot(document.getElementById("root")).render(
+//   <React.StrictMode>
+//     <App />
+//   </React.StrictMode>
+// );
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

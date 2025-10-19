@@ -4,9 +4,9 @@ VALUES
 ('USR0000001', 'john@example.com', 'johndoe', 'John', 'Doe', '0812345678', 'https://travel-planner-profile-uploads.s3.amazonaws.com/default-avatar.png');
 
 -- Insert additional trip plans
-INSERT INTO aws.planroom (room_id, user_id, title, description, total_budget, start_date, end_date, share_status, plan_url)
+INSERT INTO aws.planroom (room_id, user_id, title, description, total_budget, start_date, end_date, share_status, image)
 VALUES 
-(1, 'USR0000001', 'ทริปเที่ยวภูเก็ต 3 วัน 2 คืน', 'ทริปครอบครัวพักผ่อนช่วงปีใหม่ พร้อมดำน้ำดูปะการัง', 15000.00, '2025-12-30', '2026-01-01', 'public', 'https://images.unsplash.com/photo-1589394815804-964ed0be2eb5'),
+(1, 'USR0000001', 'ทริปเที่ยวภูเก็ต 3 วัน 2 คืน', 'ทริปครอบครัวพักผ่อนช่วงปีใหม่ พร้อมดำน้ำดูปะการัง', 15000.00, '2025-12-30', '2026-01-01', true, 'https://images.unsplash.com/photo-1589394815804-964ed0be2eb5'),
 
 (2, 'USR0000001', 'เที่ยวเชียงใหม่ หน้าหนาว', 'สัมผัสอากาศหนาว ชมดอกไม้เมืองหนาว ม่อนแจ่ม ดอยสุเทพ', 12000.00, '2025-11-15', '2025-11-18', 'public', 'https://images.unsplash.com/photo-1598008663918-6dd0025d9d85'),
 

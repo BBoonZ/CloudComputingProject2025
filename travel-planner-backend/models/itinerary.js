@@ -25,6 +25,7 @@ const Itinerary = sequelize.define('Itinerary', {
   time: DataTypes.TIME
 }, {
   tableName: 'itinerary',
+  schema: 'aws',
   timestamps: false
 });
 

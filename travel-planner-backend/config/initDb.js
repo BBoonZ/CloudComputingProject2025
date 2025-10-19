@@ -253,7 +253,7 @@ const Planroom = sequelize.define('Planroom', {
     await sequelize.query('CREATE SCHEMA IF NOT EXISTS aws');
 
     // Sync all models without dropping tables
-    await sequelize.sync({ force: true });
+    await sequelize.sync({ force: false });
     console.log('Database tables synchronized successfully');
 
     return {

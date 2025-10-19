@@ -12,9 +12,9 @@ export const tripService = {
     }
   },
 
-  async getPublicTrips() {
+  async getPublicTrips(params = {}) {
     try {
-      const response = await axios.get(`${API_URL}/api/trips/public`);
+      const response = await axios.get(`${API_URL}/api/trips/public`, { params });
       return response.data;
     } catch (error) {
       throw error;

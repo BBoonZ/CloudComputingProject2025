@@ -23,6 +23,7 @@ const Member = sequelize.define('Member', {
   photo: DataTypes.TEXT
 }, {
   tableName: 'member',
+  schema: 'aws',
   timestamps: false
 });
 

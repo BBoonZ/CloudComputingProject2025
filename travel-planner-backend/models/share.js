@@ -2,8 +2,8 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 const Planroom = require('./planroom');
 
-const Itinerary = sequelize.define('Itinerary', {
-  itinerary_id: {
+const Share = sequelize.define('Share', {
+  share_id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true
@@ -16,16 +16,11 @@ const Itinerary = sequelize.define('Itinerary', {
     },
     onDelete: 'CASCADE'
   },
-  title: {
-    type: DataTypes.STRING(100),
-    allowNull: false
-  },
-  map: DataTypes.TEXT,
-  location: DataTypes.TEXT,
-  time: DataTypes.TIME
+  mode: DataTypes.STRING(50),
+  link: DataTypes.TEXT
 }, {
-  tableName: 'itinerary',
+  tableName: 'share',
   timestamps: false
 });
 
-module.exports = Itinerary;
+module.exports = Share;

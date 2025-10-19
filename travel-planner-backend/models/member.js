@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
-const { Planroom } = require('./planroom');
+const Planroom = require('./planroom');
 
 const Member = sequelize.define('Member', {
   member_id: {
@@ -16,12 +16,14 @@ const Member = sequelize.define('Member', {
     },
     onDelete: 'CASCADE'
   },
-  member_name: DataTypes.STRING(100),
+  member_name: {
+    type: DataTypes.STRING(100),
+    allowNull: false
+  },
   photo: DataTypes.TEXT
 }, {
   tableName: 'member',
-  schema: 'aws',
   timestamps: false
 });
 
-module.exports = { Member };
+module.exports = Member;

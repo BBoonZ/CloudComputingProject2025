@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
-const { User } = require('./user');
+const User = require('./user');
 
 const Planroom = sequelize.define('Planroom', {
   room_id: {
@@ -13,26 +13,24 @@ const Planroom = sequelize.define('Planroom', {
     references: {
       model: User,
       key: 'user_id'
-    },
-    onDelete: 'CASCADE'
+    }
   },
   title: {
-    type: DataTypes.STRING(255),
+    type: DataTypes.STRING(100),
     allowNull: false
   },
   description: DataTypes.TEXT,
-  total_budget: DataTypes.DECIMAL(12, 2),
+  total_budget: DataTypes.DECIMAL(10, 2),
+  share_status: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
+  image: DataTypes.TEXT,
   start_date: DataTypes.DATEONLY,
-  end_date: DataTypes.DATEONLY,
-  share_status: DataTypes.STRING(20),
-  plan_url: {
-    type: DataTypes.TEXT,
-    defaultValue: 'https://travel-planner-profile-uploads.s3.amazonaws.com/default-trip.jpg'
-  }
+  end_date: DataTypes.DATEONLY
 }, {
   tableName: 'planroom',
-  schema: 'aws',
   timestamps: false
 });
 
-module.exports = { Planroom };
+module.exports = Planroom;

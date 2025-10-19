@@ -1,9 +1,10 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 const Planroom = require('./planroom');
+const User = require('./user');
 
-const Itinerary = sequelize.define('Itinerary', {
-  itinerary_id: {
+const Access = sequelize.define('Access', {
+  access_id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true
@@ -16,16 +17,21 @@ const Itinerary = sequelize.define('Itinerary', {
     },
     onDelete: 'CASCADE'
   },
-  title: {
-    type: DataTypes.STRING(100),
-    allowNull: false
+  user_id: {
+    type: DataTypes.CHAR(10),
+    references: {
+      model: User,
+      key: 'user_id'
+    },
+    onDelete: 'CASCADE'
   },
-  map: DataTypes.TEXT,
-  location: DataTypes.TEXT,
-  time: DataTypes.TIME
+  role: {
+    type: DataTypes.STRING(50),
+    defaultValue: 'member'
+  }
 }, {
-  tableName: 'itinerary',
+  tableName: 'access',
   timestamps: false
 });
 
-module.exports = Itinerary;
+module.exports = Access;

@@ -1,9 +1,10 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 const Planroom = require('./planroom');
+const Member = require('./member');
 
-const Itinerary = sequelize.define('Itinerary', {
-  itinerary_id: {
+const Expend = sequelize.define('Expend', {
+  expend_id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true
@@ -16,16 +17,20 @@ const Itinerary = sequelize.define('Itinerary', {
     },
     onDelete: 'CASCADE'
   },
-  title: {
-    type: DataTypes.STRING(100),
-    allowNull: false
+  member_id: {
+    type: DataTypes.INTEGER,
+    references: {
+      model: Member,
+      key: 'member_id'
+    },
+    onDelete: 'SET NULL'
   },
-  map: DataTypes.TEXT,
-  location: DataTypes.TEXT,
-  time: DataTypes.TIME
+  description: DataTypes.TEXT,
+  value: DataTypes.DECIMAL(10, 2),
+  type: DataTypes.STRING(50)
 }, {
-  tableName: 'itinerary',
+  tableName: 'expend',
   timestamps: false
 });
 
-module.exports = Itinerary;
+module.exports = Expend;

@@ -23,23 +23,74 @@ export default function TripBudget() {
     const [teamMembers, setTeamMembers] = useState([]);
     const [roomExpend, setRoomExpend] = useState([]);
     const [roomUseBudget, setRoomUseBudget] = useState();
+    const [expensesTeam, setExpensesTeam] = useState([]);
     useEffect(() => {
-        fetch(`http://localhost:3001/members?room_id=${room_id}`)
-            .then((res) => res.json())
-            .then((data) => setTeamMembers(data))
-            .catch((err) => console.error(err));
+    // ดึงรายชื่อสมาชิก
+    fetch(`http://localhost:3001/members?room_id=${room_id}`)
+        .then((res) => res.json())
+        .then((members) => {
+            setTeamMembers(members);
 
-        fetch(`http://localhost:3001/room_expends/${room_id}`)
-            .then((res) => res.json())
-            .then((dat) => {
-                setRoomExpend(dat);
+            // ดึงข้อมูลค่าใช้จ่ายของห้อง
+            fetch(`http://localhost:3001/room_expends/${room_id}`)
+                .then((res) => res.json())
+                .then((dat) => {
+                    setRoomExpend(dat);
 
-                // รวมค่าใช้จ่ายทั้งหมด
-                const totalUsed = dat.Expends?.reduce((sum, item) => sum + Number(item.value), 0) || 0;
-                setRoomUseBudget(totalUsed);
-            })
-            .catch((err) => console.error(err));
-    }, [room_id]);
+                    // รวมค่าใช้จ่ายทั้งหมด
+                    const totalUsed = dat.Expends?.reduce((sum, item) => sum + Number(item.value), 0) || 0;
+                    setRoomUseBudget(totalUsed);
+
+                    // ===== คำนวณตาราง expensesTeam =====
+                    if (members.length > 0) {
+                        // 1️⃣ รวมจ่ายต่อคน (เฉพาะคนที่มี expend)
+                        const paidByMember = {};
+                        dat.Expends?.forEach((exp) => {
+                            const memberId = exp.member_id;
+                            if (!paidByMember[memberId]) {
+                                paidByMember[memberId] = {
+                                    name: exp.Member?.member_name || "ไม่ระบุ",
+                                    paid: 0,
+                                };
+                            }
+                            paidByMember[memberId].paid += Number(exp.value);
+                        });
+
+                        // 2️⃣ รวมคนที่ไม่มี expend ด้วย (paid = 0)
+                        members.forEach((m) => {
+                            if (!paidByMember[m.member_id]) {
+                                paidByMember[m.member_id] = {
+                                    name: m.member_name,
+                                    paid: 0,
+                                };
+                            }
+                        });
+
+                        // 3️⃣ คำนวณค่าเฉลี่ยที่ควรจ่าย (เอาจำนวนสมาชิกทั้งหมดมาหาร)
+                        const totalMembers = members.length;
+                        const avgPay = totalMembers > 0 ? totalUsed / totalMembers : 0;
+
+                        // 4️⃣ คำนวณ shouldPay และ diff
+                        const calculated = Object.values(paidByMember).map((member) => {
+                            const shouldPayRaw = avgPay - member.paid;
+                            const shouldPay = shouldPayRaw <= 0 ? 0 : shouldPayRaw;
+                            const diff = shouldPayRaw < 0 ? Math.abs(shouldPayRaw) : 0;
+
+                            return {
+                                name: member.name,
+                                paid: member.paid,
+                                shouldPay,
+                                diff,
+                            };
+                        });
+
+                        setExpensesTeam(calculated);
+                    }
+                })
+                .catch((err) => console.error(err));
+        })
+        .catch((err) => console.error(err));
+}, [room_id]);
 
 
     const handleDeleteExpense = async (expend_id) => {
@@ -52,12 +103,12 @@ export default function TripBudget() {
 
             const resData = await response.json();
             console.log("ลบสำเร็จ:", resData);
-
+            window.location.reload();
             // อัปเดตรายการหลังลบ
-            setRoomExpend((prev) => ({
-                ...prev,
-                Expends: prev.Expends.filter((item) => item.expend_id !== expend_id),
-            }));
+            // setRoomExpend((prev) => ({
+            //     ...prev,
+            //     Expends: prev.Expends.filter((item) => item.expend_id !== expend_id),
+            // }));
 
             alert("ลบค่าใช้จ่ายเรียบร้อย!");
         } catch (err) {
@@ -107,11 +158,11 @@ export default function TripBudget() {
     //     },
     // ];
 
-    const expensesTeam = [
-        { name: "Jane Doe", paid: 5000, shouldPay: 1200, diff: 3200 },
-        { name: "John Smith", paid: 3000, shouldPay: 1200, diff: 1800 },
-        { name: "สมใจ", paid: 500, shouldPay: 1200, diff: -700 },
-    ];
+    // const expensesTeam = [
+    //     { name: "Jane Doe", paid: 5000, shouldPay: 1200, diff: 3200 },
+    //     { name: "John Smith", paid: 3000, shouldPay: 1200, diff: 1800 },
+    //     { name: "สมใจ", paid: 500, shouldPay: 1200, diff: -700 },
+    // ];
 
     return (
         <>

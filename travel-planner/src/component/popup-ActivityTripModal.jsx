@@ -6,6 +6,7 @@ export default function ActivityModal({
   open,
   onClose,
   editData = null,
+  date = null
 }) {
   const [activities, setActivities] = useState(
     editData?.details || [{ text: "" }]
@@ -35,6 +36,7 @@ export default function ActivityModal({
       location: e.target.activityLocation.value,
       locationLink: e.target.activityLocationLink.value,
       details: activities,
+      date: date,
     };
     console.log(isEdit ? "Edit data:" : "Add data:", data);
     onClose();

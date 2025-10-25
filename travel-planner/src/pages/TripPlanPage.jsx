@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import { Link } from "react-router-dom";
 import { useLocation, useNavigate } from "react-router-dom";
 import EditTripModal from "../component/popup-editTripPlan";
@@ -23,6 +23,7 @@ export default function TripPlanPage() {
     const [trips, setTrips] = useState([]);
     const [totaldate, setTotaldate] = useState([]);
     const [totalDays, setTotalDays] = useState(0);
+    const [selectDate, setSelectedDate] = useState(null)
 
     const generateTripDays = (startDateStr, endDateStr) => {
         const start = new Date(startDateStr);
@@ -36,10 +37,12 @@ export default function TripPlanPage() {
             // สร้างวันที่เป็น "1 ธ.ค." เช่นเดิม
             const options = { day: 'numeric', month: 'short' };
             const dateText = current.toLocaleDateString('th-TH', options);
+            const realdate = current.toISOString().split("T")[0]
 
             days.push({
                 day: dayCount,
                 date: dateText,
+                real: realdate,
                 activities: [] // กิจกรรมว่าง ๆ สามารถเติมจาก API
             });
 
@@ -224,8 +227,8 @@ export default function TripPlanPage() {
                                                     </div>
                                                 </div>
                                             ))}
-                                            <button className={styles.btnAddActivity} onClick={() => setAddActivityModalOpen(true)}>
-                                                <i className="fas fa-plus"></i> เพิ่มกิจกรรม
+                                            <button className={styles.btnAddActivity} onClick={() => {setSelectedDate(tripDay.real); setAddActivityModalOpen(true);}}>
+                                                <i className="fas fa-plus"></i> เพิ่มกิจกรรม {tripDay.real}
                                             </button>
                                         </div>
                                     </div>
@@ -253,6 +256,7 @@ export default function TripPlanPage() {
                 type="add"
                 open={addActivityModalOpen}
                 onClose={() => setAddActivityModalOpen(false)}
+                date={selectDate}
             />
 
             {/* Edit Activity Modal */}

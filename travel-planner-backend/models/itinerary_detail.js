@@ -19,6 +19,7 @@ const ItineraryDetail = sequelize.define('ItineraryDetail', {
   description: DataTypes.TEXT
 }, {
   tableName: 'itinerary_detail',
+  schema: 'aws',
   timestamps: false
 });
 

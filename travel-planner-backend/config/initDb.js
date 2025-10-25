@@ -27,7 +27,7 @@ async function initializeTables() {
         type: DataTypes.STRING(100)
       },
       profile_uri: {
-        type: DataTypes.TEXT()
+        type: DataTypes.TEXT
       }
     }, {
       tableName: 'user',
@@ -253,10 +253,20 @@ const Planroom = sequelize.define('Planroom', {
     await sequelize.query('CREATE SCHEMA IF NOT EXISTS aws');
 
     // Sync all models without dropping tables
-    await sequelize.sync({ force: false }); // Changed to false to prevent dropping tables
+    await sequelize.sync({ force: false });
     console.log('Database tables synchronized successfully');
 
-    return { User, Planroom, Member };
+    return {
+      User,
+      Planroom,
+      Member,
+      Itinerary,
+      ItineraryDetail,
+      Expend,
+      Document,
+      Share,
+      Access
+    };
   } catch (error) {
     console.error('Error initializing database:', error);
     throw error;

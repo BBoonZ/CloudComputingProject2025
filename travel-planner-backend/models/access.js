@@ -31,6 +31,7 @@ const Access = sequelize.define('Access', {
   }
 }, {
   tableName: 'access',
+  schema: 'aws',
   timestamps: false
 });
 

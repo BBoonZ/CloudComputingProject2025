@@ -30,6 +30,7 @@ const Planroom = sequelize.define('Planroom', {
   end_date: DataTypes.DATEONLY
 }, {
   tableName: 'planroom',
+  schema: 'aws',
   timestamps: false
 });
 

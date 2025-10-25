@@ -27,9 +27,11 @@ const Expend = sequelize.define('Expend', {
   },
   description: DataTypes.TEXT,
   value: DataTypes.DECIMAL(10, 2),
-  type: DataTypes.STRING(50)
+  type: DataTypes.STRING(50),
+  paydate: DataTypes.DATEONLY
 }, {
   tableName: 'expend',
+  schema: 'aws',
   timestamps: false
 });
 

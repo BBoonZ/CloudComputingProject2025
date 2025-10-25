@@ -5,29 +5,23 @@ import styles from "../css/tripManage.module.css";
 import nav from "../css/main-nav.module.css";
 
 export default function TripMainPage() {
-    const trips = [
-      {
-        title: "ทริปตะลุยเชียงใหม่",
-        date: "1 - 4 ธันวาคม 2567",
-        visited: 12,
-        cost: 15000,
-        img: "https://picsum.photos/id/1015/400/300",
-      },
-      {
-        title: "เที่ยวทะเลภูเก็ต",
-        date: "15 - 18 มกราคม 2568",
-        visited: 8,
-        cost: 12000,
-        img: "https://picsum.photos/id/1025/400/300",
-      },
-      {
-        title: "ทริปตะลุยเชียงใหม่",
-        date: "1 - 4 ธันวาคม 2567",
-        visited: 12,
-        cost: 15000,
-        img: "https://picsum.photos/id/1015/400/300",
-      },
-    ];
+   const [trips, setTrips] = useState([]);
+   const userId = "1";
+
+  useEffect(() => {
+    fetch(`http://localhost:3001/trips?user_id=${userId}`)
+      .then((res) => res.json())
+      .then((data) => setTrips(data))
+      .catch((err) => console.error(err));
+  }, []);
+
+  console.log(trips);
+  const totalUsedBudget = trips.reduce((sum, trip) => {
+    const budget = parseFloat(trip.total_budget) || 0;
+    return sum + budget;
+  }, 0);
+
+  const totalTrips = trips.length;
   
     return (
       <>
@@ -64,11 +58,11 @@ export default function TripMainPage() {
             </div>
             <div className={styles.summaryCard}>
               <h3>💸 งบที่ใช้ไป</h3>
-              <p>45,000 บาท</p>
+              <p>{totalUsedBudget}</p>
             </div>
             <div className={styles.summaryCard}>
               <h3>🧳 จำนวนทริป</h3>
-              <p>5 ทริป</p>
+              <p>{totalTrips} ทริป</p>
             </div>
             <div className={styles.summaryCard}>
               <h3>⏳ รวมระยะเวลา</h3>
@@ -88,12 +82,12 @@ export default function TripMainPage() {
                   <div className={styles.tripTitle}>{trip.title}</div>
                   <div className={styles.tripDate}>{trip.date}</div>
                   <div className={styles.tripMeta}>
-                    ไปมาแล้ว {trip.visited} แห่ง · ใช้ไป {trip.cost.toLocaleString()} บาท
+                    งบประมาณ {trip.total_budget.toLocaleString()} บาท
                   </div>
                   <div className={styles.tripActions}>
                     <button
                       className={`${styles.btn} ${styles.btnEdit}`}
-                      onClick={() => window.location.href = "/tripPlan"}
+                      onClick={() => window.location.href = `/tripPlan?room_id=${trip.room_id}`}
                     >
                       <i className="fas fa-edit"></i> จัดการ
                     </button>

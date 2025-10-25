@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-
+import { useLocation, useNavigate } from "react-router-dom";
 import EditTripModal from "../component/popup-editTripPlan";
 import ShareTripModal from "../component/popup-shareTripPlan";
 
@@ -12,7 +12,12 @@ import testIMG from "../assests/images/test1.jpg";
 
 
 export default function TripBudget() {
-    // state สำหรับ modal
+    // state สำหรับ 
+    
+    const navigate = useNavigate();
+    const location = useLocation();
+    const params = new URLSearchParams(location.search);
+    const room_id = params.get("room_id");
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [shareModalOpen, setShareModalOpen] = useState(false);
 
@@ -127,16 +132,16 @@ export default function TripBudget() {
                     </div>
                     <div className={tripTemplate.planLayout}>
                         <aside className={tripTemplate.planSidebar}>
-                            <div className={tripTemplate.sidebarItem} onClick={() => window.location.href = '/tripPlan'}>
+                            <div className={tripTemplate.sidebarItem} onClick={() => navigate(`/tripPlan?room_id=${room_id}`)}>
                                 <i className="fas fa-calendar-alt"></i> กำหนดการเดินทาง
                             </div>
-                            <div className={tripTemplate.sidebarItem} onClick={() => window.location.href = '/tripBudget'}>
+                            <div className={tripTemplate.sidebarItem} onClick={() => navigate(`/tripBudget?room_id=${room_id}`)}>
                                 <i className="fas fa-wallet"></i> งบประมาณ
                             </div>
-                            <div className={tripTemplate.sidebarItem} onClick={() => window.location.href = '/tripTeam'}>
+                            <div className={tripTemplate.sidebarItem} onClick={() => navigate(`/tripTeam?room_id=${room_id}`)}>
                                 <i className="fas fa-users"></i> สมาชิก & แชท
                             </div>
-                            <div className={`${tripTemplate.sidebarItem} ${tripTemplate.active}`} onClick={() => window.location.href = '/tripFolder'}>
+                            <div className={`${tripTemplate.sidebarItem} ${tripTemplate.active}`} onClick={() => navigate(`/tripFolder?room_id=${room_id}`)}>
                                 <i className="fas fa-file-alt"></i> เอกสาร
                             </div>
                         </aside>

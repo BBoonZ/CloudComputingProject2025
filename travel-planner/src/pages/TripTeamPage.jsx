@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-
+import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import EditTripModal from "../component/popup-editTripPlan";
 import ShareTripModal from "../component/popup-shareTripPlan";
 
@@ -10,23 +10,34 @@ import tripTemplate from "../css/tripTemplate.module.css";
 
 export default function TripBudget() {
     // state สำหรับ modal
+    
+    const navigate = useNavigate();
+    const location = useLocation();
+    const params = new URLSearchParams(location.search);
+    const room_id = params.get("room_id");
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [shareModalOpen, setShareModalOpen] = useState(false);
-
     const [showAddModal, setShowAddModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [selectedMember, setSelectedMember] = useState(null);
-
-    // state สำหรับสลับหน้า member list กับ personal budget
     const [showPersonalBudget, setShowPersonalBudget] = useState(false);
     const [member, setMember] = useState(null);
+    const [members, setMembers] = useState([]);
+    useEffect(() => {
+        fetch(`http://localhost:3001/members?room_id=${room_id}`)
+          .then((res) => res.json())
+          .then((data) => setMembers(data))
+          .catch((err) => console.error(err));
+      }, [room_id]);
+    // state สำหรับสลับหน้า member list กับ personal budget
+    
 
-    const members = [
-        { name: "Jane Doe", img: "https://img.poki-cdn.com/cdn-cgi/image/q=78,scq=50,width=1200,height=1200,fit=cover,f=png/5f8d164d8269cffacc89422054b94c70/roblox.png" },
-        { name: "John Smith", img: "https://img.poki-cdn.com/cdn-cgi/image/q=78,scq=50,width=1200,height=1200,fit=cover,f=png/5f8d164d8269cffacc89422054b94c70/roblox.png" },
-        { name: "Alice Tan", img: "https://img.poki-cdn.com/cdn-cgi/image/q=78,scq=50,width=1200,height=1200,fit=cover,f=png/5f8d164d8269cffacc89422054b94c70/roblox.png" },
-        { name: "Mark Lee", img: "https://img.poki-cdn.com/cdn-cgi/image/q=78,scq=50,width=1200,height=1200,fit=cover,f=png/5f8d164d8269cffacc89422054b94c70/roblox.png" },
-    ];
+    // const members = [
+    //     { name: "Jane Doe", img: "https://img.poki-cdn.com/cdn-cgi/image/q=78,scq=50,width=1200,height=1200,fit=cover,f=png/5f8d164d8269cffacc89422054b94c70/roblox.png" },
+    //     { name: "John Smith", img: "https://img.poki-cdn.com/cdn-cgi/image/q=78,scq=50,width=1200,height=1200,fit=cover,f=png/5f8d164d8269cffacc89422054b94c70/roblox.png" },
+    //     { name: "Alice Tan", img: "https://img.poki-cdn.com/cdn-cgi/image/q=78,scq=50,width=1200,height=1200,fit=cover,f=png/5f8d164d8269cffacc89422054b94c70/roblox.png" },
+    //     { name: "Mark Lee", img: "https://img.poki-cdn.com/cdn-cgi/image/q=78,scq=50,width=1200,height=1200,fit=cover,f=png/5f8d164d8269cffacc89422054b94c70/roblox.png" },
+    // ];
 
     const summary = { paidTotal: 20000, shouldPay: 8500, remaining: 11500 };
     const debts = [
@@ -41,7 +52,7 @@ export default function TripBudget() {
     ];
 
     const handleOpenBudget = (m) => {
-        setMember(m.name);
+        setMember(m.member_name);
         setSelectedMember(m);
         setShowPersonalBudget(true);
     };
@@ -51,11 +62,73 @@ export default function TripBudget() {
         setShowEditModal(true);
     };
 
-    const handleDelete = (m) => {
-        if (window.confirm(`ต้องการลบ ${m.name} หรือไม่?`)) {
-            console.log(`ลบ ${m.name}`);
+    const handleDelete = async (m) => {
+        if (window.confirm(`ต้องการลบ ${m.member_name} หรือไม่?`)) {
+        try {
+            
+        const res = await fetch(`http://localhost:3001/deleteMember/${m.member_id}`, {
+        method: "DELETE"
+    });
+
+      if (!res.ok) throw new Error("ส่งข้อมูลไม่สำเร็จ");
+    //   const data = await res.json();
+      navigate(`/tripTeam?room_id=${room_id}`)
+    } catch (err) {
+      console.error("เกิดข้อผิดพลาด:", err);
+      alert("เกิดข้อผิดพลาดในการลบสมาชิก");
+    }
+            console.log(`ลบ ${m.member_name}`);
         }
     };
+
+    const handleAddMember = async (name) => {
+    const data = { name: name.value.trim(), room_id };
+    // เตรียมข้อมูลที่จะส่ง
+
+    try {
+    
+    const res = await fetch("http://localhost:3001/addMember", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data),
+    });
+
+      if (!res.ok) throw new Error("ส่งข้อมูลไม่สำเร็จ");
+      setShowAddModal(false);
+    //   const data = await res.json();
+      navigate(`/tripTeam?room_id=${room_id}`)
+    } catch (err) {
+      console.error("เกิดข้อผิดพลาด:", err);
+      alert("เกิดข้อผิดพลาดในการเพิ่มสมาชิก");
+    }
+  };
+
+
+    const editMember = async (name, member_id) => {
+    const data = { name: name.value.trim(), room_id, member_id };
+    // เตรียมข้อมูลที่จะส่ง
+
+    try {
+    
+    const res = await fetch("http://localhost:3001/editMember", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data),
+    });
+
+      if (!res.ok) throw new Error("ส่งข้อมูลไม่สำเร็จ");
+      setShowEditModal(false);
+    //   const data = await res.json();
+      navigate(`/tripTeam?room_id=${room_id}`)
+    } catch (err) {
+      console.error("เกิดข้อผิดพลาด:", err);
+      alert("เกิดข้อผิดพลาดในการเพิ่มสมาชิก");
+    }
+  };
 
     const formatCurrency = (num) => `฿ ${num.toLocaleString()}`;
 
@@ -104,16 +177,16 @@ export default function TripBudget() {
                     </div>
                     <div className={tripTemplate.planLayout}>
                         <aside className={tripTemplate.planSidebar}>
-                            <div className={tripTemplate.sidebarItem} onClick={() => window.location.href = '/tripPlan'}>
+                            <div className={tripTemplate.sidebarItem} onClick={() => navigate(`/tripPlan?room_id=${room_id}`)}>
                                 <i className="fas fa-calendar-alt"></i> กำหนดการเดินทาง
                             </div>
-                            <div className={tripTemplate.sidebarItem} onClick={() => window.location.href = '/tripBudget'}>
+                            <div className={tripTemplate.sidebarItem} onClick={() => navigate(`/tripBudget?room_id=${room_id}`)}>
                                 <i className="fas fa-wallet"></i> งบประมาณ
                             </div>
-                            <div className={`${tripTemplate.sidebarItem} ${tripTemplate.active}`} onClick={() => window.location.href = '/tripTeam'}>
+                            <div className={`${tripTemplate.sidebarItem} ${tripTemplate.active}`} onClick={() => navigate(`/tripTeam?room_id=${room_id}`)}>
                                 <i className="fas fa-users"></i> สมาชิก & แชท
                             </div>
-                            <div className={tripTemplate.sidebarItem} onClick={() => window.location.href = '/tripFolder'}>
+                            <div className={tripTemplate.sidebarItem} onClick={() => navigate(`/tripFolder?room_id=${room_id}`)}>
                                 <i className="fas fa-file-alt"></i> เอกสาร
                             </div>
                         </aside>
@@ -133,9 +206,9 @@ export default function TripBudget() {
                                         {members.map((m, i) => (
                                             <div className={styles.memberCard} key={i}>
                                                 <div className={styles.memberAvatar}>
-                                                    <img src={m.img} alt={m.name} />
+                                                    <img src={m.img} alt={m.member_name} />
                                                 </div>
-                                                <div className={styles.memberName}>{m.name}</div>
+                                                <div className={styles.memberName}>{m.member_name}</div>
                                                 <div className={styles.memberActions}>
                                                     <button className={styles.btnFinance} onClick={() => handleOpenBudget(m)}>
                                                         <i className="fas fa-wallet"></i> ดูข้อมูลการเงิน
@@ -259,7 +332,7 @@ export default function TripBudget() {
                             <input type="file" id="memberPic" accept="image/*" />
                             <div style={{ display: "flex", marginTop: 10 }}>
                                 <div style={{ marginLeft: "auto" }}>
-                                    <button type="submit" className="btn-save-edit">เพิ่ม</button>
+                                    <button type="button" onClick={() => {const memberNameInput = document.getElementById("memberName"); handleAddMember(memberNameInput);}}  className="btn-save-edit">เพิ่ม</button>
                                 </div>
                             </div>
                         </form>
@@ -279,7 +352,7 @@ export default function TripBudget() {
                             <input
                                 type="text"
                                 id="memberName"
-                                defaultValue={selectedMember?.name}
+                                defaultValue={selectedMember?.member_name}
                                 placeholder="ชื่อสมาชิก"
                                 required
                             />
@@ -287,7 +360,7 @@ export default function TripBudget() {
                             <input type="file" id="memberPic" accept="image/*" />
                             <div style={{ display: "flex", marginTop: 10 }}>
                                 <div style={{ marginLeft: "auto" }}>
-                                    <button type="submit" className="btn-save-edit">บันทึก</button>
+                                    <button type="button" onClick={() => {const memberNameInput = document.getElementById("memberName"); editMember(memberNameInput, selectedMember?.member_id);}} className="btn-save-edit">บันทึก</button>
                                 </div>
                             </div>
                         </form>

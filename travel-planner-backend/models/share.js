@@ -20,6 +20,7 @@ const Share = sequelize.define('Share', {
   link: DataTypes.TEXT
 }, {
   tableName: 'share',
+  schema: 'aws',
   timestamps: false
 });
 

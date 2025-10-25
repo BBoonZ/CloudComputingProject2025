@@ -4,14 +4,14 @@ import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
 import styles from "../css/tripMain.module.css";
 import nav from "../css/main-nav.module.css";
-import e from "cors";
+// import e from "cors";
 
 export default function TripMainPage() {
     const [showModal, setShowModal] = useState(false);
     const [preview, setPreview] = useState(null);
     const [tripdata, setTripData] = useState(null)
 
-    const openModal = () => { setTripData({ name: "", detail: "", range: "", budget: "", image: null, }); setShowModal(true);};
+    const openModal = () => { setTripData({ name: "", detail: "", start_date: "",end_date: "", budget: "", image: null, }); setShowModal(true);};
     const closeModal = () => {
         setShowModal(false);
         setPreview(null);
@@ -30,7 +30,7 @@ export default function TripMainPage() {
 
     const createTrip = async () => {
   try {
-    const res = await fetch("http://localhost:5000/createplan", {
+    const res = await fetch("http://localhost:3001/createplan", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(tripdata),
@@ -38,50 +38,93 @@ export default function TripMainPage() {
     const data = await res.json();
     console.log("Trip created:", data);
     setShowModal(false);  // ปิด modal
-    setTripData({ name: "", detail: "", range: "", budget: "", image: null }); // รีเซ็ต state
+    setTripData({ name: "", detail: "", start_date: "", end_date: "", budget: "", image: null }); // รีเซ็ต state
     setPreview(null);  // รีเซ็ต preview
   } catch (err) {
     console.error(err);
   }
 };
-
-
     useEffect(() => {
-        const monthsTH = [
-            "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
-            "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
-        ];
-
         flatpickr("#tripRange", {
-            mode: "range",
-            dateFormat: "Y-m-d",
-            minDate: "today",
-            locale: "th",
-            onClose: function (selectedDates, dateStr, instance) {
-                if (selectedDates.length === 2) {
-                    const start = selectedDates[0];
-                    const end = selectedDates[1];
+  mode: "range",
+  dateFormat: "Y-m-d",
+  minDate: "today",
+  locale: "th",
+  onClose: function (selectedDates, dateStr, instance) {
+    if (selectedDates.length === 2) {
+      const start = selectedDates[0];
+      const end = selectedDates[1];
 
-                    const dayStart = start.getDate();
-                    const monthStart = monthsTH[start.getMonth()];
-                    const yearStart = start.getFullYear() + 543;
+      // เก็บเป็น ISO date ให้ backend
+      setTripData({
+        ...tripdata,
+        start_date: start.toISOString().split("T")[0], // "YYYY-MM-DD"
+        end_date: end.toISOString().split("T")[0],     // "YYYY-MM-DD"
+      });
 
-                    const dayEnd = end.getDate();
-                    const monthEnd = monthsTH[end.getMonth()];
-                    const yearEnd = end.getFullYear() + 543;
+      // สร้างข้อความ display ไทยเหมือนเดิม
+      const monthsTH = [
+        "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
+        "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
+      ];
 
-                    let displayText = "";
-                    if (monthStart === monthEnd && yearStart === yearEnd) {
-                        displayText = `${dayStart} - ${dayEnd} ${monthStart} ${yearStart}`;
-                    } else {
-                        displayText = `${dayStart} ${monthStart} ${yearStart} - ${dayEnd} ${monthEnd} ${yearEnd}`;
-                    }
+      const dayStart = start.getDate();
+      const monthStart = monthsTH[start.getMonth()];
+      const yearStart = start.getFullYear() + 543;
 
-                    instance.input.value = displayText;
-                }
-            }
-        });
-    }, [showModal]);
+      const dayEnd = end.getDate();
+      const monthEnd = monthsTH[end.getMonth()];
+      const yearEnd = end.getFullYear() + 543;
+
+      let displayText = "";
+      if (monthStart === monthEnd && yearStart === yearEnd) {
+        displayText = `${dayStart} - ${dayEnd} ${monthStart} ${yearStart}`;
+      } else {
+        displayText = `${dayStart} ${monthStart} ${yearStart} - ${dayEnd} ${monthEnd} ${yearEnd}`;
+      }
+
+      instance.input.value = displayText;
+    }
+  }
+});
+        }, [showModal]);
+
+    // useEffect(() => {
+    //     const monthsTH = [
+    //         "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
+    //         "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
+    //     ];
+
+    //     flatpickr("#tripRange", {
+    //         mode: "range",
+    //         dateFormat: "Y-m-d",
+    //         minDate: "today",
+    //         locale: "th",
+    //         onClose: function (selectedDates, dateStr, instance) {
+    //             if (selectedDates.length === 2) {
+    //                 const start = selectedDates[0];
+    //                 const end = selectedDates[1];
+
+    //                 const dayStart = start.getDate();
+    //                 const monthStart = monthsTH[start.getMonth()];
+    //                 const yearStart = start.getFullYear() + 543;
+
+    //                 const dayEnd = end.getDate();
+    //                 const monthEnd = monthsTH[end.getMonth()];
+    //                 const yearEnd = end.getFullYear() + 543;
+
+    //                 let displayText = "";
+    //                 if (monthStart === monthEnd && yearStart === yearEnd) {
+    //                     displayText = `${dayStart} - ${dayEnd} ${monthStart} ${yearStart}`;
+    //                 } else {
+    //                     displayText = `${dayStart} ${monthStart} ${yearStart} - ${dayEnd} ${monthEnd} ${yearEnd}`;
+    //                 }
+
+    //                 instance.input.value = displayText;
+    //             }
+    //         }
+    //     });
+    // }, [showModal]);
 
     return (
         <>
@@ -179,8 +222,7 @@ export default function TripMainPage() {
                             <textarea rows="3" placeholder="ใส่ข้อความ..." value={tripdata.detail} onChange={(e) => setTripData({...tripdata, detail: e.target.value})} required />
 
                             <label>เลือกวันทริป *</label>
-                            <input id="tripRange" placeholder="เลือกวันที่เริ่มต้น - สิ้นสุด" value={tripdata.range} onChange={(e) => setTripData({...tripdata, range: e.target.value})} required />
-
+                           <input id="tripRange" placeholder="เลือกวันที่เริ่มต้น - สิ้นสุด" required />
                             <label>งบประมาณ</label>
                             <input placeholder="งบประมาณ..." value={tripdata.budget} onChange={(e) => setTripData({...tripdata, budget: e.target.value})}/>
 

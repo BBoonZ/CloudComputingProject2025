@@ -7,10 +7,54 @@ const BudgetModal = ({
     onClose,
     onSubmit,
     initialData = {},
+    room_id,
+    teamMembers
 }) => {
     if (!show) return null;
 
     const isEdit = type === "edit";
+
+    const handleSave = async () => {
+    // ดึงค่าจาก form
+    const description = document.getElementById("budgetItem").value;
+    const type = document.getElementById("budgetCategory").value;
+    const member_id = document.getElementById("budgetPaidBy").value;
+    const value = document.getElementById("budgetAmount").value;
+    const DateTime = document.getElementById("budgetDateTime").value;
+    const dateOnly = DateTime.split("T")[0];
+
+    const data = { room_id, description, type, member_id, value, dateOnly };
+
+    // ✅ ถ้าเป็นโหมด edit ให้เพิ่ม expend_id ไปด้วย
+    if (isEdit && initialData.expend_id) {
+        data.expend_id = initialData.expend_id;
+    }
+
+    try {
+        // ✅ ใช้ API คนละอันตามโหมด
+        const url = isEdit
+            ? "http://localhost:3001/editBudget"
+            : "http://localhost:3001/addBudget";
+
+        const response = await fetch(url, {
+            method: isEdit ? "PUT" : "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+        });
+
+        const resData = await response.json();
+        console.log("ส่งข้อมูลสำเร็จ:", resData);
+
+        // ✅ ข้อความแจ้งผลต่างกัน
+        alert(isEdit ? "บันทึกการแก้ไขเรียบร้อย!" : "เพิ่มค่าใช้จ่ายสำเร็จ!");
+        onClose();
+        window.location.reload();
+    } catch (err) {
+        console.error("ส่งข้อมูลไม่สำเร็จ:", err);
+    }
+};
+
+
 
     return (
         <>
@@ -28,14 +72,18 @@ const BudgetModal = ({
                         </span>
                     </div>
 
-                    <form onSubmit={onSubmit}>
+                    <form onSubmit={(e) => {
+                        e.preventDefault(); // ป้องกัน page reload
+                        handleSave();       // เรียกฟังก์ชันส่งข้อมูล
+                        }}>
+
                         <label htmlFor="budgetItem">รายการ *</label>
                         <input
                             type="text"
                             id="budgetItem"
                             name="budgetItem"
                             placeholder="รายการ"
-                            defaultValue={initialData.budgetItem || ""}
+                            defaultValue={initialData.description || ""} 
                             required
                         />
 
@@ -45,7 +93,7 @@ const BudgetModal = ({
                                 <select
                                     id="budgetCategory"
                                     name="budgetCategory"
-                                    defaultValue={initialData.budgetCategory || ""}
+                                    defaultValue={initialData.type || ""} 
                                     required
                                 >
                                     <option value="">-- เลือกหมวดหมู่ --</option>
@@ -61,14 +109,13 @@ const BudgetModal = ({
                                 <select
                                     id="budgetPaidBy"
                                     name="budgetPaidBy"
-                                    defaultValue={initialData.budgetPaidBy || ""}
+                                    defaultValue={initialData.member_id || ""}
                                     required
                                 >
                                     <option value="">-- เลือกผู้จ่าย --</option>
-                                    <option value="1">มูเด้ง</option>
-                                    <option value="2">อาหวัง</option>
-                                    <option value="3">หงทอง</option>
-                                    <option value="4">ไทยราช</option>
+                                    {teamMembers.map((member) => (
+                                        <option key={member.member_id} value={member.member_id}>{member.member_name}</option>
+                                    ))}
                                 </select>
                             </div>
                         </div>
@@ -79,7 +126,7 @@ const BudgetModal = ({
                             id="budgetAmount"
                             name="budgetAmount"
                             placeholder="จำนวนเงิน"
-                            defaultValue={initialData.budgetAmount || ""}
+                            defaultValue={initialData.value || ""}
                             required
                         />
 
@@ -88,7 +135,7 @@ const BudgetModal = ({
                             type="datetime-local"
                             id="budgetDateTime"
                             name="budgetDateTime"
-                            defaultValue={initialData.budgetDateTime || ""}
+                            defaultValue={initialData.paydate || ""}
                             required
                         />
 

@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-
+import { useLocation, useNavigate } from "react-router-dom";
 import EditTripModal from "../component/popup-editTripPlan";
 import ShareTripModal from "../component/popup-shareTripPlan";
 import ActivityTripModal from "../component/popup-ActivityTripModal";
-
 import nav from "../css/main-nav.module.css";
 import plantemp from "../css/tripTemplate.module.css";
 import styles from "../css/tripPlan.module.css";
@@ -12,9 +11,12 @@ import styles from "../css/tripPlan.module.css";
 export default function TripPlanPage() {
     useEffect(() => {
         document.body.style.backgroundColor = "";
-        return () => { document.body.style.backgroundColor = "#000000"; }
+        return () => { document.body.style.backgroundColor = "#f5f5f5"; }
     }, []);
-
+    const navigate = useNavigate();
+    const location = useLocation();
+    const params = new URLSearchParams(location.search);
+    const room_id = params.get("room_id");
     // state สำหรับ modal ต่างๆ
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [shareModalOpen, setShareModalOpen] = useState(false);
@@ -119,13 +121,13 @@ export default function TripPlanPage() {
                             <div className={`${plantemp.sidebarItem} ${plantemp.active}`}>
                                 <i className="fas fa-calendar-alt"></i> กำหนดการเดินทาง
                             </div>
-                            <div className={plantemp.sidebarItem} onClick={() => window.location.href = '/tripBudget'}>
+                            <div className={plantemp.sidebarItem} onClick={() => navigate(`/tripBudget?room_id=${room_id}`)}>
                                 <i className="fas fa-wallet"></i> งบประมาณ
                             </div>
-                            <div className={plantemp.sidebarItem} onClick={() => window.location.href = '/tripTeam'}>
+                            <div className={plantemp.sidebarItem} onClick={() => navigate(`/tripTeam?room_id=${room_id}`)}>
                                 <i className="fas fa-users"></i> สมาชิก & แชท
                             </div>
-                            <div className={plantemp.sidebarItem} onClick={() => window.location.href = '/tripFolder'}>
+                            <div className={plantemp.sidebarItem} onClick={() => navigate(`/tripFolder?room_id=${room_id}`)}>
                                 <i className="fas fa-file-alt"></i> เอกสาร
                             </div>
                         </aside>

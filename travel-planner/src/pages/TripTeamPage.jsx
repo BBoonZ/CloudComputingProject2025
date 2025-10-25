@@ -27,6 +27,8 @@ export default function TripBudget() {
     const [summary, setSummary] = useState([]);
     // ✅ เก็บเฉพาะค่าใช้จ่ายของ member ที่เลือก
     const [expenses, setExpenses] = useState([]);
+    const [debts, setDebts] = useState([]);
+
     useEffect(() => {
         fetch(`http://localhost:3001/members?room_id=${room_id}`)
           .then((res) => res.json())
@@ -51,11 +53,11 @@ export default function TripBudget() {
     // ];
 
     // const summary = { paidTotal: 20000, shouldPay: 8500, remaining: 11500 };
-    const debts = [
-        { name: "สมมิตร", status: "ต้องจ่าย", amount: 5000, details: "สมมิตร ต้องจ่ายเงินให้กับ Jane Doe 5,000 บาท" },
-        { name: "สมดี", status: "จะได้รับ", amount: 200, details: "สมดี จะได้รับเงินจาก Jane Doe 200 บาท" },
-        { name: "สมร้าย", status: "ต้องจ่าย", amount: 2000, details: "สมร้าย ต้องจ่ายเงินให้กับ Jane Doe 2,000 บาท" },
-    ];
+    // const debts = [
+    //     { name: "สมมิตร", status: "ต้องจ่าย", amount: 5000, details: "สมมิตร ต้องจ่ายเงินให้กับ Jane Doe 5,000 บาท" },
+    //     { name: "สมดี", status: "จะได้รับ", amount: 200, details: "สมดี จะได้รับเงินจาก Jane Doe 200 บาท" },
+    //     { name: "สมร้าย", status: "ต้องจ่าย", amount: 2000, details: "สมร้าย ต้องจ่ายเงินให้กับ Jane Doe 2,000 บาท" },
+    // ];
     // const expenses = [
     //     { title: "ค่าตั๋วเครื่องบิน", category: "เดินทาง", amount: 5000, paidBy: "Jane Doe", date: "10/11/2567" },
     //     { title: "ค่าที่พัก 3 คืน", category: "ที่พัก", amount: 3000, paidBy: "John Doe", date: "15/11/2567" },
@@ -85,6 +87,8 @@ export default function TripBudget() {
         shouldPay,
         remaining
     });
+
+    
 
   console.log("✅ memberExpenses:", memberExpenses);
   setExpenses(memberExpenses);

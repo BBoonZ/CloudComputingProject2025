@@ -9,10 +9,7 @@ import plantemp from "../css/tripTemplate.module.css";
 import styles from "../css/tripPlan.module.css";
 
 export default function TripPlanPage() {
-    useEffect(() => {
-        document.body.style.backgroundColor = "";
-        return () => { document.body.style.backgroundColor = "#f5f5f5"; }
-    }, []);
+
     const navigate = useNavigate();
     const location = useLocation();
     const params = new URLSearchParams(location.search);
@@ -22,56 +19,122 @@ export default function TripPlanPage() {
     const [shareModalOpen, setShareModalOpen] = useState(false);
     const [addActivityModalOpen, setAddActivityModalOpen] = useState(false);
     const [editActivityModalOpen, setEditActivityModalOpen] = useState(false);
+    const [trip, setTrip] = useState(null);
+    const [trips, setTrips] = useState([]);
+    const [totaldate, setTotaldate] = useState([]);
+    const [totalDays, setTotalDays] = useState(0);
 
-    const trips = [
-        {
-            day: 1,
-            date: "1 ธ.ค.",
-            activities: [
-                {
-                    title: "ถึงสนามบินเชียงใหม่",
-                    time: "9:00",
-                    location: "สนามบินนานาชาติเชียงใหม่",
-                    mapLink: "https://maps.google.com/?q=Chiang+Mai+Airport",
-                    details: [
-                        "✈ เดินทางโดยเครื่องบินจากสนามบินสุวรรณภูมิ (BKK) → เชียงใหม่ (CNX)",
-                        "⏱ ใช้เวลาบินประมาณ 1 ชั่วโมง 15 นาที",
-                        "🛄 รอรับกระเป๋าและนัดรถตู้ใช้เวลาประมาณ 20 นาที"
-                    ]
-                },
-                {
-                    title: "กินข้าวกลางวัน ร้านข้าวซอยลุงป้า",
-                    time: "12:30",
-                    location: "ถนนเจริญประเทศ",
-                    mapLink: "https://maps.google.com/?q=Khao+Soi+Lung+Pa+Restaurant",
-                    details: [
-                        "🍴 มื้อกลางวันที่ร้านข้าวซอยลุงป้า",
-                        "⭐ เมนูแนะนำ: ข้าวซอยไก่, ขนมจีนน้ำเงี้ยว",
-                        "💰 ค่าใช้จ่ายโดยประมาณ: 80–150 บาท/คน",
-                        "📝 ร้านเล็ก แนะนำไปก่อนเที่ยงเพื่อหลีกเลี่ยงคิว"
-                    ]
-                }
-            ]
-        },
-        {
-            day: 2,
-            date: "2 ธ.ค.",
-            activities: [
-                {
-                    title: "วัดพระธาตุดอยสุเทพ",
-                    time: "10:00",
-                    location: "สุเทพ, เมืองเชียงใหม่",
-                    mapLink: "#",
-                    details: [
-                        "🚌 เดินทางจากตัวเมืองเชียงใหม่ขึ้นดอยสุเทพ (รถสองแถว/รถตู้)",
-                        "⏱ ใช้เวลาเดินทางประมาณ 30–40 นาที",
-                        "💰 ค่าเข้าชม: 30 บาท (ชาวต่างชาติ)",
-                        "📝 ใช้เวลาเที่ยวและไหว้พระประมาณ 1 ชั่วโมง"
-                    ]
-                }
-            ]
+    const generateTripDays = (startDateStr, endDateStr) => {
+        const start = new Date(startDateStr);
+        const end = new Date(endDateStr);
+        const days = [];
+        let current = new Date(start);
+
+        let dayCount = 1;
+
+        while (current <= end) {
+            // สร้างวันที่เป็น "1 ธ.ค." เช่นเดิม
+            const options = { day: 'numeric', month: 'short' };
+            const dateText = current.toLocaleDateString('th-TH', options);
+
+            days.push({
+                day: dayCount,
+                date: dateText,
+                activities: [] // กิจกรรมว่าง ๆ สามารถเติมจาก API
+            });
+
+            // ไปวันถัดไป
+            current.setDate(current.getDate() + 1);
+            dayCount++;
         }
-    ];
+        return days;
+    };
+
+    useEffect(() => {
+
+         fetch(`http://localhost:3001/trip_detail?room_id=${room_id}`)
+            .then((res) => res.json())
+            .then((data) => {
+                setTrip(data);
+
+                // คำนวณจำนวนวันรวม
+                if (data && data.start_date && data.end_date) {
+                    const start = new Date(data.start_date);
+                    const end = new Date(data.end_date);
+                    const diffTime = end - start; // milliseconds
+                    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                    setTotalDays(diffDays);
+                    const daysArray = generateTripDays(data.start_date, data.end_date);
+                    setTrips(daysArray);
+                }
+            })
+            .catch((err) => console.error(err));
+        document.body.style.backgroundColor = "";
+        return () => { document.body.style.backgroundColor = "#f5f5f5"; }
+        
+
+    }, [room_id]);
+    
+    console.log(trip);
+    console.log(totalDays);
+    // const startDate = new Date(trip.start_date);
+    // const endDate = new Date(trip.end_date);
+    // const diffTime = endDate - startDate; // หรือ endDate.getTime() - startDate.getTime()
+
+// แปลงเป็นวัน
+    // const diffDays = diffTime / (1000 * 60 * 60 * 24) + 1; // +1 ถ้าต้องการรวมวันแรกด้วย
+
+    // console.log(diffDays); // 6
+
+    // const trips = [
+    //     {
+    //         day: 1,
+    //         date: "1 ธ.ค.",
+    //         activities: [
+    //             {
+    //                 title: "ถึงสนามบินเชียงใหม่",
+    //                 time: "9:00",
+    //                 location: "สนามบินนานาชาติเชียงใหม่",
+    //                 mapLink: "https://maps.google.com/?q=Chiang+Mai+Airport",
+    //                 details: [
+    //                     "✈ เดินทางโดยเครื่องบินจากสนามบินสุวรรณภูมิ (BKK) → เชียงใหม่ (CNX)",
+    //                     "⏱ ใช้เวลาบินประมาณ 1 ชั่วโมง 15 นาที",
+    //                     "🛄 รอรับกระเป๋าและนัดรถตู้ใช้เวลาประมาณ 20 นาที"
+    //                 ]
+    //             },
+    //             {
+    //                 title: "กินข้าวกลางวัน ร้านข้าวซอยลุงป้า",
+    //                 time: "12:30",
+    //                 location: "ถนนเจริญประเทศ",
+    //                 mapLink: "https://maps.google.com/?q=Khao+Soi+Lung+Pa+Restaurant",
+    //                 details: [
+    //                     "🍴 มื้อกลางวันที่ร้านข้าวซอยลุงป้า",
+    //                     "⭐ เมนูแนะนำ: ข้าวซอยไก่, ขนมจีนน้ำเงี้ยว",
+    //                     "💰 ค่าใช้จ่ายโดยประมาณ: 80–150 บาท/คน",
+    //                     "📝 ร้านเล็ก แนะนำไปก่อนเที่ยงเพื่อหลีกเลี่ยงคิว"
+    //                 ]
+    //             }
+    //         ]
+    //     },
+    //     {
+    //         day: 2,
+    //         date: "2 ธ.ค.",
+    //         activities: [
+    //             {
+    //                 title: "วัดพระธาตุดอยสุเทพ",
+    //                 time: "10:00",
+    //                 location: "สุเทพ, เมืองเชียงใหม่",
+    //                 mapLink: "#",
+    //                 details: [
+    //                     "🚌 เดินทางจากตัวเมืองเชียงใหม่ขึ้นดอยสุเทพ (รถสองแถว/รถตู้)",
+    //                     "⏱ ใช้เวลาเดินทางประมาณ 30–40 นาที",
+    //                     "💰 ค่าเข้าชม: 30 บาท (ชาวต่างชาติ)",
+    //                     "📝 ใช้เวลาเที่ยวและไหว้พระประมาณ 1 ชั่วโมง"
+    //                 ]
+    //             }
+    //         ]
+    //     }
+    // ];
 
     return (
         <>

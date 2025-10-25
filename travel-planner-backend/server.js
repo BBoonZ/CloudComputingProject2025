@@ -57,7 +57,7 @@ app.get("/trip_detail", async (req, res) => {
     });
     
     res.json(trips);
-    console.log("gooood")
+    console.log("exceel")
   } catch (err) {
     console.error("❌ Error creating plan:", err);
     res.status(500).send("Server error");

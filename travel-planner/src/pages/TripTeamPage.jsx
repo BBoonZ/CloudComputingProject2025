@@ -23,12 +23,23 @@ export default function TripBudget() {
     const [showPersonalBudget, setShowPersonalBudget] = useState(false);
     const [member, setMember] = useState(null);
     const [members, setMembers] = useState([]);
+    const [allExpenses, setAllExpenses] = useState([]);
+    const [summary, setSummary] = useState([]);
+    // ✅ เก็บเฉพาะค่าใช้จ่ายของ member ที่เลือก
+    const [expenses, setExpenses] = useState([]);
     useEffect(() => {
         fetch(`http://localhost:3001/members?room_id=${room_id}`)
           .then((res) => res.json())
           .then((data) => setMembers(data))
           .catch((err) => console.error(err));
       }, [room_id]);
+
+      useEffect(() => {
+        fetch(`http://localhost:3001/room_expends/${room_id}`)
+            .then((res) => res.json())
+            .then((data) => setAllExpenses(data))
+            .catch((err) => console.error("fetch expenses error:", err));
+    }, [room_id]);
     // state สำหรับสลับหน้า member list กับ personal budget
     
 
@@ -39,22 +50,45 @@ export default function TripBudget() {
     //     { name: "Mark Lee", img: "https://img.poki-cdn.com/cdn-cgi/image/q=78,scq=50,width=1200,height=1200,fit=cover,f=png/5f8d164d8269cffacc89422054b94c70/roblox.png" },
     // ];
 
-    const summary = { paidTotal: 20000, shouldPay: 8500, remaining: 11500 };
+    // const summary = { paidTotal: 20000, shouldPay: 8500, remaining: 11500 };
     const debts = [
         { name: "สมมิตร", status: "ต้องจ่าย", amount: 5000, details: "สมมิตร ต้องจ่ายเงินให้กับ Jane Doe 5,000 บาท" },
         { name: "สมดี", status: "จะได้รับ", amount: 200, details: "สมดี จะได้รับเงินจาก Jane Doe 200 บาท" },
         { name: "สมร้าย", status: "ต้องจ่าย", amount: 2000, details: "สมร้าย ต้องจ่ายเงินให้กับ Jane Doe 2,000 บาท" },
     ];
-    const expenses = [
-        { title: "ค่าตั๋วเครื่องบิน", category: "เดินทาง", amount: 5000, paidBy: "Jane Doe", date: "10/11/2567" },
-        { title: "ค่าที่พัก 3 คืน", category: "ที่พัก", amount: 3000, paidBy: "John Doe", date: "15/11/2567" },
-        { title: "ค่าอาหารกลางวัน (วันแรก)", category: "อาหาร", amount: 500, paidBy: "Jane Doe", date: "01/12/2567" },
-    ];
+    // const expenses = [
+    //     { title: "ค่าตั๋วเครื่องบิน", category: "เดินทาง", amount: 5000, paidBy: "Jane Doe", date: "10/11/2567" },
+    //     { title: "ค่าที่พัก 3 คืน", category: "ที่พัก", amount: 3000, paidBy: "John Doe", date: "15/11/2567" },
+    //     { title: "ค่าอาหารกลางวัน (วันแรก)", category: "อาหาร", amount: 500, paidBy: "Jane Doe", date: "01/12/2567" },
+    // ];
 
     const handleOpenBudget = (m) => {
         setMember(m.member_name);
         setSelectedMember(m);
         setShowPersonalBudget(true);
+        if (!allExpenses.Expends || !Array.isArray(allExpenses.Expends)) {
+    console.error("Expends is not an array:", allExpenses.Expends);
+    return;
+  }
+
+  const memberExpenses = allExpenses.Expends.filter(
+    (exp) => exp.member_id === m.member_id
+  );
+
+    const paidTotal = memberExpenses.reduce((sum, exp) => sum + Number(exp.value), 0);
+
+    const shouldPay = members.length > 0 ? paidTotal / members.length : 0;
+    const remaining = paidTotal - shouldPay; // อาจติดลบก็ได้
+
+    setSummary({
+        paidTotal,
+        shouldPay,
+        remaining
+    });
+
+  console.log("✅ memberExpenses:", memberExpenses);
+  setExpenses(memberExpenses);
+
     };
 
     const handleEdit = (m) => {
@@ -296,11 +330,11 @@ export default function TripBudget() {
                                             <tbody>
                                                 {expenses.map((e, i) => (
                                                     <tr key={i}>
-                                                        <td>{e.title}</td>
-                                                        <td>{e.category}</td>
-                                                        <td>{formatCurrency(e.amount)}</td>
-                                                        <td>{e.paidBy}</td>
-                                                        <td>{e.date}</td>
+                                                        <td>{e.description}</td>
+                                                        <td>{e.type}</td>
+                                                        <td>{formatCurrency(e.value)}</td>
+                                                        <td>{e.member_name}</td>
+                                                        <td>{e.paydate}</td>
                                                     </tr>
                                                 ))}
                                             </tbody>

@@ -10,7 +10,7 @@ import tripTemplate from "../css/tripTemplate.module.css";
 
 export default function TripBudget() {
     // state สำหรับ modal
-    
+
     const navigate = useNavigate();
     const location = useLocation();
     const params = new URLSearchParams(location.search);
@@ -30,21 +30,22 @@ export default function TripBudget() {
     const [debts, setDebts] = useState([]);
     const tripTitle = location.state?.tripTitle || "กำลังโหลดชื่อทริป...";
     const tripDescription = location.state?.tripDescription || "";
+    const trip = location.state?.trip || "";
     useEffect(() => {
         fetch(`http://localhost:3001/members?room_id=${room_id}`)
-          .then((res) => res.json())
-          .then((data) => setMembers(data))
-          .catch((err) => console.error(err));
-      }, [room_id]);
+            .then((res) => res.json())
+            .then((data) => setMembers(data))
+            .catch((err) => console.error(err));
+    }, [room_id]);
 
-      useEffect(() => {
+    useEffect(() => {
         fetch(`http://localhost:3001/room_expends/${room_id}`)
             .then((res) => res.json())
             .then((data) => setAllExpenses(data))
             .catch((err) => console.error("fetch expenses error:", err));
     }, [room_id]);
     // state สำหรับสลับหน้า member list กับ personal budget
-    
+
 
     // const members = [
     //     { name: "Jane Doe", img: "https://img.poki-cdn.com/cdn-cgi/image/q=78,scq=50,width=1200,height=1200,fit=cover,f=png/5f8d164d8269cffacc89422054b94c70/roblox.png" },
@@ -70,29 +71,29 @@ export default function TripBudget() {
         setSelectedMember(m);
         setShowPersonalBudget(true);
         if (!allExpenses.Expends || !Array.isArray(allExpenses.Expends)) {
-    console.error("Expends is not an array:", allExpenses.Expends);
-    return;
-  }
+            console.error("Expends is not an array:", allExpenses.Expends);
+            return;
+        }
 
-  const memberExpenses = allExpenses.Expends.filter(
-    (exp) => exp.member_id === m.member_id
-  );
+        const memberExpenses = allExpenses.Expends.filter(
+            (exp) => exp.member_id === m.member_id
+        );
 
-    const paidTotal = memberExpenses.reduce((sum, exp) => sum + Number(exp.value), 0);
+        const paidTotal = memberExpenses.reduce((sum, exp) => sum + Number(exp.value), 0);
 
-    const shouldPay = members.length > 0 ? paidTotal / members.length : 0;
-    const remaining = paidTotal - shouldPay; // อาจติดลบก็ได้
+        const shouldPay = members.length > 0 ? paidTotal / members.length : 0;
+        const remaining = paidTotal - shouldPay; // อาจติดลบก็ได้
 
-    setSummary({
-        paidTotal,
-        shouldPay,
-        remaining
-    });
+        setSummary({
+            paidTotal,
+            shouldPay,
+            remaining
+        });
 
-    
 
-  console.log("✅ memberExpenses:", memberExpenses);
-  setExpenses(memberExpenses);
+
+        console.log("✅ memberExpenses:", memberExpenses);
+        setExpenses(memberExpenses);
 
     };
 
@@ -103,71 +104,69 @@ export default function TripBudget() {
 
     const handleDelete = async (m) => {
         if (window.confirm(`ต้องการลบ ${m.member_name} หรือไม่?`)) {
-        try {
-            
-        const res = await fetch(`http://localhost:3001/deleteMember/${m.member_id}`, {
-        method: "DELETE"
-    });
-    
-      if (!res.ok) throw new Error("ส่งข้อมูลไม่สำเร็จ");
-    //   const data = await res.json();
-    window.location.reload();
-    } catch (err) {
-      console.error("เกิดข้อผิดพลาด:", err);
-      alert("เกิดข้อผิดพลาดในการลบสมาชิก");
-    }
+            try {
+
+                const res = await fetch(`http://localhost:3001/deleteMember/${m.member_id}`, {
+                    method: "DELETE"
+                });
+
+                if (!res.ok) throw new Error("ส่งข้อมูลไม่สำเร็จ");
+                //   const data = await res.json();
+                window.location.reload();
+            } catch (err) {
+                console.error("เกิดข้อผิดพลาด:", err);
+                alert("เกิดข้อผิดพลาดในการลบสมาชิก");
+            }
             console.log(`ลบ ${m.member_name}`);
         }
     };
 
-    const handleAddMember = async (name) => {
-    const data = { name: name.value.trim(), room_id };
-    // เตรียมข้อมูลที่จะส่ง
+    const handleAddMember = async (name, img) => {
+  const formData = new FormData();
+  formData.append("name", name.value.trim());
+  formData.append("room_id", room_id);
+  formData.append("file", img.files[0]); // ✅ แก้ตรงนี้
 
-    try {
-    
+  try {
     const res = await fetch("http://localhost:3001/addMember", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(data),
+      body: formData, // ✅ อย่าใช้ JSON.stringify()
     });
 
-      if (!res.ok) throw new Error("ส่งข้อมูลไม่สำเร็จ");
-      setShowAddModal(false);
-    //   const data = await res.json();
-      window.location.reload();
-    } catch (err) {
-      console.error("เกิดข้อผิดพลาด:", err);
-      alert("เกิดข้อผิดพลาดในการเพิ่มสมาชิก");
-    }
-  };
+    if (!res.ok) throw new Error("ส่งข้อมูลไม่สำเร็จ");
+
+    setShowAddModal(false);
+    window.location.reload();
+  } catch (err) {
+    console.error("เกิดข้อผิดพลาด:", err);
+    alert("เกิดข้อผิดพลาดในการเพิ่มสมาชิก");
+  }
+};
 
 
     const editMember = async (name, member_id) => {
-    const data = { name: name.value.trim(), room_id, member_id };
-    // เตรียมข้อมูลที่จะส่ง
+        const data = { name: name.value.trim(), room_id, member_id };
+        // เตรียมข้อมูลที่จะส่ง
 
-    try {
-    
-    const res = await fetch("http://localhost:3001/editMember", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(data),
-    });
+        try {
 
-      if (!res.ok) throw new Error("ส่งข้อมูลไม่สำเร็จ");
-      setShowEditModal(false);
-    //   const data = await res.json();
-      window.location.reload();
-    } catch (err) {
-      console.error("เกิดข้อผิดพลาด:", err);
-      alert("เกิดข้อผิดพลาดในการเพิ่มสมาชิก");
-    }
-  };
+            const res = await fetch("http://localhost:3001/editMember", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (!res.ok) throw new Error("ส่งข้อมูลไม่สำเร็จ");
+            setShowEditModal(false);
+            //   const data = await res.json();
+            window.location.reload();
+        } catch (err) {
+            console.error("เกิดข้อผิดพลาด:", err);
+            alert("เกิดข้อผิดพลาดในการเพิ่มสมาชิก");
+        }
+    };
 
     const formatCurrency = (num) => `฿ ${num.toLocaleString()}`;
 
@@ -198,7 +197,7 @@ export default function TripBudget() {
             <main className={tripTemplate.tripPlanMain}>
                 <div className={tripTemplate.container}>
                     <div className={tripTemplate.planHeader}>
-                        <h1>{tripDescription}</h1>
+                        <h1>{tripTitle}</h1>
                         <div className={tripTemplate.planMeta}>
                             <span className={tripTemplate.planDates}>1 - 4 ธันวาคม 2567</span>
                             <button className={`${tripTemplate.btn} ${tripTemplate.btnSave}`} onClick={() => setEditModalOpen(true)}>
@@ -211,7 +210,7 @@ export default function TripBudget() {
                     </div>
                     <div class={tripTemplate.info}>
                         <div class={tripTemplate.container}>
-                            <p>{tripTitle}</p>
+                            <p>{tripDescription}</p>
                         </div>
                     </div>
                     <div className={tripTemplate.planLayout}>
@@ -219,7 +218,8 @@ export default function TripBudget() {
                             <div className={tripTemplate.sidebarItem} onClick={() => navigate(`/tripPlan?room_id=${room_id}`, {
                                 state: {
                                     tripTitle: tripTitle,
-                                    tripDescription: tripDescription
+                                    tripDescription: tripDescription,
+                                    trip: trip
                                 }
                             })}>
                                 <i className="fas fa-calendar-alt"></i> กำหนดการเดินทาง
@@ -227,7 +227,8 @@ export default function TripBudget() {
                             <div className={tripTemplate.sidebarItem} onClick={() => navigate(`/tripBudget?room_id=${room_id}`, {
                                 state: {
                                     tripTitle: tripTitle,
-                                    tripDescription: tripDescription
+                                    tripDescription: tripDescription,
+                                    trip: trip
                                 }
                             })}>
                                 <i className="fas fa-wallet"></i> งบประมาณ
@@ -235,7 +236,8 @@ export default function TripBudget() {
                             <div className={`${tripTemplate.sidebarItem} ${tripTemplate.active}`} onClick={() => navigate(`/tripTeam?room_id=${room_id}`, {
                                 state: {
                                     tripTitle: tripTitle,
-                                    tripDescription: tripDescription
+                                    tripDescription: tripDescription,
+                                    trip: trip
                                 }
                             })}>
                                 <i className="fas fa-users"></i> สมาชิก & แชท
@@ -243,7 +245,8 @@ export default function TripBudget() {
                             <div className={tripTemplate.sidebarItem} onClick={() => navigate(`/tripFolder?room_id=${room_id}`, {
                                 state: {
                                     tripTitle: tripTitle,
-                                    tripDescription: tripDescription
+                                    tripDescription: tripDescription,
+                                    trip: trip
                                 }
                             })}>
                                 <i className="fas fa-file-alt"></i> เอกสาร
@@ -265,7 +268,7 @@ export default function TripBudget() {
                                         {members.map((m, i) => (
                                             <div className={styles.memberCard} key={i}>
                                                 <div className={styles.memberAvatar}>
-                                                    <img src={m.img} alt={m.member_name} />
+                                                    <img src={m.photo} alt={m.member_name} />
                                                 </div>
                                                 <div className={styles.memberName}>{m.member_name}</div>
                                                 <div className={styles.memberActions}>
@@ -373,7 +376,13 @@ export default function TripBudget() {
             </main>
 
             {/* Edit & Share Modals */}
-            <EditTripModal isOpen={editModalOpen} onClose={() => setEditModalOpen(false)} />
+            <EditTripModal
+                isOpen={editModalOpen}
+                onClose={() => setEditModalOpen(false)}
+                initialData={trip} // <-- ส่งข้อมูลทริปปัจจุบัน
+                roomId={room_id}
+            />
+
             <ShareTripModal isOpen={shareModalOpen} onClose={() => setShareModalOpen(false)} />
 
             {/* Add & Edit Member Modals */}
@@ -391,7 +400,11 @@ export default function TripBudget() {
                             <input type="file" id="memberPic" accept="image/*" />
                             <div style={{ display: "flex", marginTop: 10 }}>
                                 <div style={{ marginLeft: "auto" }}>
-                                    <button type="button" onClick={() => {const memberNameInput = document.getElementById("memberName"); handleAddMember(memberNameInput);}}  className="btn-save-edit">เพิ่ม</button>
+                                    <button type="button" onClick={() => {
+                                        const memberNameInput = document.getElementById("memberName");
+                                        const memberImgInput = document.getElementById("memberPic");
+                                        handleAddMember(memberNameInput, memberImgInput);
+                                    }} className="btn-save-edit">เพิ่ม</button>
                                 </div>
                             </div>
                         </form>
@@ -419,7 +432,7 @@ export default function TripBudget() {
                             <input type="file" id="memberPic" accept="image/*" />
                             <div style={{ display: "flex", marginTop: 10 }}>
                                 <div style={{ marginLeft: "auto" }}>
-                                    <button type="button" onClick={() => {const memberNameInput = document.getElementById("memberName"); editMember(memberNameInput, selectedMember?.member_id);}} className="btn-save-edit">บันทึก</button>
+                                    <button type="button" onClick={() => { const memberNameInput = document.getElementById("memberName"); editMember(memberNameInput, selectedMember?.member_id); }} className="btn-save-edit">บันทึก</button>
                                 </div>
                             </div>
                         </form>

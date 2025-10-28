@@ -13,6 +13,10 @@ export default function EditTripModal({ isOpen, onClose }) {
         setShareOption(e.target.value);
     };
 
+    const handleadduser = (e) => {
+        setShareOption(e.target.value);
+    };
+
     if (!isOpen) return null;
 
     return (
@@ -133,7 +137,7 @@ export default function EditTripModal({ isOpen, onClose }) {
                                 <button type="button" className={styles.btnCancel} onClick={() => setInviteOpen(false)}>
                                     ยกเลิก
                                 </button>
-                                <button type="submit" className={styles.btnShare}>
+                                <button type="button" className={styles.btnShare}>
                                     เพิ่ม
                                 </button>
                             </div>

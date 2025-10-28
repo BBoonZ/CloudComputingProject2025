@@ -26,73 +26,74 @@ export default function TripBudget() {
     const [expensesTeam, setExpensesTeam] = useState([]);
     const tripTitle = location.state?.tripTitle || "กำลังโหลดชื่อทริป...";
     const tripDescription = location.state?.tripDescription || "";
+    const trip = location.state?.trip || "";
     useEffect(() => {
-    // ดึงรายชื่อสมาชิก
-    fetch(`http://localhost:3001/members?room_id=${room_id}`)
-        .then((res) => res.json())
-        .then((members) => {
-            setTeamMembers(members);
+        // ดึงรายชื่อสมาชิก
+        fetch(`http://localhost:3001/members?room_id=${room_id}`)
+            .then((res) => res.json())
+            .then((members) => {
+                setTeamMembers(members);
 
-            // ดึงข้อมูลค่าใช้จ่ายของห้อง
-            fetch(`http://localhost:3001/room_expends/${room_id}`)
-                .then((res) => res.json())
-                .then((dat) => {
-                    setRoomExpend(dat);
+                // ดึงข้อมูลค่าใช้จ่ายของห้อง
+                fetch(`http://localhost:3001/room_expends/${room_id}`)
+                    .then((res) => res.json())
+                    .then((dat) => {
+                        setRoomExpend(dat);
 
-                    // รวมค่าใช้จ่ายทั้งหมด
-                    const totalUsed = dat.Expends?.reduce((sum, item) => sum + Number(item.value), 0) || 0;
-                    setRoomUseBudget(totalUsed);
+                        // รวมค่าใช้จ่ายทั้งหมด
+                        const totalUsed = dat.Expends?.reduce((sum, item) => sum + Number(item.value), 0) || 0;
+                        setRoomUseBudget(totalUsed);
 
-                    // ===== คำนวณตาราง expensesTeam =====
-                    if (members.length > 0) {
-                        // 1️⃣ รวมจ่ายต่อคน (เฉพาะคนที่มี expend)
-                        const paidByMember = {};
-                        dat.Expends?.forEach((exp) => {
-                            const memberId = exp.member_id;
-                            if (!paidByMember[memberId]) {
-                                paidByMember[memberId] = {
-                                    name: exp.Member?.member_name || "ไม่ระบุ",
-                                    paid: 0,
+                        // ===== คำนวณตาราง expensesTeam =====
+                        if (members.length > 0) {
+                            // 1️⃣ รวมจ่ายต่อคน (เฉพาะคนที่มี expend)
+                            const paidByMember = {};
+                            dat.Expends?.forEach((exp) => {
+                                const memberId = exp.member_id;
+                                if (!paidByMember[memberId]) {
+                                    paidByMember[memberId] = {
+                                        name: exp.Member?.member_name || "ไม่ระบุ",
+                                        paid: 0,
+                                    };
+                                }
+                                paidByMember[memberId].paid += Number(exp.value);
+                            });
+
+                            // 2️⃣ รวมคนที่ไม่มี expend ด้วย (paid = 0)
+                            members.forEach((m) => {
+                                if (!paidByMember[m.member_id]) {
+                                    paidByMember[m.member_id] = {
+                                        name: m.member_name,
+                                        paid: 0,
+                                    };
+                                }
+                            });
+
+                            // 3️⃣ คำนวณค่าเฉลี่ยที่ควรจ่าย (เอาจำนวนสมาชิกทั้งหมดมาหาร)
+                            const totalMembers = members.length;
+                            const avgPay = totalMembers > 0 ? totalUsed / totalMembers : 0;
+
+                            // 4️⃣ คำนวณ shouldPay และ diff
+                            const calculated = Object.values(paidByMember).map((member) => {
+                                const shouldPayRaw = avgPay - member.paid;
+                                const shouldPay = shouldPayRaw <= 0 ? 0 : shouldPayRaw;
+                                const diff = shouldPayRaw < 0 ? Math.abs(shouldPayRaw) : 0;
+
+                                return {
+                                    name: member.name,
+                                    paid: member.paid,
+                                    shouldPay,
+                                    diff,
                                 };
-                            }
-                            paidByMember[memberId].paid += Number(exp.value);
-                        });
+                            });
 
-                        // 2️⃣ รวมคนที่ไม่มี expend ด้วย (paid = 0)
-                        members.forEach((m) => {
-                            if (!paidByMember[m.member_id]) {
-                                paidByMember[m.member_id] = {
-                                    name: m.member_name,
-                                    paid: 0,
-                                };
-                            }
-                        });
-
-                        // 3️⃣ คำนวณค่าเฉลี่ยที่ควรจ่าย (เอาจำนวนสมาชิกทั้งหมดมาหาร)
-                        const totalMembers = members.length;
-                        const avgPay = totalMembers > 0 ? totalUsed / totalMembers : 0;
-
-                        // 4️⃣ คำนวณ shouldPay และ diff
-                        const calculated = Object.values(paidByMember).map((member) => {
-                            const shouldPayRaw = avgPay - member.paid;
-                            const shouldPay = shouldPayRaw <= 0 ? 0 : shouldPayRaw;
-                            const diff = shouldPayRaw < 0 ? Math.abs(shouldPayRaw) : 0;
-
-                            return {
-                                name: member.name,
-                                paid: member.paid,
-                                shouldPay,
-                                diff,
-                            };
-                        });
-
-                        setExpensesTeam(calculated);
-                    }
-                })
-                .catch((err) => console.error(err));
-        })
-        .catch((err) => console.error(err));
-}, [room_id]);
+                            setExpensesTeam(calculated);
+                        }
+                    })
+                    .catch((err) => console.error(err));
+            })
+            .catch((err) => console.error(err));
+    }, [room_id]);
 
 
     const handleDeleteExpense = async (expend_id) => {
@@ -193,7 +194,7 @@ export default function TripBudget() {
             <main className={tripTemplate.tripPlanMain}>
                 <div className={tripTemplate.container}>
                     <div className={tripTemplate.planHeader}>
-                        <h1>{tripDescription}</h1>
+                        <h1>{tripTitle}</h1>
                         <div className={tripTemplate.planMeta}>
                             <span className={tripTemplate.planDates}>1 - 4 ธันวาคม 2567</span>
                             <button className={`${tripTemplate.btn} ${tripTemplate.btnSave}`} onClick={() => setEditModalOpen(true)}>
@@ -206,7 +207,7 @@ export default function TripBudget() {
                     </div>
                     <div class={tripTemplate.info}>
                         <div class={tripTemplate.container}>
-                            <p>{tripTitle}</p>
+                            <p>{tripDescription}</p>
                         </div>
                     </div>
                     <div className={tripTemplate.planLayout}>
@@ -214,7 +215,8 @@ export default function TripBudget() {
                             <div className={tripTemplate.sidebarItem} onClick={() => navigate(`/tripPlan?room_id=${room_id}`, {
                                 state: {
                                     tripTitle: tripTitle,
-                                    tripDescription: tripDescription
+                                    tripDescription: tripDescription,
+                                    trip: trip
                                 }
                             })}>
                                 <i className="fas fa-calendar-alt"></i> กำหนดการเดินทาง
@@ -222,7 +224,8 @@ export default function TripBudget() {
                             <div className={`${tripTemplate.sidebarItem} ${tripTemplate.active}`} onClick={() => navigate(`/tripBudget?room_id=${room_id}`, {
                                 state: {
                                     tripTitle: tripTitle,
-                                    tripDescription: tripDescription
+                                    tripDescription: tripDescription,
+                                    trip: trip
                                 }
                             })}>
                                 <i className="fas fa-wallet"></i> งบประมาณ
@@ -230,7 +233,8 @@ export default function TripBudget() {
                             <div className={tripTemplate.sidebarItem} onClick={() => navigate(`/tripTeam?room_id=${room_id}`, {
                                 state: {
                                     tripTitle: tripTitle,
-                                    tripDescription: tripDescription
+                                    tripDescription: tripDescription,
+                                    trip: trip
                                 }
                             })}>
                                 <i className="fas fa-users"></i> สมาชิก & แชท
@@ -238,7 +242,8 @@ export default function TripBudget() {
                             <div className={tripTemplate.sidebarItem} onClick={() => navigate(`/tripFolder?room_id=${room_id}`, {
                                 state: {
                                     tripTitle: tripTitle,
-                                    tripDescription: tripDescription
+                                    tripDescription: tripDescription,
+                                    trip: trip
                                 }
                             })}>
                                 <i className="fas fa-file-alt"></i> เอกสาร
@@ -367,7 +372,10 @@ export default function TripBudget() {
             <EditTripModal
                 isOpen={editModalOpen}
                 onClose={() => setEditModalOpen(false)}
+                initialData={trip} // <-- ส่งข้อมูลทริปปัจจุบัน
+                roomId={room_id}
             />
+
 
             {/* Share Modal */}
             <ShareTripModal

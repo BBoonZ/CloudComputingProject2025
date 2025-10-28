@@ -1,3 +1,31 @@
+const AWS = require("aws-sdk");
+const multer = require("multer");
+const dotenv = require("dotenv");
+dotenv.config();
+
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/"); // โฟลเดอร์เก็บรูปใน backend
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
+
+const upload = multer({ storage });
+
+// // Multer เก็บไฟล์ในหน่วยความจำ (ไม่ต้องเซฟลงเครื่อง)
+// const storage = multer.memoryStorage();
+// const upload = multer({ storage });
+
+// ตั้งค่า S3
+const s3 = new AWS.S3({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region: process.env.AWS_REGION,
+});
+
 const express = require("express");
 const path = require("path");
 const cors = require("cors");
@@ -9,7 +37,7 @@ const sequelize = require("./config/database");
 // const { Planroom } = require('./models/planroom');
 // const { Member } = require('./models/member');
 // const { Expend } = require('./models/expends');
-const { User, Planroom, Member, Expend, Itinerary, ItineraryDetail } = require('./models'); 
+const { User, Planroom, Member, Expend, Itinerary, ItineraryDetail, Access, Share } = require('./models'); 
 
 
 const app = express();
@@ -19,6 +47,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "../build")));
+app.use("/uploads", express.static("uploads"));
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -121,24 +150,50 @@ app.post("/upload_document", async (req, res) => {
 });
 
 
-app.post("/addMember", async (req, res) => {
+app.post("/addMember", upload.single("file"), async (req, res) => {
   try {
     const { name, room_id } = req.body;
+    const file = req.file;
 
-    // สร้าง planroom ใหม่ด้วย Sequelize
+    let imageUrl = null;
+    if (file) {
+      imageUrl = `http://localhost:3001/uploads/${file.filename}`;
+      console.log("📁 Saved locally:", imageUrl);
+    }
+
     const newMember = await Member.create({
       room_id,
       member_name: name,
+      photo: imageUrl,
     });
 
-    console.log("✅ Created member:", newMember.member_id);
-
-    res.json({ message: "success", memberId: newMember.member_id });
+    res.json({ message: "success", memberId: newMember.member_id, imageUrl });
   } catch (err) {
-    console.error("❌ Error creating member:", err);
-    res.status(500).send("Server error");
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
   }
 });
+
+
+
+// app.post("/addMember", async (req, res) => {
+//   try {
+//     const { name, room_id, img } = req.body;
+
+//     // สร้าง planroom ใหม่ด้วย Sequelize
+//     const newMember = await Member.create({
+//       room_id,
+//       member_name: name,
+//     });
+
+//     console.log("✅ Created member:", newMember.member_id);
+
+//     res.json({ message: "success", memberId: newMember.member_id });
+//   } catch (err) {
+//     console.error("❌ Error creating member:", err);
+//     res.status(500).send("Server error");
+//   }
+// });
 
 app.put("/editMember", async (req, res) => {
   try {
@@ -567,6 +622,99 @@ app.put("/editTrip/:room_id", async (req, res) => {
       message: 'Server error while updating trip',
       error: err.message
     });
+  }
+});
+
+// POST /inviteUser - เชิญผู้ใช้เข้าร่วมทริป (เพิ่ม/อัปเดตในตาราง Access)
+app.post("/inviteUser", async (req, res) => {
+  // 1. ดึงข้อมูล: emailOrUsername (สิ่งที่ user กรอก), roomId, role ('reader'/'editor')
+  const { emailOrUsername, roomId, role } = req.body;
+
+  if (!emailOrUsername || !roomId || !role || !['reader', 'editor'].includes(role)) {
+    return res.status(400).json({ message: "Email/Username, Room ID, and a valid Role ('reader'/'editor') are required" });
+  }
+
+  const t = await sequelize.transaction(); // ใช้ Transaction เผื่อต้อง Query หลายรอบ
+
+  try {
+    // 2. หา User ID จาก Email หรือ Username
+    const targetUser = await User.findOne({
+      where: {
+        [Op.or]: [ // ใช้ Op.or เพื่อหาจากทั้ง email และ username
+          { email: emailOrUsername },
+          { username: emailOrUsername }
+        ]
+      },
+      attributes: ['user_id'], // เอาแค่ user_id
+      transaction: t
+    });
+
+    if (!targetUser) {
+      await t.rollback(); // ไม่เจอ User ก็ไม่ต้องทำต่อ
+      return res.status(404).json({ message: `User '${emailOrUsername}' not found` });
+    }
+
+    const targetUserId = targetUser.user_id;
+
+    // 3. (Optional แต่แนะนำ) เช็คว่า Room ID มีอยู่จริง
+    const roomExists = await Planroom.findByPk(roomId, { attributes: ['room_id'], transaction: t });
+    if (!roomExists) {
+       await t.rollback();
+       return res.status(404).json({ message: `Trip room_id ${roomId} not found.` });
+    }
+
+    // --- TODO: เช็คว่า User ที่เชิญ ไม่ใช่ Owner ของทริป ---
+    // (คุณอาจจะต้องเพิ่ม Logic เช็คว่า targetUserId ไม่ใช่ planRoom.user_id)
+    // --------------------------------------------------------
+
+
+    // 4. ใช้ findOrCreate หรือ update เพื่อเพิ่ม/แก้ไขสิทธิ์ในตาราง Access
+    //    หาแถวที่มี room_id และ user_id ตรงกัน
+    const [accessEntry, created] = await Access.findOrCreate({
+      where: {
+        room_id: roomId,
+        user_id: targetUserId
+      },
+      defaults: { // ถ้าไม่เจอ ให้สร้างใหม่ด้วยค่าเหล่านี้
+        room_id: roomId,
+        user_id: targetUserId,
+        role: role // ใส่ role ที่ส่งมา
+      },
+      transaction: t
+    });
+
+    // 5. ถ้าไม่ได้สร้างใหม่ (เจอแถวเดิม) และ Role ไม่ตรง -> ให้อัปเดต Role
+    if (!created && accessEntry.role !== role) {
+      accessEntry.role = role;
+      await accessEntry.save({ transaction: t });
+      console.log(`✅ Updated role for user ${targetUserId} in room ${roomId} to ${role}`);
+    } else if (created) {
+      console.log(`✅ Granted ${role} access to user ${targetUserId} for room ${roomId}`);
+    } else {
+       console.log(`ℹ️ User ${targetUserId} already has ${role} access in room ${roomId}. No change needed.`);
+    }
+
+    // 6. Commit Transaction
+    await t.commit();
+
+    res.status(200).json({
+       message: `Successfully ${created ? 'granted' : 'updated'} access for ${emailOrUsername}`,
+       data: { // ส่งข้อมูล access ที่สร้าง/อัปเดตกลับไป
+           access_id: accessEntry.access_id,
+           room_id: accessEntry.room_id,
+           user_id: accessEntry.user_id,
+           role: accessEntry.role
+       }
+    });
+
+  } catch (err) {
+    await t.rollback(); // Rollback ถ้ามีปัญหา
+    console.error("❌ Error inviting user:", err);
+     if (err.name === 'SequelizeForeignKeyConstraintError') {
+         // อาจจะเกิดจาก user_id หรือ room_id ไม่มีอยู่จริง (ถึงแม้จะเช็คไปแล้ว)
+         return res.status(400).json({ status: 'error', message: `Invalid user_id or room_id.` });
+     }
+    res.status(500).json({ status: 'error', message: 'Server error', error: err.message });
   }
 });
 

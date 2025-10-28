@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from "react"; // <-- เพิ่ม useEffect, useRef
+import { useNavigate } from "react-router-dom";
 import styles from "../css/popup-editTripPlan.module.css";
 import flatpickr from "flatpickr"; // <-- Import flatpickr
 import "flatpickr/dist/flatpickr.min.css"; // <-- Import CSS ของ flatpickr
 
 // 1. รับ Props เพิ่ม: initialData, roomId
 export default function EditTripModal({ isOpen, onClose, initialData, roomId }) {
-
+  const navigate = useNavigate();
   // 2. ใช้ State เก็บค่าในฟอร์ม
   const [tripName, setTripName] = useState("");
   const [tripText, setTripText] = useState("");
@@ -161,7 +162,7 @@ export default function EditTripModal({ isOpen, onClose, initialData, roomId }) 
 
       alert("แก้ไขข้อมูลทริปสำเร็จ!");
       onClose(); // ปิด Modal
-      window.location.reload(); // <-- รีโหลดเพื่อให้หน้าหลักเห็นข้อมูลใหม่
+      navigate(`/tripPlan?room_id=${roomId}`);// <-- รีโหลดเพื่อให้หน้าหลักเห็นข้อมูลใหม่
 
     } catch (err) {
       console.error("❌ Error updating trip:", err);

@@ -13,7 +13,7 @@ import testIMG from "../assests/images/test1.jpg";
 
 export default function TripBudget() {
     // state สำหรับ 
-    
+
     const navigate = useNavigate();
     const location = useLocation();
     const params = new URLSearchParams(location.search);
@@ -24,6 +24,7 @@ export default function TripBudget() {
     const tripDescription = location.state?.tripDescription || "";
     const [previewModalVisible, setPreviewModalVisible] = useState(false);
     const [previewContent, setPreviewContent] = useState("");
+    const trip = location.state?.trip || "";
     const [files, setFiles] = useState([
         {
             name: "แผนการเดินทาง.pdf",
@@ -115,7 +116,7 @@ export default function TripBudget() {
             <main className={tripTemplate.tripPlanMain}>
                 <div className={tripTemplate.container}>
                     <div className={tripTemplate.planHeader}>
-                        <h1>{tripDescription}</h1>
+                        <h1>{tripTitle}</h1>
                         <div className={tripTemplate.planMeta}>
                             <span className={tripTemplate.planDates}>1 - 4 ธันวาคม 2567</span>
                             <button className={`${tripTemplate.btn} ${tripTemplate.btnSave}`} onClick={() => setEditModalOpen(true)}>
@@ -128,7 +129,7 @@ export default function TripBudget() {
                     </div>
                     <div class={tripTemplate.info}>
                         <div class={tripTemplate.container}>
-                            <p>{tripTitle}</p>
+                            <p>{tripDescription}</p>
                         </div>
                     </div>
                     <div className={tripTemplate.planLayout}>
@@ -136,7 +137,8 @@ export default function TripBudget() {
                             <div className={tripTemplate.sidebarItem} onClick={() => navigate(`/tripPlan?room_id=${room_id}`, {
                                 state: {
                                     tripTitle: tripTitle,
-                                    tripDescription: tripDescription
+                                    tripDescription: tripDescription,
+                                    trip: trip
                                 }
                             })}>
                                 <i className="fas fa-calendar-alt"></i> กำหนดการเดินทาง
@@ -144,7 +146,8 @@ export default function TripBudget() {
                             <div className={tripTemplate.sidebarItem} onClick={() => navigate(`/tripBudget?room_id=${room_id}`, {
                                 state: {
                                     tripTitle: tripTitle,
-                                    tripDescription: tripDescription
+                                    tripDescription: tripDescription,
+                                    trip: trip
                                 }
                             })}>
                                 <i className="fas fa-wallet"></i> งบประมาณ
@@ -152,7 +155,8 @@ export default function TripBudget() {
                             <div className={tripTemplate.sidebarItem} onClick={() => navigate(`/tripTeam?room_id=${room_id}`, {
                                 state: {
                                     tripTitle: tripTitle,
-                                    tripDescription: tripDescription
+                                    tripDescription: tripDescription,
+                                    trip: trip
                                 }
                             })}>
                                 <i className="fas fa-users"></i> สมาชิก & แชท
@@ -160,7 +164,8 @@ export default function TripBudget() {
                             <div className={`${tripTemplate.sidebarItem} ${tripTemplate.active}`} onClick={() => navigate(`/tripFolder?room_id=${room_id}`, {
                                 state: {
                                     tripTitle: tripTitle,
-                                    tripDescription: tripDescription
+                                    tripDescription: tripDescription,
+                                    trip: trip
                                 }
                             })}>
                                 <i className="fas fa-file-alt"></i> เอกสาร
@@ -202,7 +207,7 @@ export default function TripBudget() {
                                             </button>
                                         </div>
                                     </div>
-                            ))}
+                                ))}
                             </div>
                         </div>
 
@@ -213,7 +218,7 @@ export default function TripBudget() {
                                         &times;
                                     </span>
                                     <div className={styles.modalFit}>
-                                    {previewContent}
+                                        {previewContent}
                                     </div>
                                 </div>
                             </div>
@@ -224,11 +229,13 @@ export default function TripBudget() {
             </main >
 
             {/* Edit Modal */}
-            < EditTripModal
+            <EditTripModal
                 isOpen={editModalOpen}
-                onClose={() => setEditModalOpen(false)
-                }
+                onClose={() => setEditModalOpen(false)}
+                initialData={trip} // <-- ส่งข้อมูลทริปปัจจุบัน
+                roomId={room_id}
             />
+
 
             {/* Share Modal */}
             <ShareTripModal

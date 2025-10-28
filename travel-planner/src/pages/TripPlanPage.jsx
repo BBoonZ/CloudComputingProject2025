@@ -230,7 +230,7 @@ export default function TripPlanPage() {
             <main className={plantemp.tripPlanMain}>
                 <div className={plantemp.container}>
                     <div className={plantemp.planHeader}>
-                        <h1>{description}</h1>
+                        <h1>{title}</h1>
                         <div className={plantemp.planMeta}>
                             <span className={plantemp.planDates}>1 - 4 ธันวาคม 2567</span>
                             <button className={`${plantemp.btn} ${plantemp.btnSave}`} onClick={() => setEditModalOpen(true)}>
@@ -243,7 +243,7 @@ export default function TripPlanPage() {
                     </div>
                     <div class={plantemp.info}>
                         <div class={plantemp.container}>
-                            <p>{title}</p>
+                            <p>{description}</p>
                         </div>
                     </div>
                     <div className={plantemp.planLayout}>
@@ -254,7 +254,8 @@ export default function TripPlanPage() {
                             <div className={plantemp.sidebarItem} onClick={() => navigate(`/tripBudget?room_id=${room_id}`, {
                                 state: {
                                     tripTitle: title,
-                                    tripDescription: description
+                                    tripDescription: description,
+                                    trip: trip
                                 }
                             })}>
                                 <i className="fas fa-wallet"></i> งบประมาณ
@@ -262,7 +263,8 @@ export default function TripPlanPage() {
                             <div className={plantemp.sidebarItem} onClick={() => navigate(`/tripTeam?room_id=${room_id}`, {
                                 state: {
                                     tripTitle: title,
-                                    tripDescription: description
+                                    tripDescription: description,
+                                    trip: trip
                                 }
                             })}>
                                 <i className="fas fa-users"></i> สมาชิก & แชท
@@ -270,7 +272,8 @@ export default function TripPlanPage() {
                             <div className={plantemp.sidebarItem} onClick={() => navigate(`/tripFolder?room_id=${room_id}`, {
                                 state: {
                                     tripTitle: title,
-                                    tripDescription: description
+                                    tripDescription: description,
+                                    trip: trip
                                 }
                             })}>
                                 <i className="fas fa-file-alt"></i> เอกสาร

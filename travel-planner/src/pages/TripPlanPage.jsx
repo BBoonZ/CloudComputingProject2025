@@ -348,6 +348,8 @@ export default function TripPlanPage() {
             <EditTripModal
                 isOpen={editModalOpen}
                 onClose={() => setEditModalOpen(false)}
+                initialData={trip} // <-- ส่งข้อมูลทริปปัจจุบัน
+                roomId={room_id}
             />
 
             {/* Share Modal */}

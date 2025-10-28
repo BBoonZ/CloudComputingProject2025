@@ -505,6 +505,52 @@ app.delete("/deleteActivity/:itinerary_id", async (req, res) => {
   }
 });
 
+// PUT /editTrip/:room_id - แก้ไขข้อมูลหลักของทริป (Planroom)
+app.put("/editTrip/:room_id", async (req, res) => {
+  const { room_id } = req.params;
+  // ดึงข้อมูลที่อนุญาตให้อัปเดตได้จาก body
+  const { title, description, total_budget, start_date, end_date, image } = req.body;
+
+  if (!room_id) {
+    return res.status(400).json({ message: "Room ID is required" });
+  }
+
+  try {
+    // 1. หา Planroom ที่ต้องการแก้ไข
+    const planRoom = await Planroom.findByPk(room_id);
+
+    if (!planRoom) {
+      return res.status(404).json({ message: "Trip not found" });
+    }
+
+    // 2. สร้าง object ข้อมูลที่จะอัปเดต (เฉพาะ field ที่ส่งมาและไม่ undefined)
+    const updateData = {};
+    if (title !== undefined) updateData.title = title;
+    if (description !== undefined) updateData.description = description;
+    // แปลง budget เป็น null ถ้าเป็น string ว่าง หรือ undefined/null
+    if (total_budget !== undefined) updateData.total_budget = (total_budget === '' || total_budget == null) ? null : total_budget;
+    if (start_date !== undefined) updateData.start_date = start_date;
+    if (end_date !== undefined) updateData.end_date = end_date;
+    // ถ้า image ส่งมาเป็น null หรือ string ว่าง ก็อัปเดตเป็น null
+    if (image !== undefined) updateData.image = (image === '' || image == null) ? null : image;
+
+    // 3. สั่งอัปเดต
+    await planRoom.update(updateData);
+
+    console.log("✅ Updated Planroom ID:", room_id);
+    // ส่งข้อมูลที่อัปเดตแล้วกลับไป
+    res.status(200).json({ message: "success", data: planRoom.toJSON() });
+
+  } catch (err) {
+    console.error("❌ Error updating Planroom:", err);
+    res.status(500).json({
+      status: 'error',
+      message: 'Server error while updating trip',
+      error: err.message
+    });
+  }
+});
+
 const PORT = process.env.PORT || 3001;
 
 async function startServer() {

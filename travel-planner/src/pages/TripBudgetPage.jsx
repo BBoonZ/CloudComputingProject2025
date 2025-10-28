@@ -262,7 +262,7 @@ export default function TripBudget() {
                                 </div>
                             </div>
 
-                            <div className={styles.budgetDetails}>
+                            {/* <div className={styles.budgetDetails}>
                                 <div className={styles.detailsHeader}>
                                     <h2>จำนวนเงินที่จ่ายไปทั้งหมด</h2>
                                 </div>
@@ -291,7 +291,7 @@ export default function TripBudget() {
                                         ))}
                                     </tbody>
                                 </table>
-                            </div>
+                            </div> */}
 
                             <div className={styles.budgetDetails}>
                                 <div className={styles.detailsHeader}>

@@ -108,10 +108,10 @@ export default function TripBudget() {
         const res = await fetch(`http://localhost:3001/deleteMember/${m.member_id}`, {
         method: "DELETE"
     });
-
+    
       if (!res.ok) throw new Error("ส่งข้อมูลไม่สำเร็จ");
     //   const data = await res.json();
-      navigate(`/tripTeam?room_id=${room_id}`)
+    window.location.reload();
     } catch (err) {
       console.error("เกิดข้อผิดพลาด:", err);
       alert("เกิดข้อผิดพลาดในการลบสมาชิก");
@@ -137,7 +137,7 @@ export default function TripBudget() {
       if (!res.ok) throw new Error("ส่งข้อมูลไม่สำเร็จ");
       setShowAddModal(false);
     //   const data = await res.json();
-      navigate(`/tripTeam?room_id=${room_id}`)
+      window.location.reload();
     } catch (err) {
       console.error("เกิดข้อผิดพลาด:", err);
       alert("เกิดข้อผิดพลาดในการเพิ่มสมาชิก");
@@ -162,7 +162,7 @@ export default function TripBudget() {
       if (!res.ok) throw new Error("ส่งข้อมูลไม่สำเร็จ");
       setShowEditModal(false);
     //   const data = await res.json();
-      navigate(`/tripTeam?room_id=${room_id}`)
+      window.location.reload();
     } catch (err) {
       console.error("เกิดข้อผิดพลาด:", err);
       alert("เกิดข้อผิดพลาดในการเพิ่มสมาชิก");

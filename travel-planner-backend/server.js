@@ -178,17 +178,36 @@ app.get("/members", async (req, res) => {
 });
 
 
+// DELETE /deleteMember/:member_id - ลบสมาชิก
 app.delete("/deleteMember/:member_id", async (req, res) => {
   try {
     const { member_id } = req.params;
-    const member = await Member.destroy({
+
+    if (!member_id) {
+        return res.status(400).json({ message: "Member ID is required" });
+    }
+
+    // 1. สั่งลบ และเก็บผลลัพธ์ใส่ตัวแปรชื่อ member (เหมือนเดิม)
+    const member = await Member.destroy({ // <--- ใช้ชื่อ member เหมือนเดิม
       where: { member_id: member_id },
     });
-    
-    console.log("gooood")
+
+    // 2. ตรวจสอบผลลัพธ์ (แต่เช็คตัวแปร member แทน)
+    if (member > 0) { // <--- เปลี่ยนมาเช็ค member
+      console.log(`✅ Deleted member ID: ${member_id}`);
+      res.status(200).json({ message: "Member deleted successfully" });
+    } else {
+      console.log(`⚠️ Member ID ${member_id} not found for deletion.`);
+      res.status(404).json({ message: "Member not found" });
+    }
+
   } catch (err) {
-    console.error("❌ Error delete member:", err);
-    res.status(500).send("Server error");
+    console.error("❌ Error deleting member:", err);
+    res.status(500).json({
+        status: 'error',
+        message: 'Server error while deleting member',
+        error: err.message
+    });
   }
 });
 

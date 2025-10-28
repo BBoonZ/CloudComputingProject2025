@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+
+import React, { useState, useEffect } from "react";
 import styles from "../css/ActivityTripModal.module.css";
 
 export default function ActivityModal({
@@ -9,12 +10,37 @@ export default function ActivityModal({
   date = null,
   room_id = null
 }) {
-  const [activities, setActivities] = useState(
-    editData?.details || [{ text: "" }]
-  );
-
   const isEdit = type === "edit";
 
+  // 1. ให้ state เริ่มต้นเป็นค่าว่างเสมอ
+  const [activities, setActivities] = useState([{ text: "" }]);
+
+  // 2. ▼▼▼ เพิ่ม useEffect ตัวนี้เข้าไป ▼▼▼
+  useEffect(() => {
+    // 3. เมื่อ Modal เปิด
+    if (open) {
+      if (isEdit && editData && editData.ItineraryDetails) {
+        // 4. ถ้าเป็นโหมด "แก้ไข" และมีข้อมูล
+        // แปลง { description: "..." } ไปเป็น { text: "..." }
+        const detailsFromData = editData.ItineraryDetails.map(detail => ({
+          text: detail.description
+        }));
+
+        if (detailsFromData.length > 0) {
+          setActivities(detailsFromData);
+        } else {
+          setActivities([{ text: "" }]); // ถ้ามีกิจกรรม แต่ไม่มี details
+        }
+        
+      } else {
+        // 5. ถ้าเป็นโหมด "เพิ่ม" ให้เคลียร์เป็นค่าว่าง
+        setActivities([{ text: "" }]);
+      }
+    }
+  }, [open, isEdit, editData]); // 6. ให้ Effect นี้ทำงานทุกครั้งที่ Modal เปิด/ปิด
+
+  
+  // (ฟังก์ชัน 3 ตัวนี้ยังเหมือนเดิม)
   const handleAddDetail = () => {
     setActivities([...activities, { text: "" }]);
   };
@@ -29,7 +55,8 @@ export default function ActivityModal({
     setActivities(newActivities);
   };
 
-  const handleSubmit = async (e) => { // <-- 1. ต้องเป็น async
+  // (handleSubmit ของคุณที่เรารวมโค้ด Add/Edit ไว้แล้ว)
+  const handleSubmit = async (e) => { 
     e.preventDefault();
 
     const data = {
@@ -38,66 +65,51 @@ export default function ActivityModal({
       location: e.target.activityLocation.value,
       locationLink: e.target.activityLocationLink.value,
       details: activities,
-      date: date || editData?.date, // <-- 2. ถ้าเป็น edit ให้ใช้ date เดิม
+      date: isEdit ? editData.date : date, // <-- แก้ไขเล็กน้อย
       room_id: room_id
     };
 
-    // 3. Logic แยก ADD / EDIT
     if (isEdit) {
       // ########## LOGIC แก้ไข (EDIT) ##########
       if (!editData || !editData.itinerary_id) {
         alert("เกิดข้อผิดพลาด: ไม่พบ ID ของกิจกรรม");
         return;
       }
-
       try {
         const response = await fetch(`http://localhost:3001/editActivity/${editData.itinerary_id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data),
         });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || 'Failed to edit activity');
-        }
-        
+        if (!response.ok) throw new Error('Failed to edit activity');
         alert("แก้ไขกิจกรรมสำเร็จ!");
         onClose();
-        window.location.reload(); // <-- 4. รีโหลดหน้า (ง่ายที่สุด)
-
+        window.location.reload(); 
       } catch (err) {
-        console.error("Error editing activity:", err);
         alert(`เกิดข้อผิดพลาด: ${err.message}`);
       }
 
     } else {
       // ########## LOGIC เพิ่ม (ADD) ##########
-      // (โค้ดนี้คือตัวเดิมที่เราทำไปแล้ว)
       try {
         const response = await fetch("http://localhost:3001/addActivity", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data),
         });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || 'Failed to add activity');
-        }
-
+        if (!response.ok) throw new Error('Failed to add activity');
         alert("เพิ่มกิจกรรมสำเร็จ!");
         onClose();
-        window.location.reload(); // <-- 4. รีโหลดหน้า (ง่ายที่สุด)
-        
+        window.location.reload(); 
       } catch (err) {
-        console.error("Error adding activity:", err);
         alert(`เกิดข้อผิดพลาด: ${err.message}`);
       }
     }
   };
 
   if (!open) return null;
+
+  // (โค้ด return ของคุณต่อตรงนี้...)
 
   return (
     <>

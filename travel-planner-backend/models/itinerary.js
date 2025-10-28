@@ -22,7 +22,13 @@ const Itinerary = sequelize.define('Itinerary', {
   },
   map: DataTypes.TEXT,
   location: DataTypes.TEXT,
-  time: DataTypes.TIME
+  time: DataTypes.TIME,
+  date: {
+    type: DataTypes.DATEONLY,
+    allowNull: false // หรือตั้งเป็น false ถ้าบังคับว่าต้องมี
+  }
+
+  
 }, {
   tableName: 'itinerary',
   schema: 'aws',

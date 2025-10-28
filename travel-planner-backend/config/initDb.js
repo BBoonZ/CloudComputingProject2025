@@ -134,8 +134,10 @@ const Planroom = sequelize.define('Planroom', {
       },
       description: DataTypes.TEXT,
       value: DataTypes.DECIMAL(10, 2),
-      type: DataTypes.STRING(50)
-    }, {
+      type: DataTypes.STRING(50),
+      paydate: DataTypes.DATEONLY
+    },    
+    {
       tableName: 'expend',
       schema: 'aws',
       timestamps: false
@@ -182,7 +184,12 @@ const Planroom = sequelize.define('Planroom', {
         references: { model: Itinerary, key: 'itinerary_id' },
         onDelete: 'CASCADE'
       },
-      description: DataTypes.TEXT
+      description: DataTypes.TEXT,
+      order_index: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 0
+  }
     }, {
       tableName: 'itinerary_detail',
       schema: 'aws',

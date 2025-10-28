@@ -6,7 +6,8 @@ export default function ActivityModal({
   open,
   onClose,
   editData = null,
-  date = null
+  date = null,
+  room_id = null
 }) {
   const [activities, setActivities] = useState(
     editData?.details || [{ text: "" }]
@@ -28,18 +29,72 @@ export default function ActivityModal({
     setActivities(newActivities);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => { // <-- 1. ต้องเป็น async
     e.preventDefault();
+
     const data = {
       main: e.target.activityMain.value,
       time: e.target.activityTime.value,
       location: e.target.activityLocation.value,
       locationLink: e.target.activityLocationLink.value,
       details: activities,
-      date: date,
+      date: date || editData?.date, // <-- 2. ถ้าเป็น edit ให้ใช้ date เดิม
+      room_id: room_id
     };
-    console.log(isEdit ? "Edit data:" : "Add data:", data);
-    onClose();
+
+    // 3. Logic แยก ADD / EDIT
+    if (isEdit) {
+      // ########## LOGIC แก้ไข (EDIT) ##########
+      if (!editData || !editData.itinerary_id) {
+        alert("เกิดข้อผิดพลาด: ไม่พบ ID ของกิจกรรม");
+        return;
+      }
+
+      try {
+        const response = await fetch(`http://localhost:3001/editActivity/${editData.itinerary_id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Failed to edit activity');
+        }
+        
+        alert("แก้ไขกิจกรรมสำเร็จ!");
+        onClose();
+        window.location.reload(); // <-- 4. รีโหลดหน้า (ง่ายที่สุด)
+
+      } catch (err) {
+        console.error("Error editing activity:", err);
+        alert(`เกิดข้อผิดพลาด: ${err.message}`);
+      }
+
+    } else {
+      // ########## LOGIC เพิ่ม (ADD) ##########
+      // (โค้ดนี้คือตัวเดิมที่เราทำไปแล้ว)
+      try {
+        const response = await fetch("http://localhost:3001/addActivity", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Failed to add activity');
+        }
+
+        alert("เพิ่มกิจกรรมสำเร็จ!");
+        onClose();
+        window.location.reload(); // <-- 4. รีโหลดหน้า (ง่ายที่สุด)
+        
+      } catch (err) {
+        console.error("Error adding activity:", err);
+        alert(`เกิดข้อผิดพลาด: ${err.message}`);
+      }
+    }
   };
 
   if (!open) return null;
@@ -68,7 +123,7 @@ export default function ActivityModal({
               name="activityMain"
               type="text"
               placeholder="กิจกรรม"
-              defaultValue={editData?.main || ""}
+              defaultValue={editData?.title || ""}
               required
             />
 
@@ -92,7 +147,7 @@ export default function ActivityModal({
             <input
               name="activityLocationLink"
               placeholder="ลิงค์รายละเอียดสถานที่"
-              defaultValue={editData?.locationLink || ""}
+              defaultValue={editData?.map || ""}
             />
 
             <label>รายละเอียดกิจกรรม</label>

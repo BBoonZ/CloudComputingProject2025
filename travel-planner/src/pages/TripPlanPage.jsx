@@ -26,6 +26,48 @@ export default function TripPlanPage() {
     const [selectDate, setSelectedDate] = useState(null);
     const [description, setDescription] = useState("");
     const [title, setTitle] = useState("");
+    const [selectedActivity, setSelectedActivity] = useState(null);
+
+    const handleDeleteActivity = async (itineraryId) => {
+        // 1. ถามยืนยันก่อนลบ
+        if (!window.confirm("คุณแน่ใจหรือไม่ว่าต้องการลบกิจกรรมนี้?")) {
+            return;
+        }
+
+        try {
+            // 2. ยิง API "DELETE"
+            const response = await fetch(`http://localhost:3001/deleteActivity/${itineraryId}`, {
+                method: "DELETE",
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to delete activity');
+            }
+
+            // 3. (สำคัญ!) ลบออกจาก State เอง โดยไม่ต้อง reload หน้า
+            setTrips(currentTrips => {
+                // วนลูปทุกวัน (Days)
+                return currentTrips.map(day => {
+                    // กรอง Activity ที่เพิ่งลบออกไป
+                    const updatedActivities = day.activities.filter(
+                        act => act.itinerary_id !== itineraryId
+                    );
+
+                    return {
+                        ...day,
+                        activities: updatedActivities
+                    };
+                });
+            });
+
+            alert("ลบกิจกรรมสำเร็จ!");
+
+        } catch (err) {
+            console.error("Error deleting activity:", err);
+            alert(`เกิดข้อผิดพลาด: ${err.message}`);
+        }
+    };
 
     const generateTripDays = (startDateStr, endDateStr) => {
         const start = new Date(startDateStr);
@@ -56,28 +98,47 @@ export default function TripPlanPage() {
     };
 
     useEffect(() => {
-
+        // 1. ดึงข้อมูลทริปหลัก (ชื่อ, วันที่)
         fetch(`http://localhost:3001/trip_detail?room_id=${room_id}`)
             .then((res) => res.json())
-            .then((data) => {
-                setTrip(data);
-                setDescription(data.title);
-                setTitle(data.description);
-                // คำนวณจำนวนวันรวม
-                if (data && data.start_date && data.end_date) {
-                    const start = new Date(data.start_date);
-                    const end = new Date(data.end_date);
-                    const diffTime = end - start; // milliseconds
-                    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
-                    setTotalDays(diffDays);
-                    const daysArray = generateTripDays(data.start_date, data.end_date);
-                    setTrips(daysArray);
+            .then((tripData) => {
+                setTrip(tripData);
+                setTitle(tripData.title);           // <-- ผมแก้ bug สลับตัวแปรให้
+                setDescription(tripData.description); // <-- ผมแก้ bug สลับตัวแปรให้
+
+                // 2. ถ้าข้อมูลวันที่มีครบ
+                if (tripData && tripData.start_date && tripData.end_date) {
+                    // 2.1 สร้าง "วัน" เปล่าๆ (โครง)
+                    const daysArray = generateTripDays(tripData.start_date, tripData.end_date);
+
+                    // 2.2 ดึง "กิจกรรม" (เนื้อหา)
+                    fetch(`http://localhost:3001/itineraries/${room_id}`)
+                        .then(res => res.json())
+                        .then(apiActivities => {
+
+                            // 2.3 เอา "เนื้อหา" มายัดใส่ "โครง"
+                            const populatedDays = daysArray.map(day => {
+                                // กรองกิจกรรมเฉพาะวันที่ตรงกัน
+                                const activitiesForThisDay = apiActivities.filter(
+                                    act => act.date === day.real // day.real คือ "YYYY-MM-DD"
+                                );
+
+                                return {
+                                    ...day,
+                                    activities: activitiesForThisDay // ยัดกิจกรรมที่ดึงมาทับ array ว่าง
+                                };
+                            });
+
+                            setTrips(populatedDays); // <-- อัปเดต state ด้วยข้อมูลที่สมบูรณ์
+                        })
+                        .catch(err => console.error("Error fetching activities:", err));
+
                 }
             })
             .catch((err) => console.error(err));
+
         document.body.style.backgroundColor = "";
         return () => { document.body.style.backgroundColor = "#f5f5f5"; }
-
 
     }, [room_id]);
 
@@ -218,33 +279,59 @@ export default function TripPlanPage() {
 
                         <div className={styles.planContent}>
                             <div className={styles.itineraryView}>
+                                {/* ... อยู่ใน <div className={styles.itineraryView}> ... */}
+
                                 {trips.map((tripDay, idx) => (
                                     <div key={idx} className={styles.itineraryDay}>
                                         <h3 className={styles.dayTitle}>วันที่ {tripDay.day} <span className={styles.dateText}>({tripDay.date})</span></h3>
                                         <div className={styles.dayActivities}>
-                                            {tripDay.activities.map((act, i) => (
-                                                <div key={i} className={styles.activityCard}>
+
+                                            {/* ▼▼▼ เริ่มแก้ไขตรงนี้ ▼▼▼ */}
+
+                                            {/* 3. วนลูป activities ที่ดึงมาจาก API */}
+                                            {tripDay.activities.map((act) => (
+                                                <div key={act.itinerary_id} className={styles.activityCard}>
                                                     <div className={styles.activityInfo}>
                                                         <h4>
                                                             <i className="fas fa-plane-arrival"></i> {act.title}{" "}
-                                                            <a href={act.mapLink} target="_blank" rel="noopener noreferrer">[แผนที่]</a>
+
+                                                            {/* 3.1 เช็คว่ามี link map ค่อยแสดงผล */}
+                                                            {act.map && (
+                                                                <a href={act.map} target="_blank" rel="noopener noreferrer">[แผนที่]</a>
+                                                            )}
                                                         </h4>
-                                                        <p className={styles.activityTime}>{act.time}</p>
-                                                        <p className={styles.activityLocation}>{act.location}</p>
+
+                                                        {/* 3.2 เช็คว่ามีเวลา/สถานที่ ค่อยแสดงผล */}
+                                                        {act.time && <p className={styles.activityTime}>{act.time.substring(0, 5)}</p>}
+                                                        {act.location && <p className={styles.activityLocation}>{act.location}</p>}
+
                                                         <div className={styles.activityDetail}>
                                                             <ul>
-                                                                {act.details.map((d, j) => <li key={j}>{d}</li>)}
+                                                                {/* 3.3 วนลูป details จาก Model ที่ include มา */}
+                                                                {act.ItineraryDetails && act.ItineraryDetails.map((detail, j) => (
+                                                                    <li key={j}>{detail.description}</li>
+                                                                ))}
                                                             </ul>
                                                         </div>
                                                     </div>
                                                     <div className={styles.activityActions}>
-                                                        <button className={styles.btnEdit} onClick={() => setEditActivityModalOpen(true)}>
+                                                        <button className={styles.btnEdit} onClick={() => {
+                                                            setSelectedActivity(act); // <-- 2. จำว่าแก้ตัวไหน
+                                                            setEditActivityModalOpen(true);
+                                                        }}>
                                                             <i className="fas fa-edit"></i>
                                                         </button>
-                                                        <button className={styles.btnDelete}><i className="fas fa-trash"></i></button>
+                                                        <button
+                                                            className={styles.btnDelete}
+                                                            onClick={() => handleDeleteActivity(act.itinerary_id)}
+                                                        >
+                                                            <i className="fas fa-trash"></i>
+                                                        </button>
                                                     </div>
                                                 </div>
                                             ))}
+                                            {/* ▲▲▲ สิ้นสุดการแก้ไข ▲▲▲ */}
+
                                             <button className={styles.btnAddActivity} onClick={() => { setSelectedDate(tripDay.real); setAddActivityModalOpen(true); }}>
                                                 <i className="fas fa-plus"></i> เพิ่มกิจกรรม {tripDay.real}
                                             </button>
@@ -275,21 +362,18 @@ export default function TripPlanPage() {
                 open={addActivityModalOpen}
                 onClose={() => setAddActivityModalOpen(false)}
                 date={selectDate}
+                room_id={room_id}
             />
 
             {/* Edit Activity Modal */}
             <ActivityTripModal
                 type="edit"
                 open={editActivityModalOpen}
-                onClose={() => setEditActivityModalOpen(false)}
-                editData={{
-                    date: "1 ธ.ค.",
-                    main: "ตัวอย่างกิจกรรม",
-                    time: "09:00",
-                    location: "กรุงเทพ",
-                    locationLink: "https://...",
-                    details: [{ text: "รายละเอียด 1" }, { text: "รายละเอียด 2" }]
+                onClose={() => {
+                    setEditActivityModalOpen(false);
+                    setSelectedActivity(null); // <-- 3. พอปิดก็เคลียร์ค่า
                 }}
+                editData={selectedActivity} // <-- 4. ส่งข้อมูลจริงไป
             />
         </>
     );

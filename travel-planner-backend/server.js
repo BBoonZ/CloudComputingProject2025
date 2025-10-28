@@ -9,7 +9,7 @@ const sequelize = require("./config/database");
 // const { Planroom } = require('./models/planroom');
 // const { Member } = require('./models/member');
 // const { Expend } = require('./models/expends');
-const { User, Planroom, Member, Expend } = require('./models'); 
+const { User, Planroom, Member, Expend, Itinerary, ItineraryDetail } = require('./models'); 
 
 
 const app = express();
@@ -302,6 +302,209 @@ app.get("/room_expends/:room_id", async (req, res) => {
     res.status(500).send("Server error");
   }
 });
+
+// POST /addActivity - เพิ่มกิจกรรมใหม่ (Itinerary) พร้อมรายละเอียด (ItineraryDetail)
+app.post("/addActivity", async (req, res) => {
+  // 1. ดึงข้อมูลจาก request body
+  const { 
+    room_id,       // ID ของทริป
+    main,          // ชื่อกิจกรรม (title)
+    time,          // เวลา (e.g., "09:00")
+    location,      // ชื่อสถานที่
+    locationLink,  // ลิงก์ Google Maps
+    details,       // Array ของรายละเอียด [{ text: "..." }, { text: "..." }]
+    date           // วันที่ (e.g., "2025-12-01")
+  } = req.body;
+
+  // 2. ตรวจสอบข้อมูลที่จำเป็น
+  if (!room_id || !main || !date) {
+    return res.status(400).json({ 
+      message: "ข้อมูล room_id, main (title), และ date ห้ามว่าง" 
+    });
+  }
+
+  // 3. เริ่ม Transaction (เพราะเราจะบันทึก 2 ตาราง)
+  const t = await sequelize.transaction();
+
+  try {
+    // 4. สร้าง Itinerary (กิจกรรมหลัก)
+    const newItinerary = await Itinerary.create({
+      room_id: room_id,
+      title: main,
+      location: location,
+      map: locationLink,
+      time: time || null, // ถ้าไม่ส่งมา ให้เป็น null
+      date: date
+    }, { transaction: t }); // ระบุว่าอยู่ใน transaction นี้
+
+    // 5. ตรวจสอบว่ามี "รายละเอียด" (details) ส่งมาด้วยหรือไม่
+    if (details && Array.isArray(details) && details.length > 0) {
+      
+      // 5.1 เตรียมข้อมูล details array สำหรับ bulkCreate
+      const detailData = details
+        .filter(d => d.text && d.text.trim() !== "") // กรองอันที่ว่างๆ ออก
+        .map((detail, index) => ({ // <-- ใช้ map แบบมี index
+          itinerary_id: newItinerary.itinerary_id, // ID จาก Itinerary ที่เพิ่งสร้าง
+          description: detail.text,
+          order_index: index // <-- บันทึกลำดับ (0, 1, 2, ...)
+        }));
+
+      // 5.2 บันทึก details ทั้งหมดทีเดียว (Bulk Create)
+      if (detailData.length > 0) {
+        await ItineraryDetail.bulkCreate(detailData, { transaction: t });
+      }
+    }
+
+    // 6. ถ้าทุกอย่างสำเร็จ ให้ Commit transaction
+    await t.commit();
+    
+    console.log("✅ Created activity (Itinerary) ID:", newItinerary.itinerary_id);
+    res.status(201).json({ 
+      message: "success", 
+      data: newItinerary // ส่งข้อมูลที่สร้างใหม่กลับไป
+    });
+
+  } catch (err) {
+    // 7. ถ้ามีข้อผิดพลาดใดๆ เกิดขึ้น ให้ Rollback
+    await t.rollback();
+    console.error("❌ Error creating activity:", err);
+    res.status(500).json({
+      status: 'error',
+      message: 'Server error while creating activity',
+      error: err.message
+    });
+  }
+});
+
+app.get("/itineraries/:room_id", async (req, res) => {
+  try {
+    const { room_id } = req.params;
+
+    if (!room_id) {
+      return res.status(400).json({ message: "room_id is required" });
+    }
+
+    const activities = await Itinerary.findAll({
+      where: { room_id: room_id },
+      include: [
+        {
+          model: ItineraryDetail,
+          attributes: ['description', 'order_index'],
+          // ไม่ต้องใส่ as: '...' เพราะคุณไม่ได้ตั้ง as ใน index.js
+        }
+      ],
+      order: [
+        ['date', 'ASC'], // 1. เรียงตามวันที่
+        ['time', 'ASC'], // 2. เรียงตามเวลา
+        [ItineraryDetail, 'order_index', 'ASC'] // 3. เรียงรายละเอียดตามลำดับ
+      ]
+    });
+
+    if (!activities) {
+      // ถ้าไม่เจอก็ส่ง array ว่างกลับไป ไม่ใช่ error
+      return res.status(200).json([]);
+    }
+    
+    res.json(activities);
+
+  } catch (err) {
+    console.error("❌ Error fetching itineraries:", err);
+    res.status(500).send("Server error");
+  }
+});
+
+// PUT /editActivity/:itinerary_id - แก้ไขกิจกรรม
+app.put("/editActivity/:itinerary_id", async (req, res) => {
+  const { itinerary_id } = req.params;
+  const { main, time, location, locationLink, details, date } = req.body;
+
+  if (!itinerary_id) {
+    return res.status(400).json({ message: "Itinerary ID is required" });
+  }
+
+  const t = await sequelize.transaction(); // 1. เริ่ม Transaction
+
+  try {
+    // 2. อัปเดต Itinerary (กิจกรรมหลัก)
+    await Itinerary.update({
+      title: main,
+      location: location,
+      map: locationLink,
+      time: time || null,
+      date: date
+    }, {
+      where: { itinerary_id: itinerary_id },
+      transaction: t
+    });
+
+    // 3. ลบ ItineraryDetail (รายละเอียด) เก่าทั้งหมด
+    await ItineraryDetail.destroy({
+      where: { itinerary_id: itinerary_id },
+      transaction: t
+    });
+
+    // 4. สร้าง ItineraryDetail ใหม่ (ถ้ามี)
+    if (details && Array.isArray(details) && details.length > 0) {
+      const detailData = details
+        .filter(d => d.text && d.text.trim() !== "")
+        .map((d, index) => ({
+          itinerary_id: itinerary_id, // ใช้ ID เดิม
+          description: d.text,
+          order_index: index
+        }));
+
+      if (detailData.length > 0) {
+        await ItineraryDetail.bulkCreate(detailData, { transaction: t });
+      }
+    }
+
+    // 5. ถ้าสำเร็จ... Commit
+    await t.commit();
+    
+    console.log("✅ Updated activity ID:", itinerary_id);
+    res.status(200).json({ message: "success", itinerary_id: itinerary_id });
+
+  } catch (err) {
+    // 6. ถ้าพัง... Rollback
+    await t.rollback();
+    console.error("❌ Error updating activity:", err);
+    res.status(500).send("Server error");
+  }
+});
+
+// DELETE /deleteActivity/:itinerary_id - ลบกิจกรรม
+app.delete("/deleteActivity/:itinerary_id", async (req, res) => {
+  const { itinerary_id } = req.params;
+
+  if (!itinerary_id) {
+    return res.status(400).json({ message: "Itinerary ID is required" });
+  }
+
+  try {
+    // 1. สั่งลบ Itinerary ตัวแม่
+    const result = await Itinerary.destroy({
+      where: { itinerary_id: itinerary_id },
+    });
+
+    if (result === 0) {
+      // ถ้าลบไม่สำเร็จ (เพราะหา ID ไม่เจอ)
+      return res.status(404).json({ message: "Activity not found" });
+    }
+
+    // 2. ไม่ต้องลบ ItineraryDetail...
+    // เพราะ Model Itinerary และ ItineraryDetail ของคุณ
+    // มี 'onDelete: CASCADE' 
+    // ฐานข้อมูลจะลบลูกๆ (Details) ให้เองอัตโนมัติ
+    
+    console.log("✅ Deleted activity ID:", itinerary_id);
+    res.status(200).json({ message: "success", itinerary_id: itinerary_id });
+
+  } catch (err) {
+    console.error("❌ Error deleting activity:", err);
+    res.status(500).send("Server error");
+  }
+});
+
 const PORT = process.env.PORT || 3001;
 
 async function startServer() {

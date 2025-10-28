@@ -16,7 +16,12 @@ const ItineraryDetail = sequelize.define('ItineraryDetail', {
     },
     onDelete: 'CASCADE'
   },
-  description: DataTypes.TEXT
+  description: DataTypes.TEXT,
+  order_index: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 0
+  }
 }, {
   tableName: 'itinerary_detail',
   schema: 'aws',

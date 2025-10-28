@@ -23,7 +23,9 @@ export default function TripPlanPage() {
     const [trips, setTrips] = useState([]);
     const [totaldate, setTotaldate] = useState([]);
     const [totalDays, setTotalDays] = useState(0);
-    const [selectDate, setSelectedDate] = useState(null)
+    const [selectDate, setSelectedDate] = useState(null);
+    const [description, setDescription] = useState("");
+    const [title, setTitle] = useState("");
 
     const generateTripDays = (startDateStr, endDateStr) => {
         const start = new Date(startDateStr);
@@ -55,11 +57,12 @@ export default function TripPlanPage() {
 
     useEffect(() => {
 
-         fetch(`http://localhost:3001/trip_detail?room_id=${room_id}`)
+        fetch(`http://localhost:3001/trip_detail?room_id=${room_id}`)
             .then((res) => res.json())
             .then((data) => {
                 setTrip(data);
-
+                setDescription(data.title);
+                setTitle(data.description);
                 // คำนวณจำนวนวันรวม
                 if (data && data.start_date && data.end_date) {
                     const start = new Date(data.start_date);
@@ -74,17 +77,17 @@ export default function TripPlanPage() {
             .catch((err) => console.error(err));
         document.body.style.backgroundColor = "";
         return () => { document.body.style.backgroundColor = "#f5f5f5"; }
-        
+
 
     }, [room_id]);
-    
+
     console.log(trip);
     console.log(totalDays);
     // const startDate = new Date(trip.start_date);
     // const endDate = new Date(trip.end_date);
     // const diffTime = endDate - startDate; // หรือ endDate.getTime() - startDate.getTime()
 
-// แปลงเป็นวัน
+    // แปลงเป็นวัน
     // const diffDays = diffTime / (1000 * 60 * 60 * 24) + 1; // +1 ถ้าต้องการรวมวันแรกด้วย
 
     // console.log(diffDays); // 6
@@ -166,7 +169,7 @@ export default function TripPlanPage() {
             <main className={plantemp.tripPlanMain}>
                 <div className={plantemp.container}>
                     <div className={plantemp.planHeader}>
-                        <h1>ทริปตะลุยเชียงใหม่ 4 วัน 3 คืน</h1>
+                        <h1>{description}</h1>
                         <div className={plantemp.planMeta}>
                             <span className={plantemp.planDates}>1 - 4 ธันวาคม 2567</span>
                             <button className={`${plantemp.btn} ${plantemp.btnSave}`} onClick={() => setEditModalOpen(true)}>
@@ -179,7 +182,7 @@ export default function TripPlanPage() {
                     </div>
                     <div class={plantemp.info}>
                         <div class={plantemp.container}>
-                            <p>ทริปตะลุยเชียงใหม่ของคุณ สามารถวางแผนได้ทั้งการชมเมืองเก่า, เที่ยววัด, ไปแหล่งธรรมชาติ, หรือตะลุยกิจกรรมแอดเวนเจอร์ เช่น โหนสลิง, ล่องแก่ง, หรือขี่ ATV โดยมีสถานที่แนะนำ เช่น วัดพระธาตุดอยสุเทพ, ดอยอินทนนท์, ม่อนแจ่ม, ถนนคนเดินท่าแพ, โป่งแยง จังเกิ้ล โคสเตอร์ แอนด์ ซิปไลน์, และแกรนด์แคนยอน หางดง เพื่อให้คุณสนุกกับการผจญภัยในแบบที่ชอบ</p>
+                            <p>{title}</p>
                         </div>
                     </div>
                     <div className={plantemp.planLayout}>
@@ -187,13 +190,28 @@ export default function TripPlanPage() {
                             <div className={`${plantemp.sidebarItem} ${plantemp.active}`}>
                                 <i className="fas fa-calendar-alt"></i> กำหนดการเดินทาง
                             </div>
-                            <div className={plantemp.sidebarItem} onClick={() => navigate(`/tripBudget?room_id=${room_id}`)}>
+                            <div className={plantemp.sidebarItem} onClick={() => navigate(`/tripBudget?room_id=${room_id}`, {
+                                state: {
+                                    tripTitle: title,
+                                    tripDescription: description
+                                }
+                            })}>
                                 <i className="fas fa-wallet"></i> งบประมาณ
                             </div>
-                            <div className={plantemp.sidebarItem} onClick={() => navigate(`/tripTeam?room_id=${room_id}`)}>
+                            <div className={plantemp.sidebarItem} onClick={() => navigate(`/tripTeam?room_id=${room_id}`, {
+                                state: {
+                                    tripTitle: title,
+                                    tripDescription: description
+                                }
+                            })}>
                                 <i className="fas fa-users"></i> สมาชิก & แชท
                             </div>
-                            <div className={plantemp.sidebarItem} onClick={() => navigate(`/tripFolder?room_id=${room_id}`)}>
+                            <div className={plantemp.sidebarItem} onClick={() => navigate(`/tripFolder?room_id=${room_id}`, {
+                                state: {
+                                    tripTitle: title,
+                                    tripDescription: description
+                                }
+                            })}>
                                 <i className="fas fa-file-alt"></i> เอกสาร
                             </div>
                         </aside>
@@ -227,7 +245,7 @@ export default function TripPlanPage() {
                                                     </div>
                                                 </div>
                                             ))}
-                                            <button className={styles.btnAddActivity} onClick={() => {setSelectedDate(tripDay.real); setAddActivityModalOpen(true);}}>
+                                            <button className={styles.btnAddActivity} onClick={() => { setSelectedDate(tripDay.real); setAddActivityModalOpen(true); }}>
                                                 <i className="fas fa-plus"></i> เพิ่มกิจกรรม {tripDay.real}
                                             </button>
                                         </div>

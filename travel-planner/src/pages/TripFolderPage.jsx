@@ -20,7 +20,8 @@ export default function TripBudget() {
     const room_id = params.get("room_id");
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [shareModalOpen, setShareModalOpen] = useState(false);
-
+    const tripTitle = location.state?.tripTitle || "กำลังโหลดชื่อทริป...";
+    const tripDescription = location.state?.tripDescription || "";
     const [previewModalVisible, setPreviewModalVisible] = useState(false);
     const [previewContent, setPreviewContent] = useState("");
     const [files, setFiles] = useState([
@@ -114,7 +115,7 @@ export default function TripBudget() {
             <main className={tripTemplate.tripPlanMain}>
                 <div className={tripTemplate.container}>
                     <div className={tripTemplate.planHeader}>
-                        <h1>ทริปตะลุยเชียงใหม่ 4 วัน 3 คืน</h1>
+                        <h1>{tripDescription}</h1>
                         <div className={tripTemplate.planMeta}>
                             <span className={tripTemplate.planDates}>1 - 4 ธันวาคม 2567</span>
                             <button className={`${tripTemplate.btn} ${tripTemplate.btnSave}`} onClick={() => setEditModalOpen(true)}>
@@ -127,21 +128,41 @@ export default function TripBudget() {
                     </div>
                     <div class={tripTemplate.info}>
                         <div class={tripTemplate.container}>
-                            <p>ทริปตะลุยเชียงใหม่ของคุณ สามารถวางแผนได้ทั้งการชมเมืองเก่า, เที่ยววัด, ไปแหล่งธรรมชาติ, หรือตะลุยกิจกรรมแอดเวนเจอร์ เช่น โหนสลิง, ล่องแก่ง, หรือขี่ ATV โดยมีสถานที่แนะนำ เช่น วัดพระธาตุดอยสุเทพ, ดอยอินทนนท์, ม่อนแจ่ม, ถนนคนเดินท่าแพ, โป่งแยง จังเกิ้ล โคสเตอร์ แอนด์ ซิปไลน์, และแกรนด์แคนยอน หางดง เพื่อให้คุณสนุกกับการผจญภัยในแบบที่ชอบ</p>
+                            <p>{tripTitle}</p>
                         </div>
                     </div>
                     <div className={tripTemplate.planLayout}>
                         <aside className={tripTemplate.planSidebar}>
-                            <div className={tripTemplate.sidebarItem} onClick={() => navigate(`/tripPlan?room_id=${room_id}`)}>
+                            <div className={tripTemplate.sidebarItem} onClick={() => navigate(`/tripPlan?room_id=${room_id}`, {
+                                state: {
+                                    tripTitle: tripTitle,
+                                    tripDescription: tripDescription
+                                }
+                            })}>
                                 <i className="fas fa-calendar-alt"></i> กำหนดการเดินทาง
                             </div>
-                            <div className={tripTemplate.sidebarItem} onClick={() => navigate(`/tripBudget?room_id=${room_id}`)}>
+                            <div className={tripTemplate.sidebarItem} onClick={() => navigate(`/tripBudget?room_id=${room_id}`, {
+                                state: {
+                                    tripTitle: tripTitle,
+                                    tripDescription: tripDescription
+                                }
+                            })}>
                                 <i className="fas fa-wallet"></i> งบประมาณ
                             </div>
-                            <div className={tripTemplate.sidebarItem} onClick={() => navigate(`/tripTeam?room_id=${room_id}`)}>
+                            <div className={tripTemplate.sidebarItem} onClick={() => navigate(`/tripTeam?room_id=${room_id}`, {
+                                state: {
+                                    tripTitle: tripTitle,
+                                    tripDescription: tripDescription
+                                }
+                            })}>
                                 <i className="fas fa-users"></i> สมาชิก & แชท
                             </div>
-                            <div className={`${tripTemplate.sidebarItem} ${tripTemplate.active}`} onClick={() => navigate(`/tripFolder?room_id=${room_id}`)}>
+                            <div className={`${tripTemplate.sidebarItem} ${tripTemplate.active}`} onClick={() => navigate(`/tripFolder?room_id=${room_id}`, {
+                                state: {
+                                    tripTitle: tripTitle,
+                                    tripDescription: tripDescription
+                                }
+                            })}>
                                 <i className="fas fa-file-alt"></i> เอกสาร
                             </div>
                         </aside>

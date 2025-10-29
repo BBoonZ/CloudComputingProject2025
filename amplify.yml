@@ -2,10 +2,14 @@ version: 1
 frontend:
   phases:
     build:
-      commands: []
+      commands:
+        - cd travel-planner
+        - npm install
+        - npm run build
   artifacts:
-    baseDirectory: template
+    baseDirectory: travel-planner/build
     files:
       - '**/*'
   cache:
-    paths: []
+    paths:
+      - travel-planner/node_modules/**/*

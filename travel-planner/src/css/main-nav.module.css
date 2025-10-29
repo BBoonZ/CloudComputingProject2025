@@ -1,0 +1,188 @@
+* {
+    font-family: 'Prompt', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.container {
+    margin: 0 auto;
+    padding: 0 20px;
+    /* เพิ่ม padding ให้ดูโปร่งขึ้น */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Header */
+.header {
+    background: linear-gradient(90deg, #f9fafb 0%, #f3f4f6 100%);
+    padding: 1rem 0;
+    border-bottom: 1px solid #eee;
+    box-shadow: 0 5px 8px rgba(0, 0, 0, 0.05);
+    top: 0;
+    z-index: 1000;
+}
+
+.header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 60px;
+}
+
+/* Logo */
+.logo a {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #007bff;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.logo a {
+  text-decoration: none;
+  color: #333;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.logo a:hover {
+    color: #0056b3;
+}
+
+/* Navigation */
+.mainNav ul {
+    list-style: none;
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+}
+
+.mainNav a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    position: relative;
+    padding: 6px 0;
+    transition: color 0.3s ease;
+}
+
+.mainNav li a {
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+}
+
+/* Hover effect เส้นใต้ */
+.mainNav a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    width: 0%;
+    height: 2px;
+    background: #007bff;
+    transition: width 0.3s ease;
+}
+
+.mainNav a:hover {
+    color: #007bff;
+}
+
+.mainNav a:hover::after {
+    width: 100%;
+}
+
+.mainNav img {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.btnback {
+    color: #0056b3;
+    font-size: 18px;
+    padding: 8px 16px;
+    border: 2px solid transparent;
+    background: transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btnback:hover {
+    background: rgba(0, 86, 179, 0.05);
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.userInfo span {
+  color: #333;
+  font-weight: 500;
+}
+
+.profilePic {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  cursor: pointer;
+  border: 2px solid #007bff;
+}
+
+.profilePic:hover {
+  opacity: 0.8;
+}
+
+.logoutBtn {
+  padding: 0.5rem 1rem;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.loginBtn {
+  padding: 0.5rem 1rem;
+  background-color: #007bff;
+  color: white !important;
+  border-radius: 4px;
+  text-decoration: none;
+}
+
+.logoutBtn:hover {
+  background-color: #cc0000;
+}
+
+.loginBtn:hover {
+  background-color: #0056b3;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  .mainNav ul {
+    gap: 1rem;
+  }
+  
+  .userInfo span {
+    display: none;
+  }
+}

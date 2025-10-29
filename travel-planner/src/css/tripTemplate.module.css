@@ -1,0 +1,262 @@
+* {
+    font-family: 'Prompt', sansSerif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.container {
+    margin: 0 auto;
+    padding: 0 20px;
+    /* เพิ่ม padding ให้ดูโปร่งขึ้น */
+}
+
+/* Header */
+.header {
+    background: #fff;
+    padding: 1rem 0;
+    border-bottom: 1px solid #eee;
+    box-shadow: 0 5px 8px rgba(0, 0, 0, 0.05);
+    top: 0;
+    z-index: 1000;
+}
+
+.header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 60px;
+}
+
+/* Logo */
+.logo a {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #007bff;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.logo a:hover {
+    color: #0056b3;
+}
+
+/* Navigation */
+.mainNav ul {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+    align-items: center;
+}
+
+.mainNav a {
+    text-decoration: none;
+    color: #444;
+    font-weight: 500;
+    position: relative;
+    padding: 6px 0;
+    transition: color 0.3s ease;
+}
+
+/* Hover effect เส้นใต้ */
+.mainNav a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    width: 0%;
+    height: 2px;
+    background: #007bff;
+    transition: width 0.3s ease;
+}
+
+.mainNav a:hover {
+    color: #007bff;
+}
+
+.mainNav a:hover::after {
+    width: 100%;
+}
+
+/* ปุ่ม */
+.btnCreate,
+.btnLogin {
+    display: inline-block;
+    padding: 6px 18px !important;
+    /* เพิ่มความสูง/กว้าง */
+    border-radius: 8px;
+    /* มุมโค้งมนขึ้น */
+    font-size: 1rem;
+    /* ตัวอักษรใหญ่ขึ้นนิด */
+    font-weight: 600;
+    /* ทำให้ตัวหนาชัดเจน */
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    /* เพิ่ม cursor แบบปุ่ม */
+}
+
+/* ปุ่มสร้างแผนใหม่ */
+.btnCreate {
+    background-color: #f1f3f5;
+    color: #333;
+}
+
+.btnCreate:hover {
+    background-color: #e2e6ea;
+}
+
+/* ปุ่มเข้าสู่ระบบ */
+.btnLogin {
+    background-color: #007bff;
+    color: #fff !important;
+    box-shadow: 0 3px 6px rgba(0, 123, 255, 0.25);
+    /* เพิ่มเงาเบาๆ */
+}
+
+.btnLogin:hover {
+    background-color: #0056b3;
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.35);
+}
+
+.btnBack {
+    background-color: #E3F2FD;
+    color: #1976D2;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  
+  .btnCopy {
+    background-color: #E8F5E9;
+    color: #4CAF50;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+.btnBack:hover {
+    background-color: #BBDEFB;
+}
+
+.btnCopy:hover {
+    background-color: #C8E6C9;
+}
+
+/* User Nav */
+.userNav {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* ส่วนของ Trip Plan Main */
+.tripPlanMain {
+    padding: 30px 0;
+}
+
+.planHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 0 20px;
+}
+
+.planHeader h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    border: none;
+    background: none;
+    padding: 5px;
+    flex-grow: 1;
+    min-width: 250px;
+}
+
+.planMeta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.planDates {
+    font-size: 1rem;
+    color: #666;
+}
+
+.btnSave,
+.btnShare {
+    padding: 8px 15px;
+    border-radius: 25px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.btnSave {
+    background-color: #17a2b8;
+    color: #fff;
+}
+
+.btnSave:hover {
+    background-color: #138496;
+}
+
+.btnShare {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.btnShare:hover {
+    background-color: #0056b3;
+}
+
+/* info */
+.info {
+    margin-bottom: 15px;
+    font-weight: normal;
+}
+
+/* Layout */
+.planLayout {
+    display: flex;
+    gap: 20px;
+    padding: 0 20px;
+}
+
+.planSidebar {
+    width: 250px;
+    background: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    height: fit-content;
+}
+
+.sidebarItem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    color: #555;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.sidebarItem:hover,
+.sidebarItem.active {
+    background-color: #e6f0ff;
+    color: #007bff;
+}
+
+.planContent {
+    flex-grow: 1;
+}

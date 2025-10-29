@@ -1,0 +1,465 @@
+.planContent {
+    flex-grow: 1;
+}
+
+/* Itinerary */
+.itineraryView {
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.itineraryDay {
+    margin-bottom: 30px;
+    border-left: 3px solid #007bff;
+    padding-left: 20px;
+}
+
+.dayTitle {
+    font-size: 1.5rem;
+    color: #007bff;
+    margin-bottom: 15px;
+    font-weight: 700;
+}
+
+.dateText {
+    font-size: 1rem;
+    color: #888;
+    font-weight: 400;
+}
+
+/* Activities */
+.dayActivities {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.activityCard {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.activityCard:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.activityInfo h4 {
+    margin-bottom: 5px;
+    font-size: 1.1rem;
+}
+
+.activityInfo a {
+    color: #0056b3;
+}
+
+.activityTime,
+.activityLocation {
+    font-size: 1rem;
+    color: #666;
+}
+
+.activityDetail ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.activityDetail ul li {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+/* Activity Actions */
+.activityActions {
+    display: flex;
+    gap: 10px;
+}
+
+.btnVote,
+.btnEdit,
+.btnDelete {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.2s ease;
+}
+
+.btnVote i {
+    color: #007bff;
+}
+
+.btnVote:hover {
+    background-color: #e6f0ff;
+}
+
+.btnEdit:hover {
+    background-color: #f1f1f1;
+}
+
+/* Add Activity Button */
+.btnAddActivity {
+    background-color: #e9ecef;
+    color: #495057;
+    border: none;
+    border-radius: 8px;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 700;
+    transition: background-color 0.3s ease;
+}
+
+.btnAddActivity:hover {
+    background-color: #dee2e6;
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modalMain {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.modalContent {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    width: 470px;
+    max-width: 90%;
+    animation: fadeIn 0.3s ease;
+}
+
+.modalMain h2 {
+    margin: 0;
+}
+
+.modalContent label {
+    display: block;
+    margin: 10px 0 5px;
+}
+
+.modalContent input,
+.modalContent textarea,
+.modalContent select,
+.modalContent input[type="date"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    resize: none;
+    margin: 0;
+}
+
+.btnSaveEdit {
+    background: #007bff;
+    color: white;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    margin-top: 10px;
+    marginLeft: auto;
+}
+
+.btnSaveEdit:hover {
+    background: #0056b3;
+}
+
+/* ปุ่มปิด (X) */
+.modalMain .close {
+    float: right;
+    font-size: 2rem;
+    cursor: pointer;
+    color: #555;
+    line-height: 1;
+}
+
+.modalMain .close:hover {
+    color: red;
+}
+
+/* invite button */
+.modalInvite {
+    display: flex;
+}
+
+.modalInvite .btnCancel {
+    background: none;
+    color: #007bff;
+    padding: 8px 15px;
+    border-radius: 25px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.modalInvite .btnCancel:hover {
+    background: #e6f0ff;
+}
+
+.inputInvite select {
+    padding: 10px 5px 10px 0px;
+    border: none;
+    outline: none;
+    color: rgb(95, 99, 104);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.inputInvite select option {
+    padding: 8px 12px;
+    outline: none;
+    background-color: #ffffff;
+    color: rgb(95, 99, 104);
+    font-weight: 600;
+}
+
+
+/* popup share & profile */
+.modalMain .preProfile {
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-left: 0;
+    padding: 8px 24px 8px 16px;
+}
+
+/* profile card */
+.preProfile .profile,
+.share {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+    padding: 4px 0;
+    width: 100%;
+}
+
+/* avatar */
+.profile .pic,
+.share .sharePic {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    border-radius: 50%;
+    /* ทำให้เป็นวงกลม */
+    overflow: hidden;
+}
+
+.profile .pic img,
+.share .sharePic img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* user info */
+.profile .user .share .shareDetail {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    word-break: break-word;
+}
+
+/* username */
+.user .username,
+.share .shareOption {
+    letter-spacing: .0178571429em;
+    color: rgb(60, 64, 67);
+    font-weight: 600;
+}
+
+/* email */
+.user .email,
+.share .shareText {
+    letter-spacing: .025em;
+    color: rgb(95, 99, 104);
+    font-size: 0.8em;
+}
+
+/* privilege */
+.profile .privilege,
+.share .sharePrivilege {
+    font-weight: 600;
+    color: #007bff;
+    white-space: nowrap;
+    marginLeft: auto;
+}
+
+/* shareOption */
+.shareOption {
+    position: relative;
+    display: inline-block;
+    width: 50%;
+}
+
+.shareOption select {
+    padding: 10px 5px 10px 0px;
+    border: none;
+    outline: none;
+    color: rgb(95, 99, 104);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.shareOption select option {
+    padding: 8px 12px;
+    outline: none;
+    background-color: #ffffff;
+    color: rgb(95, 99, 104);
+    font-weight: 600;
+}
+
+
+/* share Privilege*/
+.sharePrivilege select {
+    padding: 10px 5px 10px 0px;
+    border: none;
+    outline: none;
+    color: #007bff;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.sharePrivilege select option {
+    padding: 8px 12px;
+    outline: none;
+    background-color: #ffffff;
+    color: #007bff;
+    font-weight: 600;
+}
+
+/* share button*/
+.sharebutt {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 10px;
+    gap: 10px;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.sharebutt2butt {
+    display: flex;
+    align-items: center;
+    marginLeft: auto;
+    gap: 10px;
+}
+
+.btnShareOnline {
+    background: none;
+    color: #1d73d0;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btnShareOnline:hover {
+    background: #e6f0ff;
+}
+
+/* Activity Modal Popup */
+.activityDeatails,
+.editactivityDeatils {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.activityDeatilsInput,
+.editactivityDeatilsInput {
+    display: flex;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+
+/* ครอบ iframe ด้วย overlay */
+.iframeWrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* ตัว iframe */
+.iframeEdit {
+    width: 470px;
+    max-width: 100%;
+    height: 580px;
+    border: none;
+    border-radius: 10px;
+}
+
+.iframeShare {
+    width: 90%;
+    max-width: 90%;
+    height: 600px;
+    border: none;
+    border-radius: 10px;
+    animation: fadeIn 0.3s ease;
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .planLayout {
+        flex-direction: column;
+    }
+
+    .planSidebar {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+}

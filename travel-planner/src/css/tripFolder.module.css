@@ -1,0 +1,176 @@
+.fileHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.fileList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.fileItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fff;
+    border-radius: 10px;
+    padding: 12px 16px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.fileIcon {
+    font-size: 28px;
+    margin-right: 12px;
+}
+
+.fileIcon.pdf { color: #e74c3c; }
+.fileIcon.word { color: #3498db; }
+.fileIcon.image { color: #2ecc71; }
+
+.fileInfo {
+    flex: 1;
+}
+
+.fileName {
+    font-weight: 600;
+    display: block;
+}
+
+.fileMeta {
+    font-size: 0.9em;
+    color: #777;
+}
+
+.fileActions {
+    display: flex;
+    gap: 10px;
+}
+
+.btnUpload {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.btnUpload:hover {
+    background: #2980b9;
+}
+
+.btnIcon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    color: #555;
+}
+
+.btnIcon:hover {
+    color: #000;
+}
+
+/* ครอบ iframe ด้วย overlay */
+.iframeWrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(3px);
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* ตัว iframe */
+.iframeEdit {
+    width: 470px;
+    max-width: 100%;
+    height: 580px;
+    border: none;
+    border-radius: 10px;
+}
+
+.iframeShare {
+    width: 90%;
+    max-width: 90%;
+    height: 600px;
+    border: none;
+    border-radius: 10px;
+    animation: fadeIn 0.3s ease;
+}
+
+
+/* ===== Preview Modal ===== */
+.previewModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(3px);
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.previewContent {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    width: 80%;
+    max-width: 900px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    position: relative;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.previewContent img,
+.previewContent iframe {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    max-height: 70vh;
+    object-fit: contain;
+}
+
+.previewContent p {
+    text-align: center;
+    color: #555;
+    font-size: 1rem;
+}
+
+/* ปุ่มปิด */
+.previewContent .close {
+    position: absolute;
+    top: -15px;
+    right: 18px;
+    font-size: 50px;
+    color: #333;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.previewContent .close:hover {
+    color: #e74c3c;
+}
+
+.modalFit {
+    padding: 20px;
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}

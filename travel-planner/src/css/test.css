@@ -1,0 +1,78 @@
+/* Header ปกติ */
+.header-simple {
+    width: 100%;
+    background: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    padding: 10px 5%;
+  }
+  
+  .container-simple {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .logo-simple a {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  /* เมนู desktop */
+  .nav-simple ul {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .nav-simple a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    padding: 6px 10px;
+    transition: 0.3s;
+  }
+  
+  .nav-simple a:hover {
+    color: #007bff;
+  }
+  
+  /* Burger hidden desktop */
+  .burger-simple {
+    display: none;
+    font-size: 1.8rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  /* ===== Mobile <=726px ===== */
+  @media (max-width: 726px) {
+    .burger-simple {
+      display: block;
+    }
+  
+    .nav-simple ul {
+      display: none; /* ซ่อนโดย default */
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 10px;
+    }
+  
+    .nav-simple.open ul {
+      display: flex; /* แสดงเมื่อกด burger */
+    }
+  
+    .nav-simple a {
+      display: block;
+      padding: 12px;
+      background: #f1f3f5;
+      border-radius: 8px;
+      text-align: center;
+    }
+  
+    .nav-simple a:hover {
+      background: #e2e6ea;
+    }
+  }
+  

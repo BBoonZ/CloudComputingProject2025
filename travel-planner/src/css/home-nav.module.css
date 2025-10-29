@@ -1,0 +1,274 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Prompt', sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f4f7f6;
+}
+
+.container {
+    margin: 0 auto;
+    padding: 0 20px;
+    /* เพิ่ม padding ให้ดูโปร่งขึ้น */
+}
+
+/* Header */
+.header {
+    background: #fff;
+    padding: 1rem 0;
+    border-bottom: 1px solid #eee;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    top: 0;
+    z-index: 1000;
+}
+
+.header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 60px;
+}
+
+/* Logo */
+.logo a {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #007bff;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.logo a:hover {
+    color: #0056b3;
+}
+
+/* Navigation */
+.mainNav ul {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+    align-items: center;
+}
+
+.mainNav a {
+    text-decoration: none;
+    color: #444;
+    font-weight: 500;
+    position: relative;
+    padding: 6px 0;
+    transition: color 0.3s ease;
+}
+
+/* Hover effect เส้นใต้ */
+.mainNav a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    width: 0%;
+    height: 2px;
+    background: #007bff;
+    transition: width 0.3s ease;
+}
+
+.mainNav a:hover {
+    color: #007bff;
+}
+
+.mainNav a:hover::after {
+    width: 100%;
+}
+
+/* ปุ่ม burger hidden ใน desktop */
+.menuToggle {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #007bff;
+}
+
+/* ปุ่ม */
+.btnCreate,
+.btnLogin {
+    display: inline-block;
+    padding: 6px 18px !important;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+/* ปุ่มสร้างแผนใหม่ */
+.btnCreate {
+    background-color: #f1f3f5;
+    color: #333;
+}
+
+.btnCreate:hover {
+    background-color: #e2e6ea;
+}
+
+/* ปุ่มเข้าสู่ระบบ */
+.btnLogin {
+    background-color: #007bff;
+    color: #fff !important;
+    box-shadow: 0 3px 6px rgba(0, 123, 255, 0.25);
+}
+
+.btnLogin:hover {
+    background-color: #0056b3;
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.35);
+}
+
+.btnCreate:hover::after,
+.btnLogin:hover::after {
+    width: 0% !important;
+}
+
+.btn {
+    padding: 12px 28px;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 700;
+    transition: background-color 0.3s ease;
+}
+
+.btnPrimary {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.btnPrimary:hover {
+    background-color: #0056b3;
+}
+
+@media (max-width: 1024px) {
+    .logo a {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #007bff;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .header .container {
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .mainNav ul {
+        gap: 20px;
+    }
+}
+
+/* Mobile (≤768px) */
+@media (max-width: 768px) {
+    .menuToggle {
+        display: block;
+        z-index: 1100;
+    }
+
+    /* ซ่อนเมนูปกติ */
+    .mainNav {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 75%;
+        max-width: 300px;
+        height: 100vh;
+        background: rgba(255, 255, 255, 0.95);
+        box-shadow: -3px 0 12px rgba(0, 0, 0, 0.15);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: stretch;
+        padding: 80px 20px 20px 20px;
+        transition: right 0.3s ease;
+        z-index: 1000;
+    }
+
+    .mainNav.active {
+        right: 0;
+    }
+
+    .mainNav ul {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .mainNav li {
+        width: 100%;
+    }
+
+    .mainNav a {
+        display: block;
+        padding: 12px;
+        border-radius: 10px;
+        text-align: center;
+        background-color: #f9f9f9;
+        color: #444;
+        font-size: 1rem;
+    }
+
+    .mainNav a:hover {
+        background-color: #e8f0ff;
+        color: #007bff;
+    }
+
+    .btnCreate,
+    .btnLogin {
+        display: inline-block;
+        padding: 16px 28px !important;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+
+    /* ปุ่มสร้างแผนใหม่ */
+    .btnCreate {
+        background-color: #f1f3f5;
+        color: #333;
+    }
+
+    .btnLogin {
+        background-color: #007bff !important;
+        color: #fff !important;
+        box-shadow: none !important;
+    }
+
+    .mainNav a:hover::after,
+    .btnCreate:hover::after,
+    .btnLogin:hover::after {
+        width: 0% !important;
+    }
+
+    /* Overlay */
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.35);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        z-index: 900;
+    }
+
+    .overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+}

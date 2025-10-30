@@ -77,10 +77,10 @@ export default function TripMainPage() {
   
           {/* สรุปข้อมูล */}
           <div className={styles.tripSummary}>
-            <div className={styles.summaryCard}>
+            {/* <div className={styles.summaryCard}>
               <h3>🌍 สถานที่ที่ไปแล้ว</h3>
               <p>20 แห่ง</p>
-            </div>
+            </div> */}
             <div className={styles.summaryCard}>
               <h3>💸 งบที่ใช้ไป</h3>
               <p>{totalUsedBudget}</p>
@@ -89,10 +89,10 @@ export default function TripMainPage() {
               <h3>🧳 จำนวนทริป</h3>
               <p>{totalTrips} ทริป</p>
             </div>
-            <div className={styles.summaryCard}>
+            {/* <div className={styles.summaryCard}>
               <h3>⏳ รวมระยะเวลา</h3>
               <p>18 วัน</p>
-            </div>
+            </div> */}
           </div>
   
           {/* รายการทริป */}

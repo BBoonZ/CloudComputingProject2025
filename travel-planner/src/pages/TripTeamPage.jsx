@@ -34,7 +34,28 @@ export default function TripBudget() {
     const trip = location.state?.trip || "";
     const base_api = process.env.REACT_APP_API_URL;
     useEffect(() => {
-        fetch(`${base_api}/members?room_id=${room_id}`)
+        const userDataString = localStorage.getItem('userData');
+        const userData = userDataString ? JSON.parse(userDataString) : {};
+        const currentUserId = userData.user_id;
+
+        // (ถ้าไม่มี ID เลย ก็เด้งออก)
+        if (!currentUserId) {
+            alert("ไม่พบข้อมูลผู้ใช้, กรุณาล็อกอินใหม่");
+            navigate('/'); // หรือ /login
+            return;
+        }
+
+        const authHeaders = {
+            'x-user-id': currentUserId
+        };
+
+        // --- 2. (เพิ่ม) ฟังก์ชันจัดการ Error (เด้งออก) ---
+        const handleAuthError = (err) => {
+            console.error("Access Denied:", err.message);
+            alert("คุณไม่มีสิทธิ์เข้าถึงทริปนี้");
+            navigate('/'); // เด้งกลับหน้าแรก
+        };
+        fetch(`${base_api}/members?room_id=${room_id}`,{ headers: authHeaders })
             .then((res) => res.json())
             .then((data) => setMembers(data))
             .catch((err) => console.error(err));
@@ -72,31 +93,59 @@ export default function TripBudget() {
         setMember(m.member_name);
         setSelectedMember(m);
         setShowPersonalBudget(true);
+
+        // --- 1. ตรวจสอบว่ามีข้อมูลค่าใช้จ่ายหรือไม่ ---
         if (!allExpenses.Expends || !Array.isArray(allExpenses.Expends)) {
-            console.error("Expends is not an array:", allExpenses.Expends);
+            console.error("Expends is not an array or is missing:", allExpenses.Expends);
+            // ตั้งค่าเริ่มต้นเป็น 0
+            setSummary({ paidTotal: 0, shouldPay: 0, remaining: 0 });
+            setExpenses([]);
             return;
         }
 
+        // --- 2. คำนวณยอดที่ "สมาชิกคนนี้" จ่าย (paidTotal) ---
         const memberExpenses = allExpenses.Expends.filter(
             (exp) => exp.member_id === m.member_id
         );
+        
+        const paidTotal = memberExpenses.reduce(
+            (sum, exp) => sum + Number(exp.value), 0
+        );
+        
+        // --- 3. (ใหม่) คำนวณยอด "ทั้งทริป" จ่าย (totalTripPaid) ---
+        // (นี่คือส่วนที่เพิ่มเข้ามาตามที่คุณขอ)
+        const totalTripPaid = allExpenses.Expends.reduce(
+            (sum, exp) => sum + Number(exp.value), 0
+        );
 
-        const paidTotal = memberExpenses.reduce((sum, exp) => sum + Number(exp.value), 0);
+        const tripAverage = members.length > 0 
+            ? totalTripPaid / members.length 
+            : 0;
 
-        const shouldPay = members.length > 0 ? paidTotal / members.length : 0;
-        const remaining = paidTotal - shouldPay; // อาจติดลบก็ได้
+        // --- 4. (ใหม่) คำนวณยอด "ที่ควรจ่าย" (shouldPay) ---
+        // โดยใช้ยอดรวมทั้งทริป / จำนวนสมาชิก
+        const shouldPay = (paidTotal - tripAverage) < 0 
+        ? (paidTotal - tripAverage) 
+        : 0;
+        // if(paidTotal - (totalTripPaid / members.length) <= 0){
+        //     const shouldPay = 0
+        // }
+            
+        // --- 5. (ใหม่) คำนวณยอด "คงเหลือ" (remaining) ---
+        // (ยอดที่เขาจ่าย) - (ยอดที่เขาควรจะจ่าย)
+        const remaining = paidTotal > tripAverage
+        ? paidTotal - tripAverage
+        : 0;
 
+        // --- 6. อัปเดต State ---
         setSummary({
-            paidTotal,
-            shouldPay,
-            remaining
+            paidTotal,  // ยอดที่สมาชิกคนนี้จ่าย
+            shouldPay,  // ยอดที่ควรจ่าย (จากยอดรวมทั้งทริป)
+            remaining   // ส่วนต่าง
         });
 
-
-
-        console.log("✅ memberExpenses:", memberExpenses);
-        setExpenses(memberExpenses);
-
+        console.log("✅ Member Expenses:", memberExpenses);
+        setExpenses(memberExpenses); // รายการค่าใช้จ่ายของสมาชิกคนนี้ (เหมือนเดิม)
     };
 
     const handleEdit = (m) => {
@@ -310,11 +359,11 @@ export default function TripBudget() {
                                             <p className={budget.summaryAmount}>{formatCurrency(summary.paidTotal)}</p>
                                         </div>
                                         <div className={budget.summaryCard}>
-                                            <h3>จำนวนเงินที่ควรจ่าย</h3>
+                                            <h3>จำนวนเงินที่ควรจ่ายคนอื่น</h3>
                                             <p className={`${budget.summaryAmount} ${budget.used}`}>{formatCurrency(summary.shouldPay)}</p>
                                         </div>
                                         <div className={budget.summaryCard}>
-                                            <h3>ควรได้รับคืน / ยังต้องจ่ายเพิ่ม</h3>
+                                            <h3>จำนวนเงินที่ควรได้รับคืน</h3>
                                             <p className={`${budget.summaryAmount} ${budget.remaining}`}>{formatCurrency(summary.remaining)}</p>
                                         </div>
                                     </div>

@@ -190,6 +190,54 @@ app.get("/trip_detail", async (req, res) => {
   }
 });
 
+app.delete('/trips_delete/:roomId', async (req, res) => {
+  try {
+    const { roomId } = req.params; // ดึง ID จาก URL
+
+    // (*** Optional: ตรวจสอบสิทธิ์ว่าผู้ใช้คนนี้เป็นเจ้าของทริปหรือไม่)
+    // const userId = req.user.id; // สมมติว่ามีระบบ Auth
+    // const trip = await Planroom.findOne({ where: { room_id: roomId, user_id: userId } });
+    // if (!trip) {
+    //   return res.status(403).json({ status: 'error', message: 'คุณไม่มีสิทธิ์ลบทริปนี้' });
+    // }
+
+    // ค้นหาทริป
+    const tripToDelete = await Planroom.findByPk(roomId);
+
+    if (!tripToDelete) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'ไม่พบทริปที่ต้องการลบ'
+      });
+    }
+
+    // *** ข้อควรระวัง: ต้องลบข้อมูลที่เกี่ยวข้องก่อน (เช่น Member) ***
+    // ถ้าตาราง Member มี foreign key ไปที่ Planroom (แบบ ON DELETE CASCADE)
+    // มันจะลบให้เอง แต่ถ้าไม่ได้ตั้งค่าไว้ คุณต้องลบเองก่อน
+    await Member.destroy({
+      where: { room_id: roomId }
+    });
+    
+    // (ถ้ามีตารางอื่นๆ ที่เชื่อมโยง ก็ต้องลบด้วย เช่น Itinerary, Checklist ฯลฯ)
+    
+    // ลบทริปหลัก
+    await tripToDelete.destroy();
+
+    res.json({
+      status: 'success',
+      message: 'ลบทริปสำเร็จ'
+    });
+
+  } catch (error) {
+    console.error('Error deleting trip:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Internal server error',
+      error: error.message
+    });
+  }
+});
+
 app.put("/api/trip/:room_id/share_status", async (req, res) => {
   const { room_id } = req.params;
   const { share_status } = req.body; // รับค่า true/false จาก React

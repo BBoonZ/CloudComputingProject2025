@@ -5,6 +5,36 @@ import styles from "../css/tripManage.module.css";
 import nav from "../css/main-nav.module.css";
 
 export default function TripMainPage() {
+
+  const handleDelete = async (roomId) => {
+  // 2. ยืนยันก่อนลบ (Best Practice)
+  if (!window.confirm('คุณแน่ใจหรือไม่ว่าต้องการลบทริปนี้?')) {
+    return; // ถ้าผู้ใช้กด "Cancel" ให้ออกจากฟังก์ชัน
+  }
+
+  try {
+    // 3. เรียก API ฝั่ง Backend (สมมติว่า URL คือ /api/trips/:id)
+    const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+    
+    // ‼️ Endpoint นี้คุณต้องไปสร้างใน Backend (ดูข้อ 2)
+    const response = await fetch(`${apiUrl}/trips_delete/${roomId}`, {
+      method: 'DELETE',
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'ไม่สามารถลบทริปได้');
+    }
+
+    alert('ลบทริปสำเร็จ!');
+    window.location.reload();
+
+  } catch (error) {
+    console.error('เกิดข้อผิดพลาดในการลบทริป:', error);
+    alert(`เกิดข้อผิดพลาด: ${error.message}`);
+  }
+};
+
   const calculateTripDays = (startDate, endDate) => {
   // 1. ตรวจสอบว่ามีข้อมูลครบไหม
   if (!startDate || !endDate) {
@@ -117,7 +147,7 @@ export default function TripMainPage() {
                     >
                       <i className="fas fa-edit"></i> จัดการ
                     </button>
-                    <button className={`${styles.btn} ${styles.btnDelete}`}>
+                    <button className={`${styles.btn} ${styles.btnDelete}`} onClick={() => handleDelete(trip.room_id)}>
                       <i className="fas fa-trash"></i> ลบ
                     </button>
                   </div>

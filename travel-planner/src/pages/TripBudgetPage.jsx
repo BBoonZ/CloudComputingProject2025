@@ -181,7 +181,7 @@ export default function TripBudget() {
                             <li><a href="/tripMain">หน้าหลัก</a></li>
                             <li><a href="/tripManage">แผนการเดินทางของฉัน</a></li>
                             <img
-                                src="https://img.poki-cdn.com/cdn-cgi/image/q=78,scq=50,width=1200,height=1200,fit=cover,f=png/5f8d164d8269cffacc89422054b94c70/roblox.png"
+                                src="https://travel-planner-profile-uploads-ab7bb12a.s3.us-east-1.amazonaws.com/istockphoto-1196083861-612x612.jpg"
                                 alt="User Profile"
                                 className={nav.profilePic}
                                 onClick={() => (window.location.href = "/user")}

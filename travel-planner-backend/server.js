@@ -86,6 +86,7 @@ const path = require("path");
 const cors = require("cors");
 const { initializeTables } = require("./config/initDb");
 const userRoutes = require("./routes/userRoutes");
+const tripRoutes = require("./routes/tripRoutes");
 const { validateUser } = require("./middleware/validation");
 const sequelize = require("./config/database");
 // const { User } = require('./models/user');
@@ -117,6 +118,7 @@ app.use((err, req, res, next) => {
 // Routes with validation
 // app.use('/api/users', validateUser, userRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/trips', tripRoutes);
 
 app.get("/trips", async (req, res) => {
   try {

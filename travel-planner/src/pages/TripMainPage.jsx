@@ -277,10 +277,10 @@ export default function TripMainPage() {
 
           // เก็บเป็น ISO date ให้ backend
           setNewTripData(prevState => ({
-            ...prevState, // <-- บอก React "ไปเอา State ล่าสุดมา!"
-            start_date: start.toISOString().split("T")[0], // "YYYY-MM-DD"
-            end_date: end.toISOString().split("T")[0],     // "YYYY-MM-DD"
-          }));
+            ...prevState, // <-- บอก React "ไปเอา State ล่าสุดมา!"
+            start_date: start.toISOString().split("T")[0], // "YYYY-MM-DD"
+            end_date: end.toISOString().split("T")[0],   // "YYYY-MM-DD"
+          }));
 
           // สร้างข้อความ display ไทยเหมือนเดิม
           const monthsTH = [
@@ -424,9 +424,12 @@ export default function TripMainPage() {
               <label>รูปปกทริป</label>
               <input type="file" accept="image/*" onChange={previewImage} />
 
-              {preview && <img src={preview} alt="preview" className="preview-img" />}
+                <div>
+                  {preview && <img src={preview} alt="preview" className={styles.previewImg} />}
 
-              <button type="submit" className="btn-save-edit" onClick={createTrip}>ยืนยัน</button>
+                </div>
+                <button type="submit" className="btn-save-edit" onClick={createTrip}>ยืนยัน</button>
+
             </form>
           </div>
         </div>

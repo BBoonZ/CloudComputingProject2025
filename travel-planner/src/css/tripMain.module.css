@@ -361,6 +361,16 @@
     font-weight: 500;
   }
 
+  .previewImg {
+    width: 40%;
+  }
+
+  .previewLayout1{
+    display: flex;
+    justify-content: space-between;
+  }
+
+
   @media (max-width: 768px) {
     .container {
       padding: 1rem;

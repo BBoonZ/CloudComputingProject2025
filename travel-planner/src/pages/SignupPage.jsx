@@ -52,6 +52,14 @@ export default function SignupPage() {
       // if (response.$metadata.httpStatusCode === 200) {
 
         // Show success message
+        await userService.createUser({
+          email,
+          username: email.split('@')[0],
+          name: '',
+          surname: '',
+          phone_number: ''
+        });
+
         alert("ลงทะเบียนสำเร็จ");
         setTimeout(() => {
           navigate("/login");

@@ -3,6 +3,7 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 15px;
+    margin-left: auto;
 }
 
 .fileList {
@@ -32,6 +33,7 @@
 
 .fileInfo {
     flex: 1;
+    width: 100%;
 }
 
 .fileName {
@@ -48,6 +50,7 @@
     display: flex;
     gap: 10px;
 }
+
 
 .btnUpload {
     background: #3498db;
@@ -167,6 +170,11 @@
 
 .modalFit {
     padding: 20px;
+}
+
+.stateUpload {
+    display: flex;
+    justify-content: space-between;
 }
 
 /* Animation */

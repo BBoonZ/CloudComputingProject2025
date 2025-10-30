@@ -134,36 +134,36 @@ export default function TripBudget() {
     };
 
     const handleDelete = async (index) => {
-        const fileToDelete = files[index];
-        
-        if (!fileToDelete || !fileToDelete.doc_id) {
-            alert("เกิดข้อผิดพลาด: ไม่พบ ID ของไฟล์");
-            return;
-        }
+        const fileToDelete = files[index];
 
-        if (window.confirm(`คุณต้องการลบไฟล์ ${fileToDelete.name} จริงๆ หรือไม่? \n(การกระทำนี้จะลบไฟล์ออกจากระบบถาวร)`)) {
-            try {
-                // 1. ยิง API ไปที่ Backend
-                const response = await fetch(`${base_api}/deleteDocument/${fileToDelete.doc_id}`, {
-                    method: "DELETE",
-                });
+        if (!fileToDelete || !fileToDelete.doc_id) {
+            alert("เกิดข้อผิดพลาด: ไม่พบ ID ของไฟล์");
+            return;
+        }
 
-                if (!response.ok) {
-                    const errData = await response.json();
-                    throw new Error(errData.error || "ลบไฟล์ไม่สำเร็จ");
-                }
+        if (window.confirm(`คุณต้องการลบไฟล์ ${fileToDelete.name} จริงๆ หรือไม่? \n(การกระทำนี้จะลบไฟล์ออกจากระบบถาวร)`)) {
+            try {
+                // 1. ยิง API ไปที่ Backend
+                const response = await fetch(`${base_api}/deleteDocument/${fileToDelete.doc_id}`, {
+                    method: "DELETE",
+                });
 
-                // 2. ถ้าลบสำเร็จ ค่อยลบออกจากหน้าจอ (State)
-                
-                alert("ลบไฟล์สำเร็จ!");
+                if (!response.ok) {
+                    const errData = await response.json();
+                    throw new Error(errData.error || "ลบไฟล์ไม่สำเร็จ");
+                }
+
+                // 2. ถ้าลบสำเร็จ ค่อยลบออกจากหน้าจอ (State)
+
+                alert("ลบไฟล์สำเร็จ!");
                 window.location.reload();
 
-            } catch (err) {
-                console.error("❌ Delete error:", err);
-                alert("เกิดข้อผิดพลาดในการลบไฟล์: " + err.message);
-            }
-        }
-    };
+            } catch (err) {
+                console.error("❌ Delete error:", err);
+                alert("เกิดข้อผิดพลาดในการลบไฟล์: " + err.message);
+            }
+        }
+    };
 
     // ... (วางไว้แถวๆ handlePreview, handleUpload) ...
 
@@ -171,26 +171,26 @@ export default function TripBudget() {
         try {
             // 1. ยิง fetch ไปเอาไฟล์
             const response = await fetch(fileUrl);
-            
+
             if (!response.ok) {
                 throw new Error("Network response was not ok");
             }
 
             // 2. แปลงไฟล์เป็น "ก้อนข้อมูล" (Blob)
             const blob = await response.blob();
-            
+
             // 3. สร้าง URL ชั่วคราวในเครื่องเบราว์เซอร์
             const url = window.URL.createObjectURL(blob);
-            
+
             // 4. สร้างแท็ก <a> ล่องหนขึ้นมา
             const link = document.createElement("a");
             link.href = url;
             link.setAttribute("download", fileName); // ตั้งชื่อไฟล์ที่จะดาวน์โหลด
-            
+
             // 5. สั่งให้ <a> ล่องหนทำงาน (คลิก)
             document.body.appendChild(link);
             link.click();
-            
+
             // 6. ลบ <a> ล่องหน และ URL ชั่วคราวทิ้ง
             link.parentNode.removeChild(link);
             window.URL.revokeObjectURL(url);
@@ -288,19 +288,21 @@ export default function TripBudget() {
                         <div className={tripTemplate.planContent}>
                             <div className={styles.fileHeader}>
                                 <h2>เอกสารประกอบการเดินทาง</h2>
-                                <label htmlFor="fileUpload" className={`${styles.btn} ${styles.btnUpload}`}>
-                                    <i className="fas fa-upload"></i> อัปโหลดไฟล์
-                                </label>
-                                <input
-                                    type="file"
-                                    id="fileUpload"
-                                    style={{ display: "none" }}
-                                    onChange={handleUpload} // <-- ต้องเป็นฟังก์ชัน ไม่ใช่ handleUpload()
-                                />
-                                <div style={{ marginTop: 8, minHeight: 24 }}>
-                                    {uploadStatus === "loading" && <span style={{ color: "blue" }}>⏳ กำลังอัปโหลดไฟล์...</span>}
-                                    {uploadStatus === "success" && <span style={{ color: "green" }}>✅ อัปโหลดสำเร็จ!</span>}
-                                    {uploadStatus === "error" && <span style={{ color: "red" }}>❌ อัปโหลดล้มเหลว</span>}
+                                <div className={styles.stateUpload}>
+                                    <label htmlFor="fileUpload" className={`${styles.btn} ${styles.btnUpload}`}>
+                                        <i className="fas fa-upload"></i> อัปโหลดไฟล์
+                                    </label>
+                                    <input
+                                        type="file"
+                                        id="fileUpload"
+                                        style={{ display: "none" }}
+                                        onChange={handleUpload} // <-- ต้องเป็นฟังก์ชัน ไม่ใช่ handleUpload()
+                                    />
+                                    <div style={{ marginTop: 8, minHeight: 24 }}>
+                                        {uploadStatus === "loading" && <span style={{ color: "blue" }}>⏳ กำลังอัปโหลดไฟล์...</span>}
+                                        {uploadStatus === "success" && <span style={{ color: "green" }}>✅ อัปโหลดสำเร็จ!</span>}
+                                        {uploadStatus === "error" && <span style={{ color: "red" }}>❌ อัปโหลดล้มเหลว</span>}
+                                    </div>
                                 </div>
                             </div>
 
@@ -317,8 +319,8 @@ export default function TripBudget() {
                                                 <i className="fas fa-eye"></i>
                                             </button>
                                             <button className={styles.btnIcon} onClick={() => handleDownload(file.url, file.name)}>
-                                                <i className="fa-solid fa-download"></i>
-                                            </button>
+                                                <i className="fa-solid fa-download"></i>
+                                            </button>
                                             <button className={styles.btnIcon} onClick={() => handleDelete(index)}>
                                                 <i className="fa-solid fa-trash"></i>
                                             </button>

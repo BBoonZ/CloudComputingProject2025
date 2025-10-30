@@ -7,12 +7,14 @@ const API_URL = "http://localhost:3001"; // (สมมติว่ารัน�
 export default function EditTripModal({ isOpen, onClose, roomId }) {
     const [inviteOpen, setInviteOpen] = useState(false);
     const [shareOption, setShareOption] = useState("private");
+    const [isShared, setIsShared] = useState(false); // <-- เพิ่ม: state สำหรับสถานะแชร์
+    const [shareLoading, setShareLoading] = useState(false);
 
     const [users, setUsers] = useState([]);         // เก็บ Owner + Members
     const [inviteEmail, setInviteEmail] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
-
+    const API_URL = process.env.REACT_APP_API_URL;
     // --- 1. Fetch ข้อมูล User ทั้งหมดเมื่อ Modal เปิด ---
     useEffect(() => {
         const fetchAccessList = async () => {
@@ -22,14 +24,19 @@ export default function EditTripModal({ isOpen, onClose, roomId }) {
             setError(null);
             try {
                 // ยิงไป API ใหม่ที่เราเพิ่งเพิ่มใน server.js
-                const response = await fetch(`${API_URL}/api/access/${roomId}`);
-                if (!response.ok) {
-                    throw new Error("Failed to fetch user list");
-                }
-                const data = await response.json();
+                const [accessRes, tripRes] = await Promise.all([
+                    fetch(`${API_URL}/api/access/${roomId}`),
+                    fetch(`${API_URL}/trip_detail?room_id=${roomId}`) // <-- เพิ่ม: ดึงข้อมูลทริป
+                ]);
 
-                // data คือ Array ที่มี [Owner, Member1, Member2]
-                setUsers(data);
+                if (!accessRes.ok) throw new Error("Failed to fetch user list");
+                if (!tripRes.ok) throw new Error("Failed to fetch trip details");
+
+                const accessData = await accessRes.json();
+                const tripData = await tripRes.json(); // <-- เพิ่ม
+
+                setUsers(accessData);
+                setIsShared(tripData.share_status);
 
             } catch (err) {
                 console.error(err);
@@ -52,6 +59,32 @@ export default function EditTripModal({ isOpen, onClose, roomId }) {
 
 
     // --- 2. Handlers (ปรับปรุง) ---
+    const handleToggleShareStatus = async () => {
+        setShareLoading(true);
+        const newStatus = !isShared; // สลับค่า true/false
+
+        try {
+            const response = await fetch(`${API_URL}/api/trip/${roomId}/share_status`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ share_status: newStatus }) // ส่งสถานะใหม่ไป
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to update share status');
+            }
+
+            // ถ้าสำเร็จ ให้อัปเดต State ใน React
+            setIsShared(newStatus);
+
+        } catch (err) {
+            console.error(err);
+            alert(`Error: ${err.message}`);
+        } finally {
+            setShareLoading(false);
+        }
+    };
 
     const handleInputFocus = () => {
         setInviteOpen(true);
@@ -221,11 +254,22 @@ export default function EditTripModal({ isOpen, onClose, roomId }) {
                                 <label>การเข้าถึงทั่วไป</label>
                                 {/* ... (ส่วนการเข้าถึงทั่วไป) ... */}
                                 {/* --- ลบ Dropdown เลือก Role ของ Public ออก --- */}
-                                <div className={styles.sharebutt} style={{ marginTop: '20px', textAlign: 'right' }}>
-                                    <button typef="button" className={styles.btnShare} onClick={onClose}>
-                                        เสร็จสิ้น
-                                    </button> {/* <--- ปิดแบบที่ 2 */}
-                                </div>
+                                {/* --- (เพิ่ม) ปุ่มใหม่ --- */}
+                                <div className={styles.sharebutt} style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <button
+                                        type="button"
+                                        // (เปลี่ยน style ปุ่มตามสถานะ)
+                                        className={isShared ? styles.btnCancel : styles.btnShareOnline}
+                                        onClick={handleToggleShareStatus}
+                                        disabled={shareLoading}
+                                    >
+                                        {shareLoading ? "กำลังโหลด..." : (isShared ? "ยกเลิกแบ่งปัน" : "แบ่งปันแผนของคุณ")}
+                                    </button>
+
+                                    <button type="button" className={styles.btnShare} onClick={onClose}>
+                                        เสร็จสิ้น
+                                    </button>
+                                </div>
                             </div>
                         )}
 

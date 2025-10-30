@@ -190,6 +190,47 @@ app.get("/trip_detail", async (req, res) => {
   }
 });
 
+app.put("/api/trip/:room_id/share_status", async (req, res) => {
+  const { room_id } = req.params;
+  const { share_status } = req.body; // รับค่า true/false จาก React
+
+  if (share_status === undefined) {
+    return res.status(400).json({ message: "Missing 'share_status' in body" });
+  }
+
+  try {
+    // 1. หา Planroom ที่ต้องการแก้ไข
+    const planRoom = await Planroom.findByPk(room_id);
+
+    if (!planRoom) {
+      return res.status(404).json({ message: "Trip not found" });
+    }
+
+    // --- (Optional) Security Check ---
+    // คุณควรจะเช็คก่อนว่า คนที่ยิง API นี้ (จาก req.headers['x-user-id'])
+    // เป็น "เจ้าของ" (Owner) ของ planRoom นี้จริงๆ
+    // if (planRoom.user_id !== req.headers['x-user-id']) {
+    //   return res.status(403).json({ message: "Forbidden: Only owner can change share status" });
+    // }
+    // ----------------------------------
+
+    // 2. อัปเดตสถานะ
+    await planRoom.update({
+      share_status: share_status
+    });
+
+    console.log(`✅ Updated share_status for room ${room_id} to ${share_status}`);
+    res.status(200).json({ 
+      message: "Share status updated successfully", 
+      share_status: share_status 
+    });
+
+  } catch (err) {
+    console.error("❌ Error updating share status:", err);
+    res.status(500).json({ error: "Server error updating share status" });
+  }
+});
+
 app.delete("/api/access/:access_id", async (req, res) => {
   try {
     const { access_id } = req.params;

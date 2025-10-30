@@ -330,6 +330,27 @@
   background-color: #0056b3;
 }
 
+.privilegeLayout {
+  display: flex;
+  margin-left: auto;
+  gap: 10px;
+}
+
+.btnCancel {
+  background: none;
+  color: #1d73d0;
+  padding: 8px 15px;
+  border-radius: 25px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.btnCancel:hover {
+  background: #e6f0ff;
+}
+
 @keyframes fadeIn {
   from {
       opacity: 0;

@@ -52,9 +52,12 @@ export default function SignupPage() {
       // if (response.$metadata.httpStatusCode === 200) {
 
         // Show success message
-        setAlertMessage("ลงทะเบียนสำเร็จ กรุณายืนยันอีเมล");
-        setShowAlert(true);
-        setShowVerification(true);
+        alert("ลงทะเบียนสำเร็จ");
+        setTimeout(() => {
+          navigate("/login");
+        }, 1000);
+        // setShowAlert(true);
+        // setShowVerification(true);
       // }
     } catch (error) {
       alert("Error signing up: " + error.message);

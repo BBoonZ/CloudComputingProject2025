@@ -92,7 +92,7 @@ export default function LoginPage() {
     localStorage.setItem('userData', JSON.stringify(user));
     localStorage.setItem('userEmail', email);
   
-    navigate("/");
+    navigate("/tripMain");
   };
 
   return (

@@ -234,19 +234,21 @@ export default function EditTripModal({ isOpen, onClose, roomId }) {
                                             </div>
                                             {/* ถ้าเป็น Owner ให้โชว์คำว่า Owner */}
                                             {/* ถ้าเป็น Member ให้โชว์คำว่า "ผู้เข้าร่วม" (ตามที่คุณขอก่อนหน้า) */}
-                                            <div className={styles.privilege}>
-                                                {user.role === 'Owner' ? 'Owner' : 'ผู้เข้าร่วม'}
-                                            </div>
+                                            <div className={styles.privilegeLayout}>
+                                                <div className={styles.privilege}>
+                                                    {user.role === 'Owner' ? 'Owner' : 'ผู้เข้าร่วม'}
+                                                </div>
 
-                                            {user.role !== 'Owner' && (
-                                                <button
-                                                    type="button"
-                                                    className={styles.removeButton}
-                                                    onClick={() => handleRemoveUser(user.access_id, user.username)}
-                                                >
-                                                    &times; {/* นี่คือเครื่องหมาย (X) */}
-                                                </button>
-                                            )}
+                                                {user.role !== 'Owner' && (
+                                                    <button
+                                                        type="button"
+                                                        className={styles.removeButton}
+                                                        onClick={() => handleRemoveUser(user.access_id, user.username)}
+                                                    >
+                                                        &times; {/* นี่คือเครื่องหมาย (X) */}
+                                                    </button>
+                                                )}
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
@@ -255,21 +257,21 @@ export default function EditTripModal({ isOpen, onClose, roomId }) {
                                 {/* ... (ส่วนการเข้าถึงทั่วไป) ... */}
                                 {/* --- ลบ Dropdown เลือก Role ของ Public ออก --- */}
                                 {/* --- (เพิ่ม) ปุ่มใหม่ --- */}
-                                <div className={styles.sharebutt} style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <button
-                                        type="button"
-                                        // (เปลี่ยน style ปุ่มตามสถานะ)
-                                        className={isShared ? styles.btnCancel : styles.btnShareOnline}
-                                        onClick={handleToggleShareStatus}
-                                        disabled={shareLoading}
-                                    >
-                                        {shareLoading ? "กำลังโหลด..." : (isShared ? "ยกเลิกแบ่งปัน" : "แบ่งปันแผนของคุณ")}
-                                    </button>
+                                <div className={styles.sharebutt} style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <button
+                                        type="button"
+                                        // (เปลี่ยน style ปุ่มตามสถานะ)
+                                        className={isShared ? styles.btnCancel : styles.btnShareOnline}
+                                        onClick={handleToggleShareStatus}
+                                        disabled={shareLoading}
+                                    >
+                                        {shareLoading ? "กำลังโหลด..." : (isShared ? "ยกเลิกแบ่งปัน" : "แบ่งปันแผนของคุณ")}
+                                    </button>
 
-                                    <button type="button" className={styles.btnShare} onClick={onClose}>
-                                        เสร็จสิ้น
-                                    </button>
-                                </div>
+                                    <button type="button" className={styles.btnShare} onClick={onClose}>
+                                        เสร็จสิ้น
+                                    </button>
+                                </div>
                             </div>
                         )}
 

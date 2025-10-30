@@ -340,7 +340,7 @@ export default function TripMainPage() {
         <div className={styles.container}>
           {/* Header ของ Section (อาจจะปรับปรุงตามไฟล์เพื่อน) */}
           <header className={styles.header}>
-            <h1>ทริปแนะนำ / ค้นหาแรงบันดาลใจ</h1>
+            <h2>ค้นหาแรงบันดาลใจ</h2>
             {/* อาจจะไม่มีปุ่มสร้างตรงนี้แล้ว เพราะไปอยู่บน Navbar */}
           </header>
 

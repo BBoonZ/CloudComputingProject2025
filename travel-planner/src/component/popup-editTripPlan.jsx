@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react"; // <-- เพิ่ม useEffect, useRef
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useLocation } from "react-router-dom";
 import styles from "../css/popup-editTripPlan.module.css";
 import flatpickr from "flatpickr"; // <-- Import flatpickr
 import "flatpickr/dist/flatpickr.min.css"; // <-- Import CSS ของ flatpickr
@@ -17,7 +17,8 @@ export default function EditTripModal({ isOpen, onClose, initialData, roomId }) 
   const [tripPicFile, setTripPicFile] = useState(null); // State สำหรับ File object (ถ้าจะทำอัปโหลด)
   const [previewSrc, setPreviewSrc] = useState(null); // State สำหรับ URL รูป (เดิม หรือ preview ใหม่)
   const flatpickrInstance = useRef(null); // Ref สำหรับเก็บ instance ของ flatpickr
-
+  const base_api = process.env.REACT_APP_API_URL;
+  const location = useLocation();
   // 3. ใช้ useEffect เพื่อ Populate ข้อมูล & ตั้งค่า flatpickr ตอน Modal เปิด
   useEffect(() => {
     // ทำงานเฉพาะตอน Modal เปิด (isOpen = true)
@@ -149,7 +150,7 @@ export default function EditTripModal({ isOpen, onClose, initialData, roomId }) 
     };
 
     try {
-      const response = await fetch(`http://localhost:3001/editTrip/${roomId}`, {
+      const response = await fetch(`${base_api}/editTrip/${roomId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updateData),
@@ -162,7 +163,20 @@ export default function EditTripModal({ isOpen, onClose, initialData, roomId }) 
 
       alert("แก้ไขข้อมูลทริปสำเร็จ!");
       onClose(); // ปิด Modal
-      navigate(`/tripPlan?room_id=${roomId}`);// <-- รีโหลดเพื่อให้หน้าหลักเห็นข้อมูลใหม่
+      const targetPath = `/tripPlan?room_id=${roomId}`;
+
+      // 2. เช็คว่า "หน้าปัจจุบัน" ตรงกับ "หน้าเป้าหมาย" หรือไม่
+      if (location.pathname + location.search === targetPath) {
+        
+        // 3. ถ้าใช่ (อยู่ที่ /tripPlan อยู่แล้ว) -> สั่ง F5
+        window.location.reload();
+
+      } else {
+        
+        // 4. ถ้าไม่ใช่ (เช่น อยู่ที่ /tripBudget) -> สั่งเด้งไป
+        navigate(targetPath);
+      }
+      // navigate(`/tripPlan?room_id=${roomId}`);// <-- รีโหลดเพื่อให้หน้าหลักเห็นข้อมูลใหม่
 
     } catch (err) {
       console.error("❌ Error updating trip:", err);

@@ -120,19 +120,59 @@ app.use((err, req, res, next) => {
 app.use('/api/users', userRoutes);
 app.use('/api/trips', tripRoutes);
 
-app.get("/trips", async (req, res) => {
-  try {
-    const user_id = req.query.user_id;
-    const trips = await Planroom.findAll({
-      where: { user_id: user_id },
-    });
+// app.get("/trips", async (req, res) => {
+//   try {
+//     const user_id = req.query.user_id;
+//     const trips = await Planroom.findAll({
+//       where: { user_id: user_id },
+//     });
     
-    res.json(trips);
-    console.log("gooood")
-  } catch (err) {
-    console.error("❌ Error creating plan:", err);
-    res.status(500).send("Server error");
-  }
+//     res.json(trips);
+//     console.log("gooood")
+//   } catch (err) {
+//     console.error("❌ Error creating plan:", err);
+//     res.status(500).send("Server error");
+//   }
+// });
+
+app.get("/trips", async (req, res) => {
+  try {
+    const user_id = req.query.user_id;
+
+    if (!user_id) {
+        return res.status(400).json({ message: "user_id is required" });
+    }
+
+    // --- (New Logic) ---
+    // เราจะค้นหา Planroom ทั้งหมดที่...
+    // 1. user_id (เจ้าของ) ตรงกัน
+    // 2. หรือ user_id ของเรา อยู่ในตาราง Access ที่ผูกกับ Planroom นั้น
+    const trips = await Planroom.findAll({
+      where: {
+        [Op.or]: [
+          { user_id: user_id },            // 1. ฉันเป็นเจ้าของ (Owner)
+          { '$Accesses.user_id$': user_id } // 2. ฉันมีสิทธิ์ในตาราง Access (Guest)
+        ]
+      },
+      include: [
+        {
+          model: Access,
+          as: 'Accesses', // <-- (สำคัญมาก!) ชื่อนี้ต้องตรงกับ 'as' ใน model association
+          attributes: [],   // เราไม่ต้องการข้อมูลจากตาราง Access แค่ใช้มันกรอง
+          required: false   // ใช้ LEFT JOIN (เผื่อทริปที่เป็นเจ้าของ แต่ยังไม่เชิญใคร)
+        }
+      ],
+      distinct: true // ป้องกันการได้ผลลัพธ์ซ้ำซ้อน
+    });
+    // --- (End of New Logic) ---
+    
+    res.json(trips);
+    console.log("gooood: Fetched trips for user as owner or guest.");
+
+  } catch (err) {
+    console.error("❌ Error fetching trips:", err); // (แก้คำอธิบาย Error)
+    res.status(500).send("Server error");
+  }
 });
 
 app.get("/trip_detail", async (req, res) => {

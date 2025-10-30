@@ -358,6 +358,7 @@ export default function TripBudget() {
             <ShareTripModal
                 isOpen={shareModalOpen}
                 onClose={() => setShareModalOpen(false)}
+                roomId={room_id}
             />
         </>
     );

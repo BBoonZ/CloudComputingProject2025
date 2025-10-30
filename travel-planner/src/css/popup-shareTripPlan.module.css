@@ -4,7 +4,22 @@
   padding: 0;
   box-sizing: border-box;
 }
+/* (เพิ่มใน .css) */
+.removeButton {
+  margin-left: auto; /* ดันไปขวาสุด */
+  padding: 2px 8px;
+  border: none;
+  background-color: transparent;
+  color: #cc0000;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+}
 
+.removeButton:hover {
+  background-color: #fce8e8;
+  border-radius: 4px;
+}
 .overlayBlur {
   position: fixed;
   top: 0;

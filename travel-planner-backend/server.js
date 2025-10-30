@@ -1,5 +1,6 @@
 const multer = require("multer");
 const dotenv = require("dotenv");
+const { Op } = require("sequelize");
 dotenv.config();
 const { S3Client, PutObjectCommand, DeleteObjectCommand } = require("@aws-sdk/client-s3");
 
@@ -95,6 +96,34 @@ app.get("/trip_detail", async (req, res) => {
     console.error("❌ Error creating plan:", err);
     res.status(500).send("Server error");
   }
+});
+
+app.delete("/api/access/:access_id", async (req, res) => {
+  try {
+    const { access_id } = req.params;
+
+    // --- (Optional) เพิ่มความปลอดภัย ---
+    // ตรงนี้คุณควรเช็คก่อนว่า "คนที่สั่งลบ" (อาจจะส่ง user_id มาใน body)
+    // เป็น Owner ของห้องนี้จริงๆ รึเปล่า
+    // แต่ตอนนี้เราจะข้ามไปก่อน...
+    // ---------------------------------
+
+    const result = await Access.destroy({
+      where: { access_id: access_id },
+    });
+
+    if (result === 0) {
+      // ถ้า result เป็น 0 คือไม่เจอแถวให้ลบ
+      return res.status(404).json({ message: "Access entry not found" });
+    }
+
+    console.log(`✅ Removed access entry ID: ${access_id}`);
+    res.status(200).json({ message: "User removed successfully" });
+
+  } catch (err) {
+    console.error("❌ Error removing access:", err);
+    res.status(500).json({ error: "Server error removing access" });
+  }
 });
 
 app.post("/createplan", upload.single("image"), async (req, res) => {
@@ -862,6 +891,53 @@ app.post("/inviteUser", async (req, res) => {
      }
     res.status(500).json({ status: 'error', message: 'Server error', error: err.message });
   }
+});
+
+// (เพิ่มใน server.js)
+// GET /api/access/:room_id - ดึงรายชื่อผู้มีสิทธิ์ทั้งหมดในห้อง
+app.get("/api/access/:room_id", async (req, res) => {
+  try {
+    const { room_id } = req.params;
+
+    // 1. หา Owner (จาก Planroom)
+    const planRoom = await Planroom.findByPk(room_id, {
+      include: [{
+        model: User, // Join ตาราง User เพื่อเอาข้อมูล Owner
+        attributes: ['user_id', 'username', 'email', 'profile_uri']
+      }]
+    });
+
+    if (!planRoom) {
+      return res.status(404).json({ message: "Trip not found" });
+    }
+
+    // 2. หาคนอื่นๆ (จาก Access)
+    const accesses = await Access.findAll({
+      where: { room_id },
+      include: [{
+        model: User, // Join ตาราง User เพื่อเอาข้อมูลคนที่ถูกเชิญ
+        attributes: ['user_id', 'username', 'email', 'profile_uri']
+      }]
+    });
+
+    // 3. จัดรูปแบบข้อมูลส่งกลับ (แยก Owner กับ Members)
+    const ownerData = {
+      ...planRoom.User.toJSON(), // ข้อมูล User ของ Owner
+      role: "Owner"
+    };
+
+    const membersData = accesses.map(access => ({
+      ...access.User.toJSON(), // ข้อมูล User ของ Member
+      role: access.role,
+      access_id: access.access_id // <--- เพิ่มบรรทัดนี้!
+    }));
+
+    res.json([ownerData, ...membersData]); // ส่งกลับเป็น Array เดียว
+
+  } catch (err) {
+    console.error("❌ Error fetching access list:", err);
+    res.status(500).json({ error: "Server error fetching access list" });
+  }
 });
 
 const PORT = process.env.PORT || 3001;

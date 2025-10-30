@@ -1,143 +1,240 @@
-import React, { useState } from "react";
-import styles from "../css/popup-shareTripPlan.module.css"; // นำ CSS มาใช้ในรูปแบบ Module
+import React, { useState, useEffect } from "react";
+import styles from "../css/popup-shareTripPlan.module.css";
 
-export default function EditTripModal({ isOpen, onClose }) {
+// --- URL ของ Backend (เปลี่ยนตามจริง) ---
+const API_URL = "http://localhost:3001"; // (สมมติว่ารันที่ Port 3001)
+
+export default function EditTripModal({ isOpen, onClose, roomId }) {
     const [inviteOpen, setInviteOpen] = useState(false);
     const [shareOption, setShareOption] = useState("private");
 
-    const handleInviteChange = (e) => {
-        setInviteOpen(e.target.value.length > 0);
+    const [users, setUsers] = useState([]);         // เก็บ Owner + Members
+    const [inviteEmail, setInviteEmail] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(null);
+
+    // --- 1. Fetch ข้อมูล User ทั้งหมดเมื่อ Modal เปิด ---
+    useEffect(() => {
+        const fetchAccessList = async () => {
+            if (!roomId) return; // ถ้าไม่มี roomId ก็ไม่ต้องทำ
+
+            setIsLoading(true);
+            setError(null);
+            try {
+                // ยิงไป API ใหม่ที่เราเพิ่งเพิ่มใน server.js
+                const response = await fetch(`${API_URL}/api/access/${roomId}`);
+                if (!response.ok) {
+                    throw new Error("Failed to fetch user list");
+                }
+                const data = await response.json();
+
+                // data คือ Array ที่มี [Owner, Member1, Member2]
+                setUsers(data);
+
+            } catch (err) {
+                console.error(err);
+                setError(err.message);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        if (isOpen) {
+            fetchAccessList();
+        } else {
+            // เคลียร์ค่าเมื่อ Modal ปิด
+            setUsers([]);
+            setInviteOpen(false);
+            setInviteEmail("");
+            setError(null);
+        }
+    }, [isOpen, roomId]); // ทำงานใหม่เมื่อ Modal เปิด หรือ roomId เปลี่ยน
+
+
+    // --- 2. Handlers (ปรับปรุง) ---
+
+    const handleInputFocus = () => {
+        setInviteOpen(true);
+    };
+
+    const handleInputChange = (e) => {
+        setInviteEmail(e.target.value);
+    };
+
+    // --- 4. ฟังก์ชันลบ User (ยิง API จริง) ---
+    const handleRemoveUser = async (accessId, username) => {
+        // ยืนยันก่อน
+        if (!window.confirm(`คุณแน่ใจหรือไม่ว่าต้องการลบ ${username} ออกจากทริปนี้?`)) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_URL}/api/access/${accessId}`, {
+                method: "DELETE"
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.message || "Failed to remove user");
+            }
+
+            // ถ้าลบสำเร็จ: ลบ user ออกจาก State (เร็วกว่า refetch)
+            setUsers(currentUsers =>
+                currentUsers.filter(u => u.access_id !== accessId)
+            );
+
+        } catch (err) {
+            console.error(err);
+            alert(`Error: ${err.message}`);
+        }
+    };
+
+    // --- 3. ฟังก์ชัน Invite (ยิง API จริง) ---
+    const handleInviteSubmit = async (e) => {
+        e.preventDefault();
+        if (!inviteEmail || !roomId) return;
+
+        // เช็คก่อนว่า user นี้ถูกเชิญไปรึยัง
+        if (users.find(u => u.email === inviteEmail || u.username === inviteEmail)) {
+            alert("ผู้ใช้งานนี้มีสิทธิ์อยู่แล้ว");
+            return;
+        }
+
+        try {
+            // ยิงไป API 'POST /inviteUser'
+            const response = await fetch(`${API_URL}/inviteUser`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    emailOrUsername: inviteEmail,
+                    roomId: roomId,
+                    role: "reader" // <-- Hardcode Role ตามที่เราตกลงกัน
+                })
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                // ถ้า Server ตอบ error (เช่น 404 Not Found)
+                throw new Error(result.message || "Failed to invite user");
+            }
+
+            // ถ้าสำเร็จ: เพิ่ม user ใหม่เข้าไปใน State (เพื่ออัปเดต UI ทันที)
+            // (เราต้องไปดึงข้อมูล User ที่เพิ่งเพิ่มมา... 
+            // หรือวิธีง่ายกว่าคือ refetch ทั้งหมด)
+
+            // --- Refetch ข้อมูลใหม่ ---
+            setIsLoading(true);
+            const refetchRes = await fetch(`${API_URL}/api/access/${roomId}`);
+            const data = await refetchRes.json();
+            setUsers(data);
+            setIsLoading(false);
+            // ------------------------
+
+            // กลับไปหน้า List
+            setInviteEmail("");
+            setInviteOpen(false);
+
+        } catch (err) {
+            console.error(err);
+            alert(`Error: ${err.message}`);
+        }
+    };
+
+    const handleCancelInvite = () => {
+        setInviteEmail("");
+        setInviteOpen(false);
     };
 
     const handleShareOptionChange = (e) => {
         setShareOption(e.target.value);
     };
 
-    const handleadduser = (e) => {
-        setShareOption(e.target.value);
-    };
 
     if (!isOpen) return null;
 
     return (
         <>
-            {/* overlay เบลอพื้นหลัง */}
             <div className={styles.overlayBlur} onClick={onClose}></div>
             <div className={styles.modal} style={{ display: "flex", backdropFilter: "blur(3px)" }}>
                 <div className={styles.modalContent}>
-                    <div className={styles.modalMain}>
-                        <div style={{ display: "flex", gap: "10px" }}>
-                            {inviteOpen && (
-                                <span
-                                    style={{ fontSize: "1.2rem", cursor: "pointer" }}
-                                    onClick={() => setInviteOpen(false)}
-                                >
-                                    &larr;
-                                </span>
-                            )}
-                            <h2>แชร์ทริปท่องเที่ยว</h2>
-                        </div>
-                    </div>
+                    {/* ... modalMain (Header) ... */}
 
-                    <form>
+                    <form onSubmit={handleInviteSubmit}> {/* <--- ใช้ onSubmit ได้ */}
                         <label>เพิ่มเพื่อนๆ และผู้ใช้งาน</label>
                         <div className={styles.inputInvite}>
                             <input
                                 type="text"
-                                placeholder="เพิ่มเพื่อนๆ และผู้ใช้งาน"
-                                onChange={handleInviteChange}
+                                placeholder="เพิ่มเพื่อน (พิมพ์อีเมลหรือ Username)"
+                                value={inviteEmail}
+                                onFocus={handleInputFocus}
+                                onChange={handleInputChange}
                                 style={{
-                                    width: inviteOpen ? "70%" : "100%",
+                                    width: "100%", // <-- เอา role ออก กว้าง 100%
                                     transition: "width .5s ease",
                                     padding: "10px",
                                 }}
                             />
-                            {inviteOpen && (
-                                <select>
-                                    <option value="reader">ผู้มีสิทธิ์อ่าน</option>
-                                    <option value="editor">เอดิเตอร์</option>
-                                </select>
-                            )}
+                            {/* --- ลบ Dropdown เลือก Role ออก --- */}
                         </div>
 
                         {!inviteOpen && (
                             <div>
                                 <label>บุคคลที่มีสิทธิ์เข้าถึง</label>
+
                                 <div className={styles.preProfile}>
-                                    <div className={styles.profile}>
-                                        <div className={styles.pic}>
-                                            <img
-                                                src="https://img.poki-cdn.com/cdn-cgi/image/q=78,scq=50,width=1200,height=1200,fit=cover,f=png/5f8d164d8269cffacc89422054b94c70/roblox.png"
-                                                alt="profile"
-                                            />
+                                    {isLoading && <div>Loading...</div>}
+                                    {error && <div style={{ color: 'red' }}>{error}</div>}
+
+                                    {!isLoading && !error && users.map((user) => (
+                                        <div className={styles.profile} key={user.user_id}>
+                                            <div className={styles.pic}>
+                                                <img
+                                                    src={user.profile_uri || "default-avatar.png"}
+                                                    alt="profile"
+                                                />
+                                            </div>
+                                            <div className={styles.user}>
+                                                <div className={styles.username}>{user.username}</div>
+                                                <div className={styles.email}>{user.email}</div>
+                                            </div>
+                                            {/* ถ้าเป็น Owner ให้โชว์คำว่า Owner */}
+                                            {/* ถ้าเป็น Member ให้โชว์คำว่า "ผู้เข้าร่วม" (ตามที่คุณขอก่อนหน้า) */}
+                                            <div className={styles.privilege}>
+                                                {user.role === 'Owner' ? 'Owner' : 'ผู้เข้าร่วม'}
+                                            </div>
+
+                                            {user.role !== 'Owner' && (
+                                                <button
+                                                    type="button"
+                                                    className={styles.removeButton}
+                                                    onClick={() => handleRemoveUser(user.access_id, user.username)}
+                                                >
+                                                    &times; {/* นี่คือเครื่องหมาย (X) */}
+                                                </button>
+                                            )}
                                         </div>
-                                        <div className={styles.user}>
-                                            <div className={styles.username}>boss</div>
-                                            <div className={styles.email}>boossswewe@gmail.com</div>
-                                        </div>
-                                        <div className={styles.privilege}>Owner</div>
-                                    </div>
+                                    ))}
                                 </div>
 
                                 <label>การเข้าถึงทั่วไป</label>
-                                <div className={styles.share}>
-                                    <div className={styles.sharePic}>
-                                        <img
-                                            src={
-                                                shareOption === "public"
-                                                    ? "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQho-wuA1ELDvUgdgXUT7DzgL6EqW79ZyG2QExII9_0dwsf7YYP-PDV8AvrKZ2tU8mcbno&usqp=CAU"
-                                                    : "https://img.poki-cdn.com/cdn-cgi/image/q=78,scq=50,width=1200,height=1200,fit=cover,f=png/5f8d164d8269cffacc89422054b94c70/roblox.png"
-                                            }
-                                            alt="share"
-                                        />
-                                    </div>
-                                    <div className={styles.shareDetail}>
-                                        <div className={styles.shareOption}>
-                                            <select value={shareOption} onChange={handleShareOptionChange}>
-                                                <option value="private">จำกัด</option>
-                                                <option value="public">ทุกคนที่มีลิงค์</option>
-                                            </select>
-                                        </div>
-                                        <div className={styles.shareText}>
-                                            {shareOption === "public"
-                                                ? "ผู้ใช้อินเทอร์เน็ตทุกคนที่มีลิงก์นี้จะดูได้"
-                                                : "เฉพาะคนที่มีสิทธิ์เข้าถึงเท่านั้นที่เปิดด้วยลิงก์นี้ได้"}
-                                        </div>
-                                    </div>
-                                    {shareOption === "public" && (
-                                        <div className={styles.sharePrivilege}>
-                                            <select>
-                                                <option value="reader">ผู้มีสิทธิ์อ่าน</option>
-                                                <option value="editor">เอดิเตอร์</option>
-                                            </select>
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div className={styles.sharebutt}>
-                                    <div>
-                                        <button type="button" className={styles.btnShareOnline}>
-                                            คัดลอกลิงก์แชร์
-                                        </button>
-                                    </div>
-                                    <div className={styles.sharebutt2butt}>
-                                        <button type="button" className={styles.btnShareOnline}>
-                                            แชร์เป็นสาธารณะ
-                                        </button>
-                                        <button type="button" className={styles.btnShare} onClick={onClose}>
-                                            เสร็จสิ้น
-                                        </button>
-                                    </div>
+                                {/* ... (ส่วนการเข้าถึงทั่วไป) ... */}
+                                {/* --- ลบ Dropdown เลือก Role ของ Public ออก --- */}
+                                <div className={styles.sharebutt} style={{ marginTop: '20px', textAlign: 'right' }}>
+                                    <button typef="button" className={styles.btnShare} onClick={onClose}>
+                                        เสร็จสิ้น
+                                    </button> {/* <--- ปิดแบบที่ 2 */}
                                 </div>
                             </div>
                         )}
 
                         {inviteOpen && (
                             <div className={styles.modalInvite} style={{ marginTop: "20px", display: "flex", marginLeft: "auto" }}>
-                                <button type="button" className={styles.btnCancel} onClick={() => setInviteOpen(false)}>
+                                <button type="button" className={styles.btnCancel} onClick={handleCancelInvite}>
                                     ยกเลิก
                                 </button>
-                                <button type="button" className={styles.btnShare}>
+                                <button type="submit" className={styles.btnShare}>
                                     เพิ่ม
                                 </button>
                             </div>
@@ -146,6 +243,5 @@ export default function EditTripModal({ isOpen, onClose }) {
                 </div>
             </div>
         </>
-
     );
 }

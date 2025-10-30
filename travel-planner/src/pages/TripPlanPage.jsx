@@ -7,6 +7,7 @@ import ActivityTripModal from "../component/popup-ActivityTripModal";
 import nav from "../css/main-nav.module.css";
 import plantemp from "../css/tripTemplate.module.css";
 import styles from "../css/tripPlan.module.css";
+import tripTemplate from "../css/tripTemplate.module.css";
 
 export default function TripPlanPage() {
 
@@ -32,7 +33,7 @@ export default function TripPlanPage() {
     const [shareLoading, setShareLoading] = useState(false);
     const base_api = process.env.REACT_APP_API_URL;
 
-   
+
 
 
     const handleDeleteActivity = async (itineraryId) => {
@@ -243,8 +244,8 @@ export default function TripPlanPage() {
                             <button className={`${plantemp.btn} ${plantemp.btnSave}`} onClick={() => setEditModalOpen(true)}>
                                 <i className="fas fa-edit"></i> แก้ไข
                             </button>
-                            <button className={`${plantemp.btn} ${plantemp.btnShare}`}>
-                                <i className="fas fa-share-alt"></i> {shareStatus}
+                            <button className={`${tripTemplate.btn} ${tripTemplate.btnShare}`} onClick={() => setShareModalOpen(true)}>
+                                <i className="fas fa-share-alt"></i> แชร์
                             </button>
                         </div>
                     </div>
@@ -366,6 +367,7 @@ export default function TripPlanPage() {
             <ShareTripModal
                 isOpen={shareModalOpen}
                 onClose={() => setShareModalOpen(false)}
+                roomId={room_id}
             />
 
             {/* Add Activity Modal */}

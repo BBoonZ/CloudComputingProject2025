@@ -8,6 +8,7 @@ import budget from "../css/tripBudget.module.css";
 import nav from "../css/main-nav.module.css";
 import tripTemplate from "../css/tripTemplate.module.css";
 
+
 export default function TripBudget() {
     // state สำหรับ modal
 
@@ -205,8 +206,8 @@ export default function TripBudget() {
                                 <i className="fas fa-edit"></i> แก้ไข
                             </button>
                             <button className={`${tripTemplate.btn} ${tripTemplate.btnShare}`} onClick={() => setShareModalOpen(true)}>
-                                <i className="fas fa-share-alt"></i> แบ่งปันแผนของคุณ
-                            </button>
+                                                            <i className="fas fa-share-alt"></i> แชร์
+                                                        </button>
                         </div>
                     </div>
                     <div class={tripTemplate.info}>
@@ -384,7 +385,7 @@ export default function TripBudget() {
                 roomId={room_id}
             />
 
-            <ShareTripModal isOpen={shareModalOpen} onClose={() => setShareModalOpen(false)} />
+            <ShareTripModal isOpen={shareModalOpen} onClose={() => setShareModalOpen(false)} roomId={room_id}/>
 
             {/* Add & Edit Member Modals */}
             {showAddModal && (

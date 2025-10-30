@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from "react";
 import styles from "../css/ActivityTripModal.module.css";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 export default function ActivityModal({
   type = "add",
   open,
@@ -76,7 +78,7 @@ export default function ActivityModal({
         return;
       }
       try {
-        const response = await fetch(`http://localhost:3001/editActivity/${editData.itinerary_id}`, {
+        const response = await fetch(`${API_URL}/editActivity/${editData.itinerary_id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data),
@@ -92,7 +94,7 @@ export default function ActivityModal({
     } else {
       // ########## LOGIC เพิ่ม (ADD) ##########
       try {
-        const response = await fetch("http://localhost:3001/addActivity", {
+        const response = await fetch(`${API_URL}/addActivity`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data),

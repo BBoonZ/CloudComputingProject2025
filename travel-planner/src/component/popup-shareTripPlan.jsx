@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import styles from "../css/popup-shareTripPlan.module.css";
 
 // --- URL ของ Backend (เปลี่ยนตามจริง) ---
-const API_URL = "http://localhost:3001"; // (สมมติว่ารันที่ Port 3001)
 
 export default function EditTripModal({ isOpen, onClose, roomId }) {
     const [inviteOpen, setInviteOpen] = useState(false);
@@ -15,6 +14,7 @@ export default function EditTripModal({ isOpen, onClose, roomId }) {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
     const API_URL = process.env.REACT_APP_API_URL;
+    
     // --- 1. Fetch ข้อมูล User ทั้งหมดเมื่อ Modal เปิด ---
     useEffect(() => {
         const fetchAccessList = async () => {

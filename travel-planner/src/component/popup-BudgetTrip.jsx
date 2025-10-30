@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import styles from "../css/tripBudget.module.css";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const BudgetModal = ({
     type = "add", // "add" หรือ "edit"
     show,
@@ -33,8 +35,8 @@ const BudgetModal = ({
     try {
         // ✅ ใช้ API คนละอันตามโหมด
         const url = isEdit
-            ? "http://localhost:3001/editBudget"
-            : "http://localhost:3001/addBudget";
+            ? `${API_URL}/editBudget`
+            : `${API_URL}/addBudget`;
 
         const response = await fetch(url, {
             method: isEdit ? "PUT" : "POST",

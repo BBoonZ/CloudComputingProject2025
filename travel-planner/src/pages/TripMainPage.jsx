@@ -276,11 +276,11 @@ export default function TripMainPage() {
           const end = selectedDates[1];
 
           // เก็บเป็น ISO date ให้ backend
-          setNewTripData({
-            ...newTripData,
-            start_date: start.toISOString().split("T")[0], // "YYYY-MM-DD"
-            end_date: end.toISOString().split("T")[0],     // "YYYY-MM-DD"
-          });
+          setNewTripData(prevState => ({
+            ...prevState, // <-- บอก React "ไปเอา State ล่าสุดมา!"
+            start_date: start.toISOString().split("T")[0], // "YYYY-MM-DD"
+            end_date: end.toISOString().split("T")[0],     // "YYYY-MM-DD"
+          }));
 
           // สร้างข้อความ display ไทยเหมือนเดิม
           const monthsTH = [

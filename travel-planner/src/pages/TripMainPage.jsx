@@ -159,7 +159,7 @@ export default function TripMainPage() {
     // setUploading(true); // <-- เอามาไว้ตรงนี้ถ้าจะใช้
 
     try {
-      const apiUrl = 'http://localhost:3001';
+      const apiUrl = process.env.REACT_APP_API_URL;
 
       const res = await fetch(`${apiUrl}/createplan`, {
         method: "POST",

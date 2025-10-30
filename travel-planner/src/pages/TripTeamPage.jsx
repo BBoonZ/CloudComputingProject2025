@@ -31,15 +31,16 @@ export default function TripBudget() {
     const tripTitle = location.state?.tripTitle || "กำลังโหลดชื่อทริป...";
     const tripDescription = location.state?.tripDescription || "";
     const trip = location.state?.trip || "";
+    const base_api = process.env.REACT_APP_API_URL;
     useEffect(() => {
-        fetch(`http://localhost:3001/members?room_id=${room_id}`)
+        fetch(`${base_api}/members?room_id=${room_id}`)
             .then((res) => res.json())
             .then((data) => setMembers(data))
             .catch((err) => console.error(err));
     }, [room_id]);
 
     useEffect(() => {
-        fetch(`http://localhost:3001/room_expends/${room_id}`)
+        fetch(`${base_api}/room_expends/${room_id}`)
             .then((res) => res.json())
             .then((data) => setAllExpenses(data))
             .catch((err) => console.error("fetch expenses error:", err));
@@ -106,7 +107,7 @@ export default function TripBudget() {
         if (window.confirm(`ต้องการลบ ${m.member_name} หรือไม่?`)) {
             try {
 
-                const res = await fetch(`http://localhost:3001/deleteMember/${m.member_id}`, {
+                const res = await fetch(`${base_api}/deleteMember/${m.member_id}`, {
                     method: "DELETE"
                 });
 
@@ -128,7 +129,7 @@ export default function TripBudget() {
   formData.append("file", img.files[0]); // ✅ แก้ตรงนี้
 
   try {
-    const res = await fetch("http://localhost:3001/addMember", {
+    const res = await fetch(`${base_api}/addMember`, {
       method: "POST",
       body: formData, // ✅ อย่าใช้ JSON.stringify()
     });
@@ -150,7 +151,7 @@ export default function TripBudget() {
 
         try {
 
-            const res = await fetch("http://localhost:3001/editMember", {
+            const res = await fetch(`${base_api}/editMember`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json"

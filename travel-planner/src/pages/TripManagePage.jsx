@@ -31,9 +31,10 @@ export default function TripMainPage() {
 
 // ดึง user_id
     const userId = userData?.user_id;
+    const base_api = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
-    fetch(`http://localhost:3001/trips?user_id=${userId}`)
+    fetch(`${base_api}/trips?user_id=${userId}`)
       .then((res) => res.json())
       .then((data) => setTrips(data))
       .catch((err) => console.error(err));

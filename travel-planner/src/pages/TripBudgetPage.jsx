@@ -27,15 +27,16 @@ export default function TripBudget() {
     const tripTitle = location.state?.tripTitle || "กำลังโหลดชื่อทริป...";
     const tripDescription = location.state?.tripDescription || "";
     const trip = location.state?.trip || "";
+    const base_api = process.env.REACT_APP_API_URL;
     useEffect(() => {
         // ดึงรายชื่อสมาชิก
-        fetch(`http://localhost:3001/members?room_id=${room_id}`)
+        fetch(`${base_api}/members?room_id=${room_id}`)
             .then((res) => res.json())
             .then((members) => {
                 setTeamMembers(members);
 
                 // ดึงข้อมูลค่าใช้จ่ายของห้อง
-                fetch(`http://localhost:3001/room_expends/${room_id}`)
+                fetch(`${base_api}/room_expends/${room_id}`)
                     .then((res) => res.json())
                     .then((dat) => {
                         setRoomExpend(dat);
@@ -100,7 +101,7 @@ export default function TripBudget() {
         if (!window.confirm("คุณแน่ใจหรือไม่ว่าต้องการลบค่าใช้จ่ายนี้?")) return;
 
         try {
-            const response = await fetch(`http://localhost:3001/deleteBudget/${expend_id}`, {
+            const response = await fetch(`${base_api}/deleteBudget/${expend_id}`, {
                 method: "DELETE",
             });
 

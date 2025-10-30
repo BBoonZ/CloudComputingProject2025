@@ -30,6 +30,7 @@ export default function TripPlanPage() {
     const [shareStatus, setShareStatus] = useState("แบ่งปันแผนของคุณ")
     const [isShared, setIsShared] = useState(false); // ใช้ boolean
     const [shareLoading, setShareLoading] = useState(false);
+    const base_api = process.env.REACT_APP_API_URL;
 
    
 
@@ -42,7 +43,7 @@ export default function TripPlanPage() {
 
         try {
             // 2. ยิง API "DELETE"
-            const response = await fetch(`http://localhost:3001/deleteActivity/${itineraryId}`, {
+            const response = await fetch(`${base_api}/deleteActivity/${itineraryId}`, {
                 method: "DELETE",
             });
 
@@ -105,7 +106,7 @@ export default function TripPlanPage() {
 
     useEffect(() => {
         // 1. ดึงข้อมูลทริปหลัก (ชื่อ, วันที่)
-        fetch(`http://localhost:3001/trip_detail?room_id=${room_id}`)
+        fetch(`${base_api}/trip_detail?room_id=${room_id}`)
             .then((res) => res.json())
             .then((tripData) => {
                 setTrip(tripData);
@@ -118,7 +119,7 @@ export default function TripPlanPage() {
                     const daysArray = generateTripDays(tripData.start_date, tripData.end_date);
 
                     // 2.2 ดึง "กิจกรรม" (เนื้อหา)
-                    fetch(`http://localhost:3001/itineraries/${room_id}`)
+                    fetch(`${base_api}/itineraries/${room_id}`)
                         .then(res => res.json())
                         .then(apiActivities => {
 

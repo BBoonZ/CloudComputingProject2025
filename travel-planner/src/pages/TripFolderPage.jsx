@@ -27,11 +27,12 @@ export default function TripBudget() {
     const [uploadStatus, setUploadStatus] = useState("");
     const trip = location.state?.trip || "";
     const [files, setFiles] = useState([]);
+    const base_api = process.env.REACT_APP_API_URL;
 
     useEffect(() => {
         const fetchDocuments = async () => {
             try {
-                const res = await fetch(`http://localhost:3001/getDocuments/${room_id}`);
+                const res = await fetch(`${base_api}/getDocuments/${room_id}`);
                 const data = await res.json();
 
                 // แปลงข้อมูลจาก DB เป็นรูปแบบที่จะแสดงในหน้า
@@ -90,7 +91,7 @@ export default function TripBudget() {
             formData.append("file", file);
             formData.append("room_id", room_id);
 
-            const response = await fetch("http://localhost:3001/uploadDocument", {
+            const response = await fetch(`${base_api}/uploadDocument`, {
                 method: "POST",
                 body: formData,
             });
@@ -143,7 +144,7 @@ export default function TripBudget() {
         if (window.confirm(`คุณต้องการลบไฟล์ ${fileToDelete.name} จริงๆ หรือไม่? \n(การกระทำนี้จะลบไฟล์ออกจากระบบถาวร)`)) {
             try {
                 // 1. ยิง API ไปที่ Backend
-                const response = await fetch(`http://localhost:3001/deleteDocument/${fileToDelete.doc_id}`, {
+                const response = await fetch(`${base_api}/deleteDocument/${fileToDelete.doc_id}`, {
                     method: "DELETE",
                 });
 

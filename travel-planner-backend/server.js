@@ -714,6 +714,43 @@ app.get("/itineraries/:room_id",checkTripAccess, async (req, res) => {
   }
 });
 
+app.get("/itineraries_demo/:room_id", async (req, res) => {
+  try {
+    const { room_id } = req.params;
+
+    if (!room_id) {
+      return res.status(400).json({ message: "room_id is required" });
+    }
+
+    const activities = await Itinerary.findAll({
+      where: { room_id: room_id },
+      include: [
+        {
+          model: ItineraryDetail,
+          attributes: ['description', 'order_index'],
+          // ไม่ต้องใส่ as: '...' เพราะคุณไม่ได้ตั้ง as ใน index.js
+        }
+      ],
+      order: [
+        ['date', 'ASC'], // 1. เรียงตามวันที่
+        ['time', 'ASC'], // 2. เรียงตามเวลา
+        [ItineraryDetail, 'order_index', 'ASC'] // 3. เรียงรายละเอียดตามลำดับ
+      ]
+    });
+
+    if (!activities) {
+      // ถ้าไม่เจอก็ส่ง array ว่างกลับไป ไม่ใช่ error
+      return res.status(200).json([]);
+    }
+    
+    res.json(activities);
+
+  } catch (err) {
+    console.error("❌ Error fetching itineraries:", err);
+    res.status(500).send("Server error");
+  }
+});
+
 // PUT /editActivity/:itinerary_id - แก้ไขกิจกรรม
 app.put("/editActivity/:itinerary_id", async (req, res) => {
   const { itinerary_id } = req.params;

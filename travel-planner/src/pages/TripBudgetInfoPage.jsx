@@ -1,12 +1,98 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import EditTripModal from "../component/popup-editTripPlan";
+import ShareTripModal from "../component/popup-shareTripPlan";
+import BudgetModal from "../component/popup-BudgetTrip";
+
 import styles from "../css/tripBudget.module.css";
 import nav from "../css/main-nav.module.css";
 import tripTemplate from "../css/tripTemplate.module.css";
-import { useNavigate } from "react-router-dom";
-
 export default function TripBudget() {
     const navigate = useNavigate();
+    const location = useLocation();
+    const params = new URLSearchParams(location.search);
+    const room_id = params.get("room_id");
+    const [editModalOpen, setEditModalOpen] = useState(false);
+    const [shareModalOpen, setShareModalOpen] = useState(false);
 
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [selectedExpense, setSelectedExpense] = useState(null);
+    const [teamMembers, setTeamMembers] = useState([]);
+    const [roomExpend, setRoomExpend] = useState([]);
+    const [roomUseBudget, setRoomUseBudget] = useState();
+    const [expensesTeam, setExpensesTeam] = useState([]);
+    const tripTitle = location.state?.tripTitle || "กำลังโหลดชื่อทริป...";
+    const tripDescription = location.state?.tripDescription || "";
+    const trip = location.state?.trip || "";
+    const base_api = process.env.REACT_APP_API_URL;
+    useEffect(() => {
+        // ดึงรายชื่อสมาชิก
+        fetch(`${base_api}/members?room_id=${room_id}`)
+            .then((res) => res.json())
+            .then((members) => {
+                setTeamMembers(members);
+
+                // ดึงข้อมูลค่าใช้จ่ายของห้อง
+                fetch(`${base_api}/room_expends/${room_id}`)
+                    .then((res) => res.json())
+                    .then((dat) => {
+                        setRoomExpend(dat);
+
+                        // รวมค่าใช้จ่ายทั้งหมด
+                        const totalUsed = dat.Expends?.reduce((sum, item) => sum + Number(item.value), 0) || 0;
+                        setRoomUseBudget(totalUsed);
+
+                        // ===== คำนวณตาราง expensesTeam =====
+                        if (members.length > 0) {
+                            // 1️⃣ รวมจ่ายต่อคน (เฉพาะคนที่มี expend)
+                            const paidByMember = {};
+                            dat.Expends?.forEach((exp) => {
+                                const memberId = exp.member_id;
+                                if (!paidByMember[memberId]) {
+                                    paidByMember[memberId] = {
+                                        name: exp.Member?.member_name || "ไม่ระบุ",
+                                        paid: 0,
+                                    };
+                                }
+                                paidByMember[memberId].paid += Number(exp.value);
+                            });
+
+                            // 2️⃣ รวมคนที่ไม่มี expend ด้วย (paid = 0)
+                            members.forEach((m) => {
+                                if (!paidByMember[m.member_id]) {
+                                    paidByMember[m.member_id] = {
+                                        name: m.member_name,
+                                        paid: 0,
+                                    };
+                                }
+                            });
+
+                            // 3️⃣ คำนวณค่าเฉลี่ยที่ควรจ่าย (เอาจำนวนสมาชิกทั้งหมดมาหาร)
+                            const totalMembers = members.length;
+                            const avgPay = totalMembers > 0 ? totalUsed / totalMembers : 0;
+
+                            // 4️⃣ คำนวณ shouldPay และ diff
+                            const calculated = Object.values(paidByMember).map((member) => {
+                                const shouldPayRaw = avgPay - member.paid;
+                                const shouldPay = shouldPayRaw <= 0 ? 0 : shouldPayRaw;
+                                const diff = shouldPayRaw < 0 ? Math.abs(shouldPayRaw) : 0;
+
+                                return {
+                                    name: member.name,
+                                    paid: member.paid,
+                                    shouldPay,
+                                    diff,
+                                };
+                            });
+
+                            setExpensesTeam(calculated);
+                        }
+                    })
+                    .catch((err) => console.error(err));
+            })
+            .catch((err) => console.error(err));
+    }, [room_id]);
     const expenses = [
         {
             name: "ค่าตั๋วเครื่องบิน",
@@ -31,11 +117,11 @@ export default function TripBudget() {
         },
     ];
 
-    const expensesTeam = [
-        { name: "Jane Doe", paid: 5000, shouldPay: 1200, diff: 3200 },
-        { name: "John Smith", paid: 3000, shouldPay: 1200, diff: 1800 },
-        { name: "สมใจ", paid: 500, shouldPay: 1200, diff: -700 },
-    ];
+    // const expensesTeam = [
+    //     { name: "Jane Doe", paid: 5000, shouldPay: 1200, diff: 3200 },
+    //     { name: "John Smith", paid: 3000, shouldPay: 1200, diff: 1800 },
+    //     { name: "สมใจ", paid: 500, shouldPay: 1200, diff: -700 },
+    // ];
 
     return (
         <>
@@ -64,7 +150,7 @@ export default function TripBudget() {
             <main className={tripTemplate.tripPlanMain}>
                 <div className={tripTemplate.container}>
                     <div className={tripTemplate.planHeader}>
-                        <h1>ทริปตะลุยเชียงใหม่ 4 วัน 3 คืน</h1>
+                        <h1>{tripTitle}</h1>
                         <div className={tripTemplate.planMeta}>
                             <span className={tripTemplate.planDates}></span>
                             <button className={`${tripTemplate.btn} ${tripTemplate.btnBack}`} onClick={() => navigate("/tripmain")}>
@@ -77,15 +163,27 @@ export default function TripBudget() {
                     </div>
                     <div class={tripTemplate.info}>
                         <div class={tripTemplate.container}>
-                            <p>ทริปตะลุยเชียงใหม่ของคุณ สามารถวางแผนได้ทั้งการชมเมืองเก่า, เที่ยววัด, ไปแหล่งธรรมชาติ, หรือตะลุยกิจกรรมแอดเวนเจอร์ เช่น โหนสลิง, ล่องแก่ง, หรือขี่ ATV โดยมีสถานที่แนะนำ เช่น วัดพระธาตุดอยสุเทพ, ดอยอินทนนท์, ม่อนแจ่ม, ถนนคนเดินท่าแพ, โป่งแยง จังเกิ้ล โคสเตอร์ แอนด์ ซิปไลน์, และแกรนด์แคนยอน หางดง เพื่อให้คุณสนุกกับการผจญภัยในแบบที่ชอบ</p>
+                            <p>{tripDescription}</p>
                         </div>
                     </div>
                     <div className={tripTemplate.planLayout}>
                         <aside className={tripTemplate.planSidebar}>
-                            <div className={tripTemplate.sidebarItem} onClick={() => window.location.href = '/tripPlanInfo'}>
+                            <div className={tripTemplate.sidebarItem} onClick={() => navigate(`/tripPlanInfo?room_id=${room_id}`, {
+                                state: {
+                                    tripTitle: tripTitle,
+                                    tripDescription: tripDescription,
+                                    trip: trip
+                                }
+                            })}>
                                 <i className="fas fa-calendar-alt"></i> กำหนดการเดินทาง
                             </div>
-                            <div className={`${tripTemplate.sidebarItem} ${tripTemplate.active}`}>
+                            <div className={`${tripTemplate.sidebarItem} ${tripTemplate.active}`} onClick={() => navigate(`/tripBudgetInfo?room_id=${room_id}`, {
+                                state: {
+                                    tripTitle: tripTitle,
+                                    tripDescription: tripDescription,
+                                    trip: trip
+                                }
+                            })}>
                                 <i className="fas fa-wallet"></i> งบประมาณ
                             </div>
 
@@ -96,53 +194,23 @@ export default function TripBudget() {
                             <div className={styles.budgetSummary}>
                                 <div className={styles.summaryCard}>
                                     <h3>งบประมาณรวม</h3>
-                                    <p className={styles.summaryAmount}>฿ 20,000</p>
+                                    <p className={styles.summaryAmount}>฿{Number(roomExpend.total_budget)?.toLocaleString()}</p>
                                 </div>
                                 <div className={styles.summaryCard}>
                                     <h3>ใช้จ่ายไปแล้ว</h3>
-                                    <p className={`${styles.summaryAmount} ${styles.used}`}>฿ 8,500</p>
+                                    <p className={`${styles.summaryAmount} ${styles.used}`}>฿{roomUseBudget?.toLocaleString()}</p>
                                 </div>
                                 <div className={styles.summaryCard}>
                                     <h3>คงเหลือ</h3>
-                                    <p className={`${styles.summaryAmount} ${styles.remaining}`}>฿ 11,500</p>
+                                    <p className={`${styles.summaryAmount} ${styles.remaining}`}>฿{(roomExpend.total_budget - roomUseBudget)?.toLocaleString()}</p>
                                 </div>
                             </div>
 
-                            <div className={styles.budgetDetails}>
-                                <div className={styles.detailsHeader}>
-                                    <h2>จำนวนเงินที่จ่ายไปทั้งหมด</h2>
-                                </div>
 
-                                <table className={styles.expenseTable}>
-                                    <thead>
-                                        <tr>
-                                            <th>รายชื่อ</th>
-                                            <th>จำนวนเงินที่จ่ายไปทั้งหมด</th>
-                                            <th>จำนวนเงินที่ควรจ่าย</th>
-                                            <th>ควรได้รับคืน / ยังต้องจ่ายเพิ่ม</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {expensesTeam.map((item, index) => (
-                                            <tr key={index}>
-                                                <td>{item.name}</td>
-                                                <td>{item.paid.toLocaleString()} B</td>
-                                                <td>{item.shouldPay.toLocaleString()} B</td>
-                                                <td
-                                                    className={item.diff >= 0 ? styles.td1 : styles.td2}
-                                                >
-                                                    {Math.abs(item.diff).toLocaleString()} B
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
 
                             <div className={styles.budgetDetails}>
                                 <div className={styles.detailsHeader}>
                                     <h2>รายการค่าใช้จ่าย</h2>
-
                                 </div>
 
                                 <table className={styles.expenseTable}>
@@ -151,19 +219,14 @@ export default function TripBudget() {
                                             <th>รายการ</th>
                                             <th>หมวดหมู่</th>
                                             <th>จำนวนเงิน</th>
-                                            <th>จ่ายโดย</th>
-                                            <th>วัน/เวลา</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {expenses.map((item, index) => (
+                                        {roomExpend?.Expends?.map((item, index) => (
                                             <tr key={index}>
-                                                <td>{item.name}</td>
-                                                <td>{item.category}</td>
-                                                <td>{item.amount}</td>
-                                                <td>{item.paidBy}</td>
-                                                <td>{item.date}</td>
-
+                                                <td>{item.description}</td>
+                                                <td>{item.type}</td>
+                                                <td>{item.value}</td>
                                             </tr>
                                         ))}
                                     </tbody>

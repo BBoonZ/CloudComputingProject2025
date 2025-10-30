@@ -208,7 +208,7 @@ export default function SettingPage() {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/');
   };
 
   useEffect(() => {
@@ -244,7 +244,7 @@ export default function SettingPage() {
 
         <div className={userStyles.profile}>
           <img
-            src={userData.profile_uri || "https://img.poki-cdn.com/cdn-cgi/image/q=78,scq=50,width=1200,height=1200,fit=cover,f=png/5f8d164d8269cffacc89422054b94c70/roblox.png"}
+            src={userData.profile_uri || "https://travel-planner-profile-uploads-ab7bb12a.s3.us-east-1.amazonaws.com/istockphoto-1196083861-612x612.jpg"}
             alt="User Profile"
             className={userStyles.profilePic}
             style={{ cursor: 'pointer' }}
@@ -252,7 +252,7 @@ export default function SettingPage() {
             title="คลิกเพื่อเปลี่ยนรูปโปรไฟล์"
             onError={(e) => {
               e.target.onerror = null;
-              e.target.src = "https://img.poki-cdn.com/cdn-cgi/image/q=78,scq=50,width=1200,height=1200,fit=cover,f=png/5f8d164d8269cffacc89422054b94c70/roblox.png";
+              e.target.src = "https://travel-planner-profile-uploads-ab7bb12a.s3.us-east-1.amazonaws.com/istockphoto-1196083861-612x612.jpg";
             }}
           />
         </div>

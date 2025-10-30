@@ -5,6 +5,15 @@ import { useAuth } from '../context/AuthContext';
 import styles from '../css/LoginPage.module.css';
 const config = { region: process.env.REACT_APP_AWS_REGION  }
 
+function generateUserId(length = 9) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
+
 const cognitoClient = new CognitoIdentityProviderClient(config);
 const clientId = process.env.REACT_APP_COGNITO_CLIENT_ID
 export default function LoginPage() {
@@ -26,48 +35,64 @@ export default function LoginPage() {
   const handleLogin = async () => {
     setError("");
 
-    try {
-      const input = {
-        "AuthFlow": "USER_PASSWORD_AUTH",
-        "AuthParameters": {
-          "USERNAME": email,
-          "PASSWORD": password,
-        },
-        "ClientId": clientId,
-      };
-      const command = new InitiateAuthCommand(input);
-      const response = await cognitoClient.send(command);
+    // try {
+    //   const input = {
+    //     "AuthFlow": "USER_PASSWORD_AUTH",
+    //     "AuthParameters": {
+    //       "USERNAME": email,
+    //       "PASSWORD": password,
+    //     },
+    //     "ClientId": clientId,
+    //   };
+    //   const command = new InitiateAuthCommand(input);
+    //   const response = await cognitoClient.send(command);
 
-      if (response.ChallengeName === "NEW_PASSWORD_REQUIRED") {
-        setSession(response.Session);
-        setView('otp');
-      }
-      else if (response['$metadata']['httpStatusCode'] === 200) {
-        login(email, response.AuthenticationResult.AccessToken);
-        navigate('/');
-      }
-    } catch (error) {
-      // Handle specific Cognito errors
-      switch (error.name) {
-        case 'NotAuthorizedException':
-          handleError("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
-          break;
-        case 'UserNotFoundException':
-          handleError("ไม่พบบัญชีผู้ใช้นี้");
-          break;
-        case 'UserNotConfirmedException':
-          handleError("กรุณายืนยันอีเมลก่อนเข้าสู่ระบบ");
-          break;
-        default:
-          handleError("เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง");
-      }
-    }
+    //   if (response.ChallengeName === "NEW_PASSWORD_REQUIRED") {
+    //     setSession(response.Session);
+    //     setView('otp');
+    //   }
+    //   else if (response['$metadata']['httpStatusCode'] === 200) {
+    //     login(email, response.AuthenticationResult.AccessToken);
+    //     navigate('/');
+    //   }
+    // } catch (error) {
+    //   // Handle specific Cognito errors
+    //   switch (error.name) {
+    //     case 'NotAuthorizedException':
+    //       handleError("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
+    //       break;
+    //     case 'UserNotFoundException':
+    //       handleError("ไม่พบบัญชีผู้ใช้นี้");
+    //       break;
+    //     case 'UserNotConfirmedException':
+    //       handleError("กรุณายืนยันอีเมลก่อนเข้าสู่ระบบ");
+    //       break;
+    //     default:
+    //       handleError("เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง");
+    //   }
+    // }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("เข้าสู่ระบบ...");
-    // TODO: ต่อ Cognito หรือ API login ตรงนี้ได้
+    
+    const user = {
+      user_id: generateUserId(), // ฟังก์ชันสร้าง user id
+      email,
+      username: email.split('@')[0],
+      name: '',
+      surname: '',
+      phone_number: ''
+    };
+  
+    console.log("เข้าสู่ระบบ...", user);
+  
+    // เก็บข้อมูลลง localStorage
+    localStorage.setItem('userData', JSON.stringify(user));
+    localStorage.setItem('userEmail', email);
+  
+    navigate("/");
   };
 
   return (

@@ -6,7 +6,7 @@
 }
 
 .profile img {
-    width: 10%;
+    width: 15%;
     border: none;
     border-radius: 30px;
 }
@@ -26,7 +26,7 @@
 }
 
 .settingsContainer {
-    max-width: 800px;
+    max-width: 1000px;
     margin: 2rem auto;
     padding: 2rem;
     background-color: #fff;

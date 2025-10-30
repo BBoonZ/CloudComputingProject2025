@@ -81,61 +81,61 @@ export default function TripMainPage() {
 
   // --- Function สร้างทริป (จากไฟล์คุณ, **ใช้ Fetch ตรงไปก่อน**) ---
   // *** TODO: ควรเปลี่ยนไปใช้ tripService และใส่ Logic S3 Upload ***
-//   const createTrip = async (e) => {
-//     e.preventDefault(); // <-- ต้องมี e.preventDefault() ใน onSubmit
-//     // setUploading(true); // <-- ถ้าทำ S3
-//     const userData = JSON.parse(localStorage.getItem('userData'));
+  //   const createTrip = async (e) => {
+  //     e.preventDefault(); // <-- ต้องมี e.preventDefault() ใน onSubmit
+  //     // setUploading(true); // <-- ถ้าทำ S3
+  //     const userData = JSON.parse(localStorage.getItem('userData'));
 
-// // ดึง user_id
-//     const userId = userData?.user_id;
-//     // --- ส่วน S3 Upload (ยังไม่ใส่) ---
-//     let imageUrlToSend = null; // <-- ค่าเริ่มต้นคือไม่มีรูป
-//     // if (selectedFile) { ... upload to S3 ... imageUrlToSend = s3Url; }
-//     // else { ... }
-//     // --------------------------------
+  // // ดึง user_id
+  //     const userId = userData?.user_id;
+  //     // --- ส่วน S3 Upload (ยังไม่ใส่) ---
+  //     let imageUrlToSend = null; // <-- ค่าเริ่มต้นคือไม่มีรูป
+  //     // if (selectedFile) { ... upload to S3 ... imageUrlToSend = s3Url; }
+  //     // else { ... }
+  //     // --------------------------------
 
-//     try {
-//       // เตรียมข้อมูลจาก State newTripData
-//       const dataToSend = {
-//         name: newTripData.name,
-//         detail: newTripData.detail,
-//         start_date: newTripData.start_date, // จาก flatpickr
-//         end_date: newTripData.end_date,   // จาก flatpickr
-//         budget: newTripData.budget === '' ? null : newTripData.budget, // ส่ง null ถ้าว่าง
-//         image: imageUrlToSend, // <-- ส่ง URL จาก S3 (ตอนนี้เป็น null)
-//         user_id: userId
-//       };
+  //     try {
+  //       // เตรียมข้อมูลจาก State newTripData
+  //       const dataToSend = {
+  //         name: newTripData.name,
+  //         detail: newTripData.detail,
+  //         start_date: newTripData.start_date, // จาก flatpickr
+  //         end_date: newTripData.end_date,   // จาก flatpickr
+  //         budget: newTripData.budget === '' ? null : newTripData.budget, // ส่ง null ถ้าว่าง
+  //         image: imageUrlToSend, // <-- ส่ง URL จาก S3 (ตอนนี้เป็น null)
+  //         user_id: userId
+  //       };
 
-//       // ใช้ Base URL ถ้าตั้งค่าไว้
-//       const apiUrl = 'http://localhost:3001';
+  //       // ใช้ Base URL ถ้าตั้งค่าไว้
+  //       const apiUrl = 'http://localhost:3001';
 
-//       const res = await fetch(`${apiUrl}/createplan`, { // <-- เรียก Endpoint สร้างทริป
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify(dataToSend),
-//       });
+  //       const res = await fetch(`${apiUrl}/createplan`, { // <-- เรียก Endpoint สร้างทริป
+  //         method: "POST",
+  //         headers: { "Content-Type": "application/json" },
+  //         body: JSON.stringify(dataToSend),
+  //       });
 
-//       if (!res.ok) {
-//         const errorData = await res.json();
-//         throw new Error(errorData.message || 'Failed to create trip');
-//       }
+  //       if (!res.ok) {
+  //         const errorData = await res.json();
+  //         throw new Error(errorData.message || 'Failed to create trip');
+  //       }
 
-//       const data = await res.json();
-//       console.log("✅ Trip created:", data);
-//       alert("สร้างทริปสำเร็จ!");
-//       closeModal(); // ปิด Modal
-//       fetchTrips(); // <-- ✨ สำคัญ: เรียก fetchTrips ใหม่เพื่อโหลดรายการล่าสุด!
+  //       const data = await res.json();
+  //       console.log("✅ Trip created:", data);
+  //       alert("สร้างทริปสำเร็จ!");
+  //       closeModal(); // ปิด Modal
+  //       fetchTrips(); // <-- ✨ สำคัญ: เรียก fetchTrips ใหม่เพื่อโหลดรายการล่าสุด!
 
-//     } catch (err) {
-//       console.error("❌ Error creating plan:", err);
-//       alert(`เกิดข้อผิดพลาดในการสร้างทริป: ${err.message}`);
-//     } finally {
-//       // setUploading(false); // <-- ถ้าทำ S3
-//     }
-//   };
+  //     } catch (err) {
+  //       console.error("❌ Error creating plan:", err);
+  //       alert(`เกิดข้อผิดพลาดในการสร้างทริป: ${err.message}`);
+  //     } finally {
+  //       // setUploading(false); // <-- ถ้าทำ S3
+  //     }
+  //   };
 
-const createTrip = async (e) => {
-    e.preventDefault(); 
+  const createTrip = async (e) => {
+    e.preventDefault();
     const userData = JSON.parse(localStorage.getItem('userData'));
     const userId = userData?.user_id;
 
@@ -153,7 +153,7 @@ const createTrip = async (e) => {
     // 3. ใส่ File object ลงไป (ถ้ามี)
     // Backend ของคุณจะมองหาไฟล์นี้ด้วย key 'image'
     if (newTripData.image) {
-      formData.append('image', newTripData.image); 
+      formData.append('image', newTripData.image);
     }
 
     // setUploading(true); // <-- เอามาไว้ตรงนี้ถ้าจะใช้
@@ -161,13 +161,13 @@ const createTrip = async (e) => {
     try {
       const apiUrl = 'http://localhost:3001';
 
-      const res = await fetch(`${apiUrl}/createplan`, { 
+      const res = await fetch(`${apiUrl}/createplan`, {
         method: "POST",
         // 4. ลบ headers: { "Content-Type": "application/json" } ออก
         //    Browser จะตั้งค่า Content-Type เป็น 'multipart/form-data' ให้เอง
-        
+
         // 5. ส่ง formData ทั้งก้อนเป็น body
-        body: formData, 
+        body: formData,
       });
 
       if (!res.ok) {
@@ -178,8 +178,8 @@ const createTrip = async (e) => {
       const data = await res.json();
       console.log("✅ Trip created:", data);
       alert("สร้างทริปสำเร็จ!");
-      closeModal(); 
-      fetchTrips(); 
+      closeModal();
+      fetchTrips();
 
     } catch (err) {
       console.error("❌ Error creating plan:", err);
@@ -220,14 +220,14 @@ const createTrip = async (e) => {
   };
 
   // --- useEffect ดึงข้อมูลครั้งแรก (จากไฟล์เพื่อน, ปรับปรุง) ---
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/login'); // Redirect ถ้ายังไม่ Login
-      return; // หยุดการทำงาน
-    }
-    fetchTrips(); // เรียก fetch ตอน Component โหลด
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated, navigate]); // ทำงานเมื่อสถานะ Login เปลี่ยน
+  // useEffect(() => {
+  //   if (!isAuthenticated) {
+  //     navigate('/login'); // Redirect ถ้ายังไม่ Login
+  //     return; // หยุดการทำงาน
+  //   }
+  //   fetchTrips(); // เรียก fetch ตอน Component โหลด
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [isAuthenticated, navigate]); // ทำงานเมื่อสถานะ Login เปลี่ยน
 
   // --- Handlers สำหรับ Search, Sort, Filter (จากไฟล์เพื่อน) ---
   const handleSearch = (query) => {
@@ -265,54 +265,53 @@ const createTrip = async (e) => {
 
   // --- useEffect สำหรับ Flatpickr **ใน Modal** (จากไฟล์คุณ, ปรับปรุง) ---
   useEffect(() => {
-        flatpickr("#tripRange", {
-  mode: "range",
-  dateFormat: "Y-m-d",
-  minDate: "today",
-  locale: "th",
-  onClose: function (selectedDates, dateStr, instance) {
-    if (selectedDates.length === 2) {
-      const start = selectedDates[0];
-      const end = selectedDates[1];
+    flatpickr("#tripRange", {
+      mode: "range",
+      dateFormat: "Y-m-d",
+      minDate: "today",
+      locale: "th",
+      onClose: function (selectedDates, dateStr, instance) {
+        if (selectedDates.length === 2) {
+          const start = selectedDates[0];
+          const end = selectedDates[1];
 
-      // เก็บเป็น ISO date ให้ backend
-      setNewTripData({
-        ...newTripData,
-        start_date: start.toISOString().split("T")[0], // "YYYY-MM-DD"
-        end_date: end.toISOString().split("T")[0],     // "YYYY-MM-DD"
-      });
+          // เก็บเป็น ISO date ให้ backend
+          setNewTripData({
+            ...newTripData,
+            start_date: start.toISOString().split("T")[0], // "YYYY-MM-DD"
+            end_date: end.toISOString().split("T")[0],     // "YYYY-MM-DD"
+          });
 
-      // สร้างข้อความ display ไทยเหมือนเดิม
-      const monthsTH = [
-        "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
-        "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
-      ];
+          // สร้างข้อความ display ไทยเหมือนเดิม
+          const monthsTH = [
+            "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
+            "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
+          ];
 
-      const dayStart = start.getDate();
-      const monthStart = monthsTH[start.getMonth()];
-      const yearStart = start.getFullYear() + 543;
+          const dayStart = start.getDate();
+          const monthStart = monthsTH[start.getMonth()];
+          const yearStart = start.getFullYear() + 543;
 
-      const dayEnd = end.getDate();
-      const monthEnd = monthsTH[end.getMonth()];
-      const yearEnd = end.getFullYear() + 543;
+          const dayEnd = end.getDate();
+          const monthEnd = monthsTH[end.getMonth()];
+          const yearEnd = end.getFullYear() + 543;
 
-      let displayText = "";
-      if (monthStart === monthEnd && yearStart === yearEnd) {
-        displayText = `${dayStart} - ${dayEnd} ${monthStart} ${yearStart}`;
-      } else {
-        displayText = `${dayStart} ${monthStart} ${yearStart} - ${dayEnd} ${monthEnd} ${yearEnd}`;
+          let displayText = "";
+          if (monthStart === monthEnd && yearStart === yearEnd) {
+            displayText = `${dayStart} - ${dayEnd} ${monthStart} ${yearStart}`;
+          } else {
+            displayText = `${dayStart} ${monthStart} ${yearStart} - ${dayEnd} ${monthEnd} ${yearEnd}`;
+          }
+
+          instance.input.value = displayText;
+        }
       }
-
-      instance.input.value = displayText;
-    }
-  }
-});
-        }, [showModal]); // <-- ให้ Effect ทำงานเมื่อ showModal เปลี่ยน
+    });
+  }, [showModal]); // <-- ให้ Effect ทำงานเมื่อ showModal เปลี่ยน
 
   // --- JSX ---
   return (
     <>
-      {/* Header (จากไฟล์คุณ) */}
       <header className={nav.header}>
         <div className={nav.container}>
           <div className={nav.logo}>
@@ -322,15 +321,13 @@ const createTrip = async (e) => {
             <ul>
               <li><Link to="/tripMain">หน้าหลัก</Link></li>
               <li><Link to="/tripManage">แผนการเดินทางของฉัน</Link></li>
-              {/* ปุ่มสร้างแผน (จากไฟล์คุณ) */}
               <li><button className={nav.btnback} onClick={openModal}>สร้างแผนการเดินทาง</button></li>
-              {/* รูป Profile (จากไฟล์คุณ) */}
-              <li> {/* แก้ไข: ใส่ <li> ครอบ */}
+              <li>
                 <img
-                  src="URL_PROFILE_PIC" // <-- ควรดึงมาจาก User Context หรือ State
+                  src="https://travel-planner-profile-uploads-ab7bb12a.s3.us-east-1.amazonaws.com/istockphoto-1196083861-612x612.jpg"
                   alt="User Profile"
                   className={nav.profilePic}
-                  onClick={() => navigate("/user")} // <-- ใช้ navigate แทน window.location
+                  onClick={() => window.location.href = "/user"}
                 />
               </li>
             </ul>

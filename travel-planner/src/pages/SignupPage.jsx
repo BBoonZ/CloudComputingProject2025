@@ -46,16 +46,16 @@ export default function SignupPage() {
       }
 
 
-      const command = new SignUpCommand(input);
-      const response = await cognitoClient.send(command);
+      // const command = new SignUpCommand(input);
+      // const response = await cognitoClient.send(command);
 
-      if (response.$metadata.httpStatusCode === 200) {
+      // if (response.$metadata.httpStatusCode === 200) {
 
         // Show success message
         setAlertMessage("ลงทะเบียนสำเร็จ กรุณายืนยันอีเมล");
         setShowAlert(true);
         setShowVerification(true);
-      }
+      // }
     } catch (error) {
       alert("Error signing up: " + error.message);
     }
@@ -71,10 +71,10 @@ export default function SignupPage() {
         ConfirmationCode: verificationCode,
       };
 
-      const command = new ConfirmSignUpCommand(input);
-      const response = await cognitoClient.send(command);
+      // const command = new ConfirmSignUpCommand(input);
+      // const response = await cognitoClient.send(command);
 
-      if (response.$metadata.httpStatusCode === 200) {
+      // if (response.$metadata.httpStatusCode === 200) {
         // ✅ เมื่อยืนยันสำเร็จให้ไปหน้า login ทันที
         
         // Create user through API
@@ -87,7 +87,7 @@ export default function SignupPage() {
         });
         alert("ยืนยันอีเมลสำเร็จ! กรุณาเข้าสู่ระบบ");
         navigate("/login");
-      }
+      // }
     } catch (error) {
       alert("Error verifying code: " + error.message);
     }

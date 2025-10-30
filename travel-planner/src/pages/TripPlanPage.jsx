@@ -106,49 +106,82 @@ export default function TripPlanPage() {
     };
 
     useEffect(() => {
-        // 1. ดึงข้อมูลทริปหลัก (ชื่อ, วันที่)
-        fetch(`${base_api}/trip_detail?room_id=${room_id}`)
-            .then((res) => res.json())
-            .then((tripData) => {
-                setTrip(tripData);
-                setTitle(tripData.title);           // <-- ผมแก้ bug สลับตัวแปรให้
-                setDescription(tripData.description); // <-- ผมแก้ bug สลับตัวแปรให้
+        // --- 1. (เพิ่ม) ดึง ID ผู้ใช้สำหรับ "แสดงบัตร" ---
+        // (สมมติว่าคุณเก็บ user_id ไว้ใน localStorage ตอนล็อกอิน)
+        const userDataString = localStorage.getItem('userData'); // 1. ดึง "ก้อน" JSON
+        const userData = userDataString ? JSON.parse(userDataString) : {}; // 2. แปลงเป็น Object
+        const currentUserId = userData.user_id;
+        const authHeaders = {
+            'x-user-id': currentUserId || ''
+        };
 
-                // 2. ถ้าข้อมูลวันที่มีครบ
-                if (tripData && tripData.start_date && tripData.end_date) {
-                    // 2.1 สร้าง "วัน" เปล่าๆ (โครง)
-                    const daysArray = generateTripDays(tripData.start_date, tripData.end_date);
+        // --- 2. (เพิ่ม) ฟังก์ชันจัดการ Error (เด้งออก) ---
+        const handleAuthError = (err) => {
+            console.error("Access Denied:", err.message);
+            alert("คุณไม่มีสิทธิ์เข้าถึงทริปนี้");
+            navigate('/'); // เด้งกลับหน้าแรก
+        };
 
-                    // 2.2 ดึง "กิจกรรม" (เนื้อหา)
-                    fetch(`${base_api}/itineraries/${room_id}`)
-                        .then(res => res.json())
-                        .then(apiActivities => {
+        // 3. (แก้ไข) fetch ข้อมูลทริปหลัก (ใส่ headers)
+        fetch(`${base_api}/trip_detail?room_id=${room_id}`, { headers: authHeaders }) // <--- เพิ่ม headers
+            .then((res) => {
+                // --- 4. (เพิ่ม) ตรวจสอบสิทธิ์ ---
+                if (!res.ok) {
+                    // ถ้าโดน Block (401/403) หรือหาไม่เจอ (404)
+                    if (res.status === 401 || res.status === 403 || res.status === 404) {
+                        throw new Error('Forbidden: Access Denied'); // โยน Error ให้ .catch()
+                    }
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
+                return res.json();
+                // --------------------------
+            })
+            .then((tripData) => {
+                setTrip(tripData);
+                setTitle(tripData.title);
+                setDescription(tripData.description); 
 
-                            // 2.3 เอา "เนื้อหา" มายัดใส่ "โครง"
-                            const populatedDays = daysArray.map(day => {
-                                // กรองกิจกรรมเฉพาะวันที่ตรงกัน
-                                const activitiesForThisDay = apiActivities.filter(
-                                    act => act.date === day.real // day.real คือ "YYYY-MM-DD"
-                                );
+                if (tripData && tripData.start_date && tripData.end_date) {
+                    const daysArray = generateTripDays(tripData.start_date, tripData.end_date);
 
-                                return {
-                                    ...day,
-                                    activities: activitiesForThisDay // ยัดกิจกรรมที่ดึงมาทับ array ว่าง
-                                };
-                            });
-
-                            setTrips(populatedDays); // <-- อัปเดต state ด้วยข้อมูลที่สมบูรณ์
+                    // 5. (แก้ไข) ดึง "กิจกรรม" (ใส่ headers)
+                    fetch(`${base_api}/itineraries/${room_id}`, { headers: authHeaders }) // <--- เพิ่ม headers
+                        .then(res => {
+                            if (!res.ok){ 
+                                alert("คุณไม่มีสิทธิ์เข้าถึงทริปนี้");
+                                navigate('/');
+                            } // เช็คเผื่อไว้
+                            return res.json()
                         })
-                        .catch(err => console.error("Error fetching activities:", err));
+                        .then(apiActivities => {
+                            const populatedDays = daysArray.map(day => {
+                                const activitiesForThisDay = apiActivities.filter(
+                                    act => act.date === day.real
+                                );
+                                return { ...day, activities: activitiesForThisDay };
+                            });
+                            setTrips(populatedDays);
+                        })
+                        .catch(err => console.error("Error fetching activities:", err)); 
+                }
+            })
+            .catch((err) => {
+                // --- 6. (แก้ไข) catch ที่จะจัดการการเด้งออก ---
+                if (err.message.includes('Forbidden')) {
+                    handleAuthError(err);
+                } else {
+                    console.error("Error fetching trip details:", err);
+                    // (อาจจะเด้งออกเหมือนกัน ถ้าหาทริปไม่เจอ)
+                    handleAuthError(err); 
+                }
+                // --------------------------------------
+            });
 
-                }
-            })
-            .catch((err) => console.error(err));
+        document.body.style.backgroundColor = "";
+        return () => { document.body.style.backgroundColor = "#f5f5f5"; }
 
-        document.body.style.backgroundColor = "";
-        return () => { document.body.style.backgroundColor = "#f5f5f5"; }
-
-    }, [room_id]);
+        // 7. (เพิ่ม) ใส่ dependency 
+    }, [room_id, base_api, navigate]);
 
     console.log(trip);
     console.log(totalDays);

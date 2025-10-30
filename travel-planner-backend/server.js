@@ -12,7 +12,57 @@ const { S3Client, PutObjectCommand, DeleteObjectCommand } = require("@aws-sdk/cl
 //     cb(null, Date.now() + path.extname(file.originalname));
 //   },
 // });
+const checkTripAccess = async (req, res, next) => {
+  try {
+    // 1. หา "บัตรประชาชน" (ID ของคนที่ยิง API มา)
+    // เราจะตกลงกันว่าให้ Frontend ส่งมาใน Header ชื่อ 'x-user-id'
+    const userId = req.headers['x-user-id']; 
+    if (!userId) {
+      // ถ้าไม่ส่งบัตรมา = ไม่ได้รับอนุญาต
+      return res.status(401).json({ message: "Unauthorized: Missing user ID header" });
+    }
 
+    // 2. หา "ห้อง" ที่เขากำลังจะเข้า
+    // (เช็คทั้ง 2 ที่ เผื่อ API ส่ง room_id มาไม่เหมือนกัน)
+    const roomId = req.params.room_id || req.body.room_id || req.params.id; // (ปรับปรุง: เพิ่มเผื่อไว้)
+    if (!roomId) {
+      return res.status(400).json({ message: "Bad Request: Missing room ID" });
+    }
+
+    // 3. ตรวจสอบ: เขาเป็น "เจ้าของห้อง" (Owner) หรือไม่?
+    const planRoom = await Planroom.findByPk(roomId, {
+      attributes: ['user_id']
+    });
+
+    if (!planRoom) {
+      return res.status(404).json({ message: "Trip not found" });
+    }
+
+    if (planRoom.user_id === userId) {
+      return next(); // เป็น Owner -> เชิญผ่าน!
+    }
+
+    // 4. ตรวจสอบ: เขาเป็น "แขกที่ถูกเชิญ" (ในตาราง Access) หรือไม่?
+    const accessEntry = await Access.findOne({
+      where: {
+        room_id: roomId,
+        user_id: userId
+      }
+    });
+
+    if (accessEntry) {
+      return next(); // มีชื่อใน Access -> เชิญผ่าน!
+    }
+
+    // 5. ถ้าไม่ใช่ทั้ง 2 อย่าง = ห้ามเข้า
+    console.warn(`🚫 BLOCK! User ${userId} tried to access room ${roomId}.`);
+    return res.status(403).json({ message: "Forbidden: You do not have access to this trip" });
+
+  } catch (err) {
+    console.error("Error in checkTripAccess middleware:", err);
+    res.status(500).json({ error: "Server error during access check" });
+  }
+};
 // const upload = multer({ storage });
 
 
@@ -625,7 +675,7 @@ app.post("/addActivity", async (req, res) => {
   }
 });
 
-app.get("/itineraries/:room_id", async (req, res) => {
+app.get("/itineraries/:room_id",checkTripAccess, async (req, res) => {
   try {
     const { room_id } = req.params;
 

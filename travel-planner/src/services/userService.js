@@ -28,6 +28,8 @@ export const userService = {
       }
     }
 
+
+    
     try {
       const response = await axios.get(`${API_URL}/api/users/${email}`);
       if (response.data.status === 'success') {

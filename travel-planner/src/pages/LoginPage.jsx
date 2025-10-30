@@ -3,7 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { CognitoIdentityProviderClient, InitiateAuthCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { useAuth } from '../context/AuthContext';
 import styles from '../css/LoginPage.module.css';
+import axios from 'axios';
+
 const config = { region: process.env.REACT_APP_AWS_REGION  }
+const API_URL = process.env.REACT_APP_API_URL;
 
 function generateUserId(length = 9) {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -73,26 +76,36 @@ export default function LoginPage() {
     // }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("เข้าสู่ระบบ...");
     
-    const user = {
-      user_id: generateUserId(), // ฟังก์ชันสร้าง user id
-      email,
-      username: email.split('@')[0],
-      name: '',
-      surname: '',
-      phone_number: ''
-    };
+    // const user = {
+    //   user_id: generateUserId(), // ฟังก์ชันสร้าง user id
+    //   email,
+    //   username: email.split('@')[0],
+    //   name: '',
+    //   surname: '',
+    //   phone_number: ''
+    // };
   
-    console.log("เข้าสู่ระบบ...", user);
+    // console.log("เข้าสู่ระบบ...", user);
   
     // เก็บข้อมูลลง localStorage
-    localStorage.setItem('userData', JSON.stringify(user));
-    localStorage.setItem('userEmail', email);
+    // localStorage.setItem('userData', JSON.stringify(user));
+    // localStorage.setItem('userEmail', email);
   
-    navigate("/tripMain");
+    try {
+      const response = await axios.get(`${API_URL}/api/users/${email}`);
+      
+      if (response.data.status === 'success') {
+        localStorage.setItem('userData', JSON.stringify(response.data.data));
+        localStorage.setItem('userEmail', email);
+      }
+      navigate("/tripmain");
+    } catch (error) {
+      console.error("Login failed:", error);
+    }
   };
 
   return (
